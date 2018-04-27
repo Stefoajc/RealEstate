@@ -1,0 +1,596 @@
+﻿@model RealEstate.ViewModels.WebMVC.CreatePropertyViewModel
+
+@{
+    ViewBag.Title = "Създай Къща";
+}
+
+<link type="text/css" href="/css/modal.css" rel="stylesheet" />
+<style type="text/css">
+    #rentalInfo {
+        border: 2px;
+        border-color: black;
+        border-style: solid;
+        margin: 20px;
+        padding-top: 10px;
+        padding-left: 10px;
+    }
+
+    .propertyInfo, .addressField {
+    }
+
+
+    .basicPropertyInfo {
+        margin-bottom: 20px;
+    }
+
+    #title, .propertyAdditionalInfoLbl, .rentalAdditionalInfoLabel {
+        text-align: center;
+        display: block;
+    }
+
+    .rentalAdditionalInfoTextArea {
+        max-height: 100px;
+        height: 100%;
+    }
+
+    .rentalAdditionalInfoTextArea {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+    }
+
+    .basicPropertyInfo, .additionalInfo {
+        max-width: 100%;
+        height: 100%;
+    }
+
+    .propertyAdditionalInfo {
+        margin-bottom: 20px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .topright {
+        position: relative;
+        top: -33px;
+        right: 16px;
+        font-size: 18px;
+        color: red;
+        cursor: pointer;
+    }
+
+    .imagePlaceholder, .imagePlaceholderSlider {
+        margin: 0 5px 5px 0;
+        width: 80px;
+        height: 80px;
+        padding: 0;
+        position: relative;
+    }
+
+    .imageFieldset, .imageFieldsetSlider, .propertyextras, .owner-info {
+        display: block;
+        padding-top: 0.35em;
+        padding-bottom: 0.625em;
+        border: 2px groove;
+    }
+
+    legend {
+        border-bottom: 0px;
+        width: auto;
+        margin-bottom: 0px;
+        margin-left: 20px;
+    }
+
+    #gallery, #gallerySlider {
+        height: 170px;
+        overflow: hidden;
+    }
+
+    .propertyInfo {
+        margin-top: 20px;
+    }
+
+    .add_rentalinfo {
+        margin-bottom: 10px;
+    }
+
+    .rentperiods {
+        margin-top: 10px
+    }
+
+    .additionalDescriptors {
+        width: 47%;
+        font-size: 14px;
+        line-height: 1.42857143;
+        height: 40px;
+    }
+
+    .propertyDescriptors {
+        margin-top: 20px;
+        height: 410px;
+        overflow-y: auto;
+    }
+
+    .rentalDescriptors {
+        margin-top: 20px;
+        height: 80px;
+        overflow-y: auto;
+    }
+
+    .attributes {
+        padding-bottom: 7px;
+    }
+
+    #google-map {
+        height: 200px;
+    }
+</style>
+
+<h2 id="title">Създай Къща</h2>
+
+
+@using (Html.BeginForm(
+    "Create", "Properties", FormMethod.Post, new { enctype = "multipart/form-data", id = "create-property-form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="row basicPropertyInfo">
+            <div class="col-md-6 col-xs-12">
+                <section class="propertyInfo">
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4"> Вид имот <span style="color: red">*</span></label>
+                        <div class="col-md-8">
+                            @Html.DropDownList("PropertyTypeId", null, htmlAttributes: new {@class = "form-control chosen-select", id = "property-type", disabled = "disabled" })
+                            @Html.ValidationMessageFor(model => model.PropertyTypeId, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+
+                    @*<div class="form-group">
+                            @Html.Label("Сезон на имота", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-8">
+                                @Html.DropDownList("PropertySeasonId", null, htmlAttributes: new { @class = "form-control chosen-select", id = "property-season" })
+                                @Html.ValidationMessageFor(model => model.PropertySeasonId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>*@
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4"> Площ </label>
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.Area, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Area, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4"> Име на имота <span style="color: red">*</span></label>
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.PropertyName, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.PropertyName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4"> Продажна цена </label>
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.SellingPrice, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.SellingPrice, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4"> Наемна цена </label>
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.RentalPrice, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.RentalPrice, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </section>
+
+                <section class="addressField">
+                    <div class="form-group">
+                        <label class="control-label col-md-4"> Държава </label>
+                        <div class="col-md-8">
+                            @Html.DropDownList("CountryId", null, htmlAttributes: new { @class = "form-control", id = "CountryId" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4"> Населено място <span style="color: red">*</span></label>
+                        <div class="col-md-8">
+                            <select name="Address.CityId" class="form-control" id="property-City">
+                                @* Options to be added from ajax call to cities *@
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4"> Пълен Адрес <span style="color: red">*</span></label>
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.Address.FullAddress, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Address.FullAddress, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                </section>
+
+                <div class="form-group">
+                    <label class="control-label col-md-4"> Собственик <span style="color: red">*</span></label>
+                    <div class="col-md-8">
+                        <div style="width: 83.33333333%; position: relative; float: left;">
+                            @Html.DropDownList("OwnerId", null, htmlAttributes: new { @class = "form-control chosen-select", id = "owners" })
+                        </div>
+                        <div style="width: 16.66666667%; position: relative; float: left;">
+                            <input type="button" class="btn btn-primary" value="Нов" style="width: 100%" onclick="showModal('modal-owner-create')" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-6 col-xs-offset-6">Местоположение</label>
+                    <div class="col-xs-10 col-xs-offset-2" id="google-map">
+
+                    </div>
+                    <input name="Address.Latitude" id="property-latitude" hidden="hidden" />
+                    <input name="Address.Longitude" id="property-longitude" hidden="hidden" />
+                </div>
+
+            </div>
+            <div class="col-md-6 col-xs-12 additionalInfo">
+                <h3 class="propertyAdditionalInfoLbl">Допълнителна информация</h3>
+                <textarea class="form-control row propertyAdditionalInfoTB" id="AdditionalDescription" name="AdditionalDescription" rows="12"></textarea>
+                @Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })
+
+                <section class="propertyDescriptors">
+                    <label><b>Допълнителни описатели</b></label>
+                    <div class="propertyDescriotorValues">
+                        <div class="attributes">
+                            <input name="Attributes[0].Key" class="additionalDescriptors key" value="Брой спални" readonly="readonly" />
+                            <input name="Attributes[0].Value" class="additionalDescriptors value" placeholder="Стойност (пример: 3)" />
+                        </div>
+                        <div class="attributes">
+                            <input name="Attributes[1].Key" class="additionalDescriptors key" value="Брой бани" readonly="readonly" />
+                            <input name="Attributes[1].Value" class="additionalDescriptors value" placeholder="Стойност (пример: 3)" />
+                        </div>
+                        <div class="attributes">
+                            <input name="Attributes[2].Key" class="additionalDescriptors key" value="Етажи" placeholder="Описател (пример: Етажи)" readonly="readonly" />
+                            <input name="Attributes[2].Value" class="additionalDescriptors value" placeholder="Стойност (пример: 3)" />
+                        </div>
+                        <div class="attributes">
+                            <input name="Attributes[3].Key" class="additionalDescriptors key" value="Стаи" placeholder="Описател (пример: Стаи)" readonly="readonly" />
+                            <input name="Attributes[3].Value" class="additionalDescriptors value" placeholder="Стойност (пример: 7)" />
+                        </div>
+                        <div class="attributes">
+                            <input name="Attributes[4].Key" class="additionalDescriptors key" value="Стройтелство" placeholder="Описател (пример: Стройтелство)" readonly="readonly" />
+                            <input name="Attributes[4].Value" class="additionalDescriptors value" placeholder="Стойност (пример: тухла)" />
+                        </div>
+                        <div class="attributes">
+                            <input name="Attributes[5].Key" class="additionalDescriptors key" placeholder="Описател (пример: Стройтелство)" />
+                            <input name="Attributes[5].Value" class="additionalDescriptors value" placeholder="Стойност (пример: тухла)" />
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="row propertyAdditionalInfo">
+
+            @Html.Partial("PropertyImages_Partial")
+
+
+            @*Property Extras*@
+            <fieldset class="col-xs-12 col-md-12 propertyextras">
+                <legend>Екстри на имота:</legend>
+                @for (var i = 0; i < Model.PropertyExtrasCheckBoxes.Count; i++)
+                {
+                    <div class="col-xs-3">
+                        @Html.HiddenFor(m => m.PropertyExtrasCheckBoxes[i].ExtraId)
+                        @Html.CheckBoxFor(m => m.PropertyExtrasCheckBoxes[i].IsChecked)
+                        @Model.PropertyExtrasCheckBoxes[i].ExtraName
+                    </div>
+                }
+            </fieldset>
+
+        </div>
+
+        <div id="rentalInfo">
+            <input type="checkbox" id="activate-rental" /> <span>Активирай полетата</span>
+            @Html.Partial("RentalInfo_Partial")
+            <div>
+                <input type="button" class="btn btn-primary add_rentalinfo rental-info-field" value="Добави нова група за наемане" />
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="col-md-offset-10 col-xs-2">
+                <input type="submit" value="Създай имот" class="btn btn-primary" id="submit-form-btn" />
+            </div>
+        </div>
+    </div>
+}
+
+<!-- The Modal Regular Images -->
+<div id="modalRegular" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+        <div class="modal-header">
+            Преглед на снимки
+            <span class="close closeRegular" onclick="closeModal('modalRegular')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="owl-regular-slider" class="owl-carousel pgl-pro-slide owl-theme owl-carousel-init" data-plugin-options='{"items": 2, "singleItem": false,"autoPlay": false, "pagination": false}'>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal Slider Images -->
+<div id="modalSlider" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+        <div class="modal-header">
+            Преглед на снимки
+            <span class="close closeSlider" onclick="closeModal('modalSlider');">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="owl-main-slider" class="owl-carousel manual pgl-main-slide owl-theme">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal Slider Images -->
+<div id="modal-owner-create" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content" style="width: 50%;">
+        <div class="modal-header">
+            Създай Собственик
+            <span class="close closeSlider" onclick="closeModal('modal-owner-create');">&times;</span>
+        </div>
+        <div class="modal-body">
+            @Html.Partial("OwnerCreate_Partial", new RealEstate.ViewModels.WebMVC.OwnerCreateViewMode())
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript" src="/js/modal.js"></script>
+    <script>
+
+
+        $(document).ready(function () {
+
+            // Countries Cities Master Detail
+            function GetCities(countryId) {
+                let url = "/Cities/GetCitiesInCountry?countryId=" + countryId;
+                $.getJSON(url,
+                    function (data) {
+                        var items = '<option value="">Избери град</option>';
+                        $.each(data,
+                            function (i, city) {
+                                items += `<option value='${city.CityId}'>${city.CityName}</option>`;
+                            });
+                        $("#property-City").html(items);
+                        $('#property-City').trigger("chosen:updated");
+                    });
+            }
+
+            //Select Default Country and make the select as Chosen
+            $('#CountryId').chosen().val(40).trigger('chosen:updated');
+
+            GetCities($('#CountryId').val());
+            $('#CountryId').change(function () { GetCities(this.value) });
+            $('#property-City').chosen();
+        });
+        //------------------------------------
+
+
+        function AddRentalInfo(rentalInfoNumber, template) {
+            let replacement = 'RentalsInfo[' + rentalInfoNumber + ']';
+            $('#rentalInfo').after(template.replace(/RentalsInfo\[0\]/g, replacement));
+            //$('.rentalInfo').append(template.replace(/RentalInfo[0]/g, 'RentalInfo[' + rentalInfoNumber + ']'));
+        }
+
+        $(document).ready(function () {
+            var rentInfoCount = 1;
+            var rentInfoTemplate =
+                '<div id="rentalInfo">' + $('.rentalInfoTemplate').html() + '</div>';
+
+            $('body').on('click',
+                '.add_rentalinfo',
+                function () {
+                    AddRentalInfo(rentInfoCount++, rentInfoTemplate);
+                    $('.unit-type').chosen();
+                    $('.price-period').chosen();
+                });
+        });
+
+        function AddPeriod(rentPeriodNumber, template, toAddTo) {
+            let rentalInfoNumber = $(toAddTo).parent().attr('data-val');
+            let rentalPeriodNumberDom = $(toAddTo).parent().attr('data-number');
+            $(toAddTo).parent().attr('data-number', parseInt(rentalPeriodNumberDom) + 1);
+            let replacement = rentalInfoNumber + '.' + 'RentalPrices[' + rentalPeriodNumberDom + ']';
+            //$('.rentperiods').append(template.replace(/RentalPrices\[0\]/g, replacement));
+            toAddTo.after(template.replace(/RentalsInfo\[\d\]\.RentalPrices\[0\]/g,
+                replacement));
+        }
+
+        $(document).ready(function () {
+
+            let rentPeriodCount = 1;
+            var rentPeriodTemplate = '<div class="row">' + $('.rentalPricesTemplate').html() + '</div>';
+
+
+            //$('.rentperiods').on('click', '.addperiod', function () { });
+            $('body').on('click',
+                '.addperiod',
+                function () {
+                    let placeToAddPricePeriod = $(this).closest('div').parent();
+                    AddPeriod(rentPeriodCount++, rentPeriodTemplate, placeToAddPricePeriod);
+                });
+        });
+
+
+        //-----CREATE OWNER USER------
+
+        $(document).ready(function () {
+            $('#create-owner-btn').on('click',
+                function (e) {
+                    e.preventDefault();
+                    var form = $('#create-owner-form');
+                    $.ajax({
+                        type: "POST",
+                        url: '/Account/CreateOwner',
+                        data: form.serialize(),
+                        success: function (data) {
+                            $('#owners').append('<option selected value="' + data.Id + '">' + data.Info + '</option>');
+                            $('#owners').trigger("chosen:updated");
+                            closeModal('modal-owner-create');
+                        }
+                    });
+                });
+        });
+
+
+
+        //Submiting the form
+        $(document).ready(function () {
+            function fixModel(form) {
+
+
+                let attributes = $('.attributes');
+                for (let i = 0; i < attributes.length; i++) {
+                    var key = $(attributes[i]).find('.key').val();
+                    var value = $(attributes[i]).find('.value').val();
+                    if (key === '' || value === '') {
+                        var keyName = $(attributes[i]).find('.key').attr('name');
+                        var valueName = $(attributes[i]).find('.value').attr('name');
+
+                        form.delete(keyName);
+                        form.delete(valueName);
+                    }
+                }
+
+                form.delete('ImageFiles');
+                $('.imagePlaceholder').each(function (index) {
+                    form.append('ImageFiles[' + index + ']', $(this).data('file'));
+                });
+
+                form.delete('ImageFilesForSlider');
+                $('.imagePlaceholderSlider').each(function (index) {
+                    form.append('ImageFilesForSlider[' + index + ']', $(this).data('file'));
+                });
+
+
+                //let images = $('.images');
+                //for (let i = 0; i < images.length; i++) {
+                //    if (images[i].files.length === 0) {
+                //        $(images[i]).remove();
+                //    }
+                //}
+
+                let rentalsInfo = $('.rentalInfoTemplate');
+                if (rentalsInfo.length === 1) {
+                    var unitsCount = $(rentalsInfo[0]).find('#beds-count').val();
+                    var rentalPrice = $(rentalsInfo[0]).find('#rental-price').val();
+                    if (unitsCount === '' && rentalPrice === '') {
+                        var unitsCountName = $(rentalsInfo[0]).find('#beds-count').attr('name');
+                        var rentalPriceName = $(rentalsInfo[0]).find('#rental-price').attr('name');
+
+                        form.delete(unitsCountName);
+                        form.delete(rentalPriceName);
+                    }
+                }
+
+            }
+
+            $('#submit-form-btn').on('click',
+                function submitForm(e) {
+                    e.preventDefault();
+                    var form = new FormData($('#create-property-form')[0]);
+                    fixModel(form);
+
+
+                    $.ajax({
+                        url: 'Create',
+                        data: form,
+                        processData: false,
+                        contentType: false,
+                        type: 'POST',
+                        success: function (data) {
+                            console.log(data);
+                        }
+                    });
+                });
+
+
+            //Activate rentalInfo form
+            function disableRentalInfo(activate) {
+                $('.rental-info-field').attr('disabled', activate);
+            }
+
+            disableRentalInfo(true);
+            $("#activate-rental").click(function () { disableRentalInfo(!this.checked); });
+
+        });
+
+
+        // Extending string prototype
+        // ReSharper disable once NativeTypePrototypeExtending
+        String.prototype.replaceAll = function (search, replacement) {
+            var target = this;
+            return target.replace(new RegExp(search, 'g'), replacement);
+        };
+        //---------------------------
+    </script>
+
+    <!--GoogleMap Setup-->
+    <script>
+
+        var marker, map;
+
+        function initMap() {
+            var plovdiv = new google.maps.LatLng(42.15, 24.75);
+
+
+            var mapOptions = {
+                center: plovdiv,
+                zoom: 10,
+                mapTypeId: 'roadmap'
+            }
+            map = new google.maps.Map(document.getElementById("google-map"), mapOptions);
+
+            // This event listener will call addMarker() when the map is clicked.
+            map.addListener('click', function (event) {
+                addMarker(event.latLng);
+            });
+
+        }
+
+        function addMarker(latLng) {
+
+            if (marker != null) {
+                marker.setMap(null);
+            }
+
+            marker = new google.maps.Marker({
+                position: latLng,
+                map: map,
+                visible: true
+            });
+
+            $('#property-latitude').val(latLng.lat());
+            $('#property-longitude').val(latLng.lng());
+        }
+    </script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRNibRrD3DnsD2EoqbagZhLwnf82GxraU&callback=initMap"></script>
+    <!--END GoogleMap Setup-->
+
+    <script src="../../js/properties/images.js"></script>
+}

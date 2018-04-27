@@ -1,0 +1,69 @@
+﻿@model RealEstate.ViewModels.WebMVC.RegisterOwnerViewModel
+
+@{
+    ViewBag.Title = "Регистрация на собственик";
+}
+
+@section css{
+    <style>
+        .receive-offers, .terms {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+}
+
+<div role="main" class="main pgl-bg-grey">
+    <!-- Begin page top -->
+    <section class="page-top">
+        <div class="container">
+            <div class="page-top-in">
+                <h2><span>Регистрация за Собственици</span></h2>
+            </div>
+        </div>
+    </section>
+    <section class="registerOwner">
+        <div class="container">
+            <div class="col-md-4 col-lg-offset-4">
+                <!-- End page top -->
+                @using (Html.BeginForm("RegisterOwner", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary("", new { @class = "text-danger" })
+
+                    <div class="form-group">
+                        <label>Потребителско име</label>
+                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Е-мейл", new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Парола", new { @class = "control-label" })
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Потвърди Парола", new { @class = "control-label" })
+                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Регистрационен код", new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.RegisterCode, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <p class="terms"><input type="checkbox" name="remember"> <a href="#">Съгласен съм с условията и правилата на ползване.</a></p>
+                        <p class="receive-offers"><input type="checkbox" name="remember"> <a href="#">Искам да получавам новини и оферти.</a></p>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-block btn-primary">Регистрирай се</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

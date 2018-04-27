@@ -1,0 +1,16 @@
+//*****************************************************************************************//
+This File contains all countries which are going to be seed with
+	    the running of the web application
+
+The Model of the Database Countries Table is:
+
+->int CountryId, string CountryName, string IsoCode(3 chars), int CountryPhoneCode<-
+
+The information have to be stored in the current format here in this file
+
+ex. 1,Bulgaria,BG,359
+
+//****************************************************************************************//
+
+START
+

@@ -1,0 +1,16 @@
+//*****************************************************************************************//
+This File contains all countries which are going to be seed with
+	    the running of the web application
+
+The Model of the Database Cities Table is:
+
+->int CityId, string CountryId (Bulgaria Id), string CityName, int CityPhoneCode
+
+The information have to be stored in the current format here in this file
+
+ex. 1,1,Asenovgrad,032
+
+//****************************************************************************************//
+
+START
+

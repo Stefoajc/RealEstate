@@ -1,0 +1,29 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.PropertyBriefInfoViewModel>
+
+<section class="pgl-featured">
+    <div class="container">
+        <h2>Специални предложения</h2>
+        <div class="row">
+            <div class="owl-carousel pgl-pro-slide owl-theme owl-carousel-init" data-plugin-options='{"items": 4, "singleItem": false,"autoPlay": false, "pagination": false}' style="display: block; opacity: 1;">
+                @foreach (var property in Model)
+                {
+                    <div class="owl-item">
+                        <div class="col-md-12 animation">
+                            <div class="pgl-property featured-item">
+                                <div class="property-thumb-info">
+                                    <div class="property-thumb-info-image">
+                                        <img alt="" class="img-responsive" src="@property.ImagePath">
+                                    </div>
+                                    <div class="property-thumb-info-content">
+                                        <h3><a href="@Url.Action("Details" , new {id = property.PropertyId})">@property.FullAddress</a></h3>
+                                        <p>@property.PropertyName</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>

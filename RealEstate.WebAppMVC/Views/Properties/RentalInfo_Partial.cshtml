@@ -1,0 +1,104 @@
+﻿<section class="rentalInfoTemplate">
+    <h2 align="center" style="margin-bottom: 5px;">Помещения отдавани под наем в имота</h2>
+    <h6 align="center" style="margin-top: 5px;">(Това поле се попълва само ако от имота се отдават под наем отделни части.)</h6>
+    <hr />
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label col-md-4"> Вид помещение <span style="color: red">*</span></label>
+                <div class="col-md-8">
+                    @Html.DropDownList("RentalsInfo[0].UnitTypeId", (SelectList)ViewBag.UnitTypeId, new { @class = "form-control unit-type", @id="unitType" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4"> Брой помещения <span style="color: red">*</span></label>
+                <div class="col-md-8">
+                    <input name="RentalsInfo[0].UnitsCount" class="form-control rental-info-field" id="beds-count" />
+                    @Html.ValidationMessage("RentalsInfo[0].UnitsCount", new { @class = "text-danger" })
+                    @*@Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })*@
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4"> Наемна цена <span style="color: red">*</span></label>
+                <div class="col-md-8">
+                    <input name="RentalsInfo[0].RentalPrice" class="form-control rental-info-field" id="rental-price" />
+                    @Html.ValidationMessage("RentalsInfo[0].RentalPrice", new { @class = "text-danger"})
+                    @*@Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })*@
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4"> Наемен период <span style="color: red">*</span></label>
+                <div class="col-md-8">
+                    <select id="rentalPricePeriod" name="RentalsInfo[0].RentalPricePeriod" class="form-control price-period">
+                        <option value="" selected="selected">Изберете период</option>
+                        @foreach (var item in ViewBag.RentalPeriodId)
+                        {
+                            <option name="RentPricePeriod" value="@item.PeriodId">
+                                @item.Period
+                            </option>
+                        }
+                    </select>
+                    @Html.ValidationMessage("RentalsInfo[0].RentalPricePeriod", new { @class = "text-danger"})
+                    @*@Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })*@
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-11 col-md-offset-1 col-xs-12">
+                    <label class="rentalAdditionalInfoLabel">
+                        <b>Допълнителна информация</b>
+                    </label>
+                </div>
+                <div class="col-md-11 col-md-offset-1 col-xs-12">
+                    <textarea name="RentalsInfo[0].AdditionalInfo" class="form-control rentalAdditionalInfoTextArea rental-info-field"></textarea>
+                    @*@Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })*@
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6">
+
+            <section class="col-xs-12 rentalDescriptors">
+                <label><b>Допълнителни описатели</b></label>
+                <div class="rentalDescripotorValues">
+                    <div class="attributes">
+                        <input name="RentalsInfo[0].Attributes[0].Key" class="additionalDescriptors key rental-info-field" value="Брой посетители" />
+                        <input name="RentalsInfo[0].Attributes[0].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност (пример: 3)" />
+                    </div>
+                    <div class="attributes">
+                        <input name="RentalsInfo[0].Attributes[1].Key" class="additionalDescriptors key rental-info-field" placeholder="Описател (пример: Етаж)" />
+                        <input name="RentalsInfo[0].Attributes[1].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност (пример: 3)" />
+                    </div>
+                    <div class="attributes">
+                        <input name="RentalsInfo[0].Attributes[2].Key" class="additionalDescriptors key rental-info-field" placeholder="Описател (пример: Изглед)" />
+                        <input name="RentalsInfo[0].Attributes[2].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност (пример: Към морето)" />
+                    </div>
+                    <div class="attributes">
+                        <input name="RentalsInfo[0].Attributes[3].Key" class="additionalDescriptors key rental-info-field" placeholder="Описател (пример: Легла)" />
+                        <input name="RentalsInfo[0].Attributes[3].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност (пример: 3)" />
+                    </div>
+
+                    <input type="button" value="Добави нов атрибут" id="add-rental-attribute" class="btn btn-primary rental-info-field" style="float: right; margin-right:35px" />
+                </div>
+                
+            </section>
+        </div>
+
+        <div class="col-xs-12 col-md-12">
+            <div class="row rental-extras">
+                @for (int i = 0; i < ViewBag.RentalExtras.Count; i++)
+                {
+                    <div class="col-xs-3">
+                        <input class="rental-info-field" data-val="true" data-val-number="The field ExtraId must be a number." data-val-required="The ExtraId field is required." id="RentalsInfo_@(i)__ExtraId" name="RentalsInfo[0].RentalExtras[@i].ExtraId" value="@ViewBag.RentalExtras[i].ExtraId" type="hidden">
+                        <input class="rental-info-field" data-val="true" data-val-required="The IsChecked field is required." id="RentalsInfo_@(i)__IsChecked" name="RentalsInfo[0].RentalExtras[@i].IsChecked" value="true" type="checkbox">
+                        <input class="rental-info-field" name="RentalsInfo[0].RentalExtras[@i].IsChecked" value="false" type="hidden">
+                        @ViewBag.RentalExtras[i].ExtraName
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</section>

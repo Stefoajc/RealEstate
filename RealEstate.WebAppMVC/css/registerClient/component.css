@@ -1,0 +1,27 @@
+
+
+.cclogin-addon{
+	color:#0473e3; 
+	float:left;
+	padding:9px;
+	width:8%;
+	background:#FFFFFF;
+	text-align:center;	
+}
+
+.cclogin.simple{
+	margin-bottom:60px;
+}
+
+.cclogin .half {
+    float: left;
+    width: 48%;
+	margin-right:4%
+}
+.cclogin .half.last{
+	margin-right:0%;	
+}
+.cclogin input[type="checkbox"]{
+	margin: 0 10px 0 0;
+	border:none;
+}

@@ -1,0 +1,440 @@
+﻿@model RealEstate.ViewModels.WebMVC.EditPropertyViewModel
+
+@{
+    ViewBag.Title = "Създай имот";
+}
+<style type="text/css">
+    #rentalInfo {
+        border: 2px;
+        border-color: black;
+        border-style: solid;
+        margin-bottom: 10px;
+        margin-top: 10px;
+        padding-top: 10px;
+    }
+
+
+    .basicPropertyInfo {
+        margin-bottom: 20px;
+    }
+
+    #title, .propertyAdditionalInfoLbl, .rentalAdditionalInfoLabel {
+        text-align: center;
+    }
+
+    .rentalAdditionalInfoTextArea {
+        max-height: 100px;
+        height: 100%;
+    }
+
+    .rentalAdditionalInfoTextArea {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+    }
+
+    .propertyAdditionalInfoTB {
+        max-width: 100%;
+    }
+
+    .propertyAdditionalInfo {
+        margin-bottom: 20px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .propertyextras {
+        margin-bottom: 20px;
+        padding-top: 20px;
+    }
+
+    .imagePlaceholder {
+        width: 80px;
+        height: 80px;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .imageFieldset, .imageFieldsetSlider {
+        display: block;
+        padding-top: 0.35em;
+        padding-bottom: 0.625em;
+        border: 2px groove;
+    }
+
+    .imageFieldset {
+        border-right: 0;
+    }
+
+    legend {
+        border-bottom: 0;
+        width: auto;
+        margin-bottom: 0;
+        margin-left: 20px;
+    }
+
+    .gallery, .gallerySlider {
+        height: 160px;
+        overflow: hidden;
+    }
+
+    .propertyInfo {
+        margin-top: 20px;
+    }
+
+    .add_rentalinfo {
+        margin-bottom: 10px;
+    }
+
+    .rentperiods {
+        margin-top: 10px
+    }
+</style>
+
+<h2 id="title">Създай имот</h2>
+
+
+@using (Html.BeginForm(
+    "Create", "Properties", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @*<div class="form-group">
+                @Html.LabelFor(model => model.AddressId, "AddressId", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("AddressId", null, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.AddressId, "", new { @class = "text-danger" })
+                </div>
+            </div>*@
+        <div class="row basicPropertyInfo">
+            <div class="col-md-6 col-xs-12">
+                <section class="propertyInfo">
+                    <div class="form-group">
+                        @Html.Label("Сезон на имота", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.DropDownList("PropertySeasonId", null, htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.PropertySeasonId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("Име на имота", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.PropertyName, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.PropertyName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </section>
+
+                <section class="addressField">
+                    <div class="form-group">
+                        @Html.Label("Държава", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.DropDownList("CountyId", null, htmlAttributes: new { @class = "form-control country" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("Населено място", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            <select name="Address.CityId" class="form-control city">
+                                @* Options to be added from ajax call to cities *@
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+            <div class="col-md-6 col-xs-12">
+
+                <h3 class="propertyAdditionalInfoLbl">Допълнителна информация</h3>
+                <textarea class="form-control row propertyAdditionalInfoTB" id="AdditionalDescription" name="AdditionalDescription" rows="12">
+                </textarea>
+                @Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })
+
+            </div>
+        </div>
+
+        <div class="row propertyAdditionalInfo">
+            <fieldset class="imageFieldset col-md-6 col-xs-12">
+                <legend class="imageLegend">Снимки</legend>
+                <div class="row">
+                    <div class="gallery col-md-8 col-xs-8"></div>
+
+                    <div class="col-md-4 col-xs-4">
+                        <img id="imgRegularPreview" width="165" height="110" />
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <input type="file" style="display:none" name="ImageFiles" multiple id="gallery-photo-add">
+                    <input type="button" name="fileBrowserWrapper" value="Избери снимки" onclick="$('#gallery-photo-add').trigger('click')" />
+                    <span id="imageRegularCount"></span>
+                </div>
+            </fieldset>
+
+            <fieldset class="imageFieldsetSlider col-md-6 col-xs-12">
+                <legend class="imageLegend">Снимки за слайдери</legend>
+
+                <div class="gallerySlider col-xs-12"></div>
+
+                <div class="col-xs-12">
+                    <input type="file" style="display:none" name="ImageFilesForSlider" multiple id="gallery-photo-slider-add">
+                    <input type="button" name="fileBrowserWrapper" value="Избери снимки" onclick="$('#gallery-photo-slider-add').trigger('click')" />
+                    <span id="imageSliderCount"></span>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="row">
+            <fieldset class="col-xs-12 propertyextras">
+                <legend>Екстри:</legend>
+                @for (var i = 0; i < Model.PropertyExtrasCheckBoxes.Count; i++)
+                {
+                    <div class="col-xs-3">
+                        @Html.HiddenFor(m => m.PropertyExtrasCheckBoxes[i].ExtraId)
+                        @Html.CheckBoxFor(m => m.PropertyExtrasCheckBoxes[i].IsChecked)
+                        @Model.PropertyExtrasCheckBoxes[i].ExtraName
+                    </div>
+                }
+            </fieldset>
+        </div>
+
+        <hr />
+        <div id="rentalInfo" class="col-xs-12">
+            <div class="rentalInfoTemplate">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            @Html.Label("Вид помещение", new { @class = "control-label col-md-4" })
+                            <div class="col-md-8">
+
+                                @Html.DropDownList("RentalsInfo[0].UnitTypeId", (SelectList)ViewBag.RentalTypeId, new { @class = "form-control", name = "" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.Label("Брой легла", new { @class = "control-label col-md-4" })
+                            <div class="col-md-8">
+                                <input name="RentalsInfo[0].BedsCount" class="beds-count form-control" />
+                                @*@Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.Label("Брой помещения от този вид", new { @class = "control-label col-md-4" })
+                            <div class="col-md-8">
+                                <input name="RentalsInfo[0].RoomsCount" class="rooms-count form-control" />
+                                @*@Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="col-xs-12">
+                            <p class="rentalAdditionalInfoLabel"><b>Допълнителна информация</b></p>
+                        </div>
+                        <div class="col-xs-12">
+                            <textarea name="RentalsInfo[0].AdditionalInfo" class="form-control rentalAdditionalInfoTextArea"></textarea>
+                            @*@Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })*@
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row rental-extras">
+                    @for (int i = 0; i < ViewBag.RentalExtras.Count; i++)
+                    {
+                        <div class="col-xs-3">
+                            <input data-val="true" data-val-number="The field ExtraId must be a number." data-val-required="The ExtraId field is required." id="RentalsInfo_@(i)__ExtraId" name="RentalsInfo[0].RentalExtras[@i].ExtraId" value="@ViewBag.RentalExtras[i].ExtraId" type="hidden">
+                            <input data-val="true" data-val-required="The IsChecked field is required." id="RentalsInfo_@(i)__IsChecked" name="RentalsInfo[0].RentalExtras[@i].IsChecked" value="true" type="checkbox">
+                            <input name="RentalsInfo[0].RentalExtras[@i].IsChecked" value="false" type="hidden">
+                            @ViewBag.RentalExtras[i].ExtraName
+                        </div>
+                    }
+                </div>
+
+                <div class="rentperiods" data-val="RentalsInfo[0]" data-number=1>
+                    <div class="row">
+                        <div class="rentalPricesTemplate">
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    @Html.Label("От", new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        <input class="rental-price-from form-control" name="RentalsInfo[0].RentalPrices[0].From" />
+                                        @*@Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    @Html.Label("До", new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        <input class="rental-price-to form-control" name="RentalsInfo[0].RentalPrices[0].To" />
+                                        @*@Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    @Html.Label("Цена", new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        <input class="rental-price-money form-control" name="RentalsInfo[0].RentalPrices[0].Price" />
+                                        @*@Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <input class="btn btn-default addperiod" type="button" value="Добави нов Период" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <input type="button" class="btn btn-default add_rentalinfo" value="Добави нова група за наемане" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-10 col-xs-2">
+                <input type="submit" value="Създай имот" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+
+        function GetCities(countryId) {
+            let url = "/Cities/GetCitiesInCountry?countryId=" + countryId;
+            $.getJSON(url,
+                function (data) {
+                    var items = '<option value="">Избери град</option>';
+                    $.each(data,
+                        function (i, city) {
+                            items += `<option value='${city.CityId}'>${city.CityName}</option>`;
+                        });
+                    $(".city").html(items);
+                });
+        }
+
+        $(document).ready(function () {
+            GetCities($(".country option:selected").val());
+            $(".country").change(GetCities(this.value));
+        });
+
+        function AddRentalInfo(rentalInfoNumber, template) {
+            let replacement = 'RentalsInfo[' + rentalInfoNumber + ']';
+            $('#rentalInfo').after(template.replace(/RentalsInfo\[0\]/g, replacement));
+            //$('.rentalInfo').append(template.replace(/RentalInfo[0]/g, 'RentalInfo[' + rentalInfoNumber + ']'));
+        }
+
+        $(document).ready(function () {
+            var rentInfoCount = 1;
+            var rentInfoTemplate =
+                '<div id="rentalInfo" class="col-xs-12">' + $('.rentalInfoTemplate').html() + '</div>';
+
+            $('body').on('click',
+                '.add_rentalinfo',
+                function () { AddRentalInfo(rentInfoCount++, rentInfoTemplate) });
+        });
+
+        function AddPeriod(rentPeriodNumber, template, toAddTo) {
+            let rentalInfoNumber = $(toAddTo).parent().attr('data-val');
+            let rentalPeriodNumberDom = $(toAddTo).parent().attr('data-number');
+            $(toAddTo).parent().attr('data-number', parseInt(rentalPeriodNumberDom) + 1);
+            let replacement = rentalInfoNumber + 'RentalPrices[' + rentalPeriodNumberDom + ']';
+            //$('.rentperiods').append(template.replace(/RentalPrices\[0\]/g, replacement));
+            toAddTo.after(template.replace(/RentalsInfo\[\d\]\.RentalPrices\[0\]/g,
+                replacement));
+        }
+
+        $(document).ready(function () {
+            let rentPeriodCount = 1;
+            var rentPeriodTemplate = '<div class="row">' + $('.rentalPricesTemplate').html() + '</div>';
+
+
+            //$('.rentperiods').on('click', '.addperiod', function () { });
+            $('body').on('click',
+                '.addperiod',
+                function () {
+                    let placeToAddPricePeriod = $(this).closest('div').parent();
+                    AddPeriod(rentPeriodCount++, rentPeriodTemplate, placeToAddPricePeriod);
+                });
+        });
+
+
+        $(document).ready(function () {
+
+            var imagesRegularCount = 0;
+            var imagesSliderCount = 0;
+
+            // Multiple images preview in browser
+            let imagesPreview = function (input, placeToInsertImagePreview) {
+
+                if (input.files) {
+                    let filesAmount = input.files.length;
+
+                    for (let i = 0; i < filesAmount; i++) {
+                        let reader = new FileReader();
+
+                        reader.onload = function (event) {
+                            $($.parseHTML('<img class="col-xs-2 imagePlaceholder">'))
+                                .attr('src', event.target.result)
+                                .appendTo(placeToInsertImagePreview);
+
+
+                        }
+                        reader.readAsDataURL(input.files[i]);
+                    }
+                }
+
+            };
+
+
+            $('body').on('change',
+                '#gallery-photo-add',
+                function () {
+                    imagesRegularCount += this.files.length;
+                    $('#imageRegularCount').text(imagesRegularCount + ' Images');
+
+                    imagesPreview(this, 'div.gallery');
+
+                    $(this).clone().appendTo($(this).parent()).val('');
+                    $(this).hide();
+                });
+
+            $('body').on('change',
+                '#gallery-photo-slider-add',
+                function () {
+                    imagesSliderCount += this.files.length;
+                    $('#imageSliderCount').text(imagesSliderCount + ' Images');
+
+                    imagesPreview(this, 'div.gallerySlider');
+
+                    $(this).clone().appendTo($(this).parent()).val('');
+                    $(this).hide();
+                });
+        });
+
+        $(document).ready(function () {
+            $('body').on('click',
+                '.imagePlaceholder',
+                function () {
+                    let source = $(this).attr('src');
+                    $('#imgRegularPreview').attr('src', source);
+                });
+        });
+
+        String.prototype.replaceAll = function (search, replacement) {
+            var target = this;
+            return target.replace(new RegExp(search, 'g'), replacement);
+        };
+
+    </script>
+}

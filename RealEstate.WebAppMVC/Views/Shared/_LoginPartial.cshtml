@@ -1,0 +1,33 @@
+﻿@if (Request.IsAuthenticated)
+{
+    <li class="dropdown">
+        <a class="dropdown-toggle disabled" data-toggle="dropdown" href="javascript:document.getElementById('logoutForm').submit()">Изход</a>
+        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+        {
+            @Html.AntiForgeryToken()
+        }
+    </li>
+}
+else
+{
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle disabled" data-toggle="dropdown">Вход</a>
+        <ul class="dropdown-menu">
+            <li class="dropdown">
+                @Html.ActionLink("Регистрация", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })
+                <ul class="dropdown-menu" style="right: 130px; left: auto;">
+                    <li>
+                        @Html.ActionLink("Собственик на имот", "RegisterOwner", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })
+                    </li>
+                    <li>
+                        @Html.ActionLink("Клиент", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })
+                    </li>
+                </ul>
+            </li>
+            <li>
+                @Html.ActionLink("Вход", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })
+            </li>
+        </ul>
+
+    </li>
+}

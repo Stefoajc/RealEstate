@@ -1,0 +1,117 @@
+﻿@using RealEstate.ViewModels.WebMVC
+@model LoginViewModel
+@{
+    ViewBag.Title = "Вход";
+}
+
+<style>
+    #Google {
+        background-image: url(/ExternalLoginIcons/googleLoginIcon.png);
+        background-size: 30px,30px;
+        background-repeat: no-repeat;
+        width: 33px;
+        height: 33px;
+        border-style: none;
+    }
+
+    #Facebook {
+        background-image: url(/ExternalLoginIcons/facebookIcon.png);
+        background-size: 50px,50px;
+        background-repeat: no-repeat;
+        width: 33px;
+        height: 33px;
+        background-position: center;
+        border-style: none;
+    }
+
+    #Twitter {
+        background-image: url(/ExternalLoginIcons/twitterIcon.png);
+        background-size: 35px,35px;
+        background-repeat: no-repeat;
+        width: 33px;
+        height: 33px;
+        background-position: center;
+        border-style: none;
+    }
+
+    #Instagram {
+        background-image: url(/ExternalLoginIcons/instagramIcon.jpg);
+        background-size: 33px,33px;
+        background-repeat: no-repeat;
+        width: 33px;
+        height: 33px;
+        border-style: none;
+    }
+
+    #LinkedIn {
+        background-image: url(/ExternalLoginIcons/linkedinIcon.png);
+        background-size: 33px,33px;
+        background-repeat: no-repeat;
+        width: 33px;
+        height: 33px;
+        border-style: none;
+    }
+
+    .loginForm {
+        margin-top: 10px;
+    }
+
+    .registerLink {
+        text-decoration: underline;
+    }
+</style>
+
+<div role="main" class="main pgl-bg-grey">
+    <!-- Begin page top -->
+    <section class="page-top">
+        <div class="container">
+            <div class="page-top-in">
+                <h2><span>Вход в системата</span></h2>
+            </div>
+        </div>
+    </section>
+    <section class="login">
+        <div class="container">
+            <div class="col-md-4 col-md-offset-4 loginForm">
+                @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        @Html.Label("Потребителско име", new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Парола", new { @class = "control-label" })
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        @Html.CheckBoxFor(m => m.RememberMe)
+                        <label>Запомни ме?</label>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-block btn-primary">Вход</button>
+                    </div>
+                }
+
+                <div class="form-group">
+                    <section id="socialLoginForm">
+                        @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+                    </section>
+                </div>
+                <p>
+                    <b>@Html.ActionLink("Нямате регистрация ?", "Register", new { }, new { @class = "registerLink" })</b>
+                </p>
+                @* Enable this once you have account confirmation enabled for password reset functionality
+                    <p>
+                        @Html.ActionLink("Forgot your password?", "ForgotPassword")
+                    </p>*@
+            </div>
+        </div>
+    </section>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

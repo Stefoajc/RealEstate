@@ -1,0 +1,18 @@
+//*****************************************************************************************//
+This File contains all countries which are going to be seed with
+	    the running of the web application
+
+The Model of the Database RentalExtras Table is:
+
+->int ExtraId, string ExtraName, RentalType RentalType (enumerated type) (0-Apartament,1-Room,null means all Types)
+
+The information have to be stored in the current format here in this file
+
+ex. 
+1,Balcony,null
+2,Individual Bathroom, null
+
+//****************************************************************************************//
+
+START
+

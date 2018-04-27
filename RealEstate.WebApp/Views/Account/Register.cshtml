@@ -1,0 +1,56 @@
+﻿@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    @Styles.Render("~/Content/AccountStyleSheets")
+</head>
+<body>
+    <div id="login-box">
+        <div class="left">
+            <h1>Sign up</h1>
+
+            <input type="text" name="username" placeholder="Username"/>
+            <input type="text" name="email" placeholder="E-mail"/>
+            <input type="password" name="password" placeholder="Password"/>
+            <input type="password" name="password2" placeholder="Retype password"/>
+
+            <input type="submit" name="signup_submit" value="Sign me up"/>
+        </div>
+
+        <div class="right">
+            <span class="loginwith">Sign in with<br />social network</span>
+
+            <button class="social-signin facebook">Sign in with Facebook</button>
+            <button class="social-signin twitter">Sign in with Twitter</button>
+            <button class="social-signin google">Sign in with Google+</button>
+        </div>
+        <div class="or">OR</div>
+    </div>
+
+    @section scripts
+    {
+        <script>
+            $(document).ready(function () {
+                $('input[name=signup_submit]').on('click', function () {
+                    $.post("/api/AccountApi/Register",
+                        {
+                            Email: $('input[name=email]').val(),
+                            Password: $('input[name=password]').val(),
+                            ConfirmPassword: $('input[name=password2]').val()
+                        },
+                        function (data, status) {
+                            console.log(data);
+                            console.log(status);
+                        }
+                    );
+                });
+            });
+        </script>
+    }
+</body>
+</html>

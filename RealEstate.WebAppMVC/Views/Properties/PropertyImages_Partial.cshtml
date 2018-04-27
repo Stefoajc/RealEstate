@@ -1,0 +1,35 @@
+﻿<section class="images">
+    <fieldset class="imageFieldset col-md-6 col-xs-12">
+        <legend>Снимки <span style="color: red">*</span></legend>
+        <div class="row">
+            <div id="gallery" class="col-md-12 col-xs-12"></div>
+        </div>
+        <div class="col-xs-12">
+            <input type="file" style="display: none" name="ImageFiles" multiple id="gallery-photo-add" class="images">
+            <input type="button" name="fileBrowserWrapper" value="Избери снимки" onclick="$('#gallery-photo-add').trigger('click')" />
+            <span id="imageRegularCount"></span>
+
+            <!-- Trigger/Open The Modal -->
+            <input type="button" id="modalBtnRegular" value="Преглед" onclick="showModal('modalRegular');" />
+            @Html.ValidationMessage("ImageFiles", new { @class = "text-danger", style = "display: inline-block;" })
+        </div>
+    </fieldset>
+
+    <fieldset class="imageFieldsetSlider col-md-6 col-xs-12">
+        <legend>Снимки за слайдери <span style="color: red">*</span></legend>
+        <div class="row">
+            <div id="gallerySlider" class="col-md-12 col-xs-12"></div>
+        </div>
+        <div class="col-xs-12">
+            <input type="file" style="display: none" name="ImageFilesForSlider" multiple id="gallery-photo-slider-add" class="images">
+            <input type="button" name="fileBrowserWrapper" value="Избери снимки" onclick="$('#gallery-photo-slider-add').trigger('click')" />
+            <span id="imageSliderCount"></span>
+
+            <!-- Trigger/Open The Modal -->
+            <input type="button" id="modalBtnSlider" value="Преглед" onclick="showModal('modalSlider');" />
+            @Html.ValidationMessage("ImageFilesForSlider", new { @class = "text-danger", style = "display: inline-block;" })
+        </div>
+    </fieldset>
+</section>
+
+@*WORKS WITH <script src="../../js/properties/images.js"></script>*@

@@ -1,0 +1,17 @@
+//*****************************************************************************************//
+This File contains all countries which are going to be seed with
+	    the running of the web application
+
+The Model of the Database Sights Table is:
+
+->int CityId, string CoordinatesId, string SightName, string SightInfo
+
+The information have to be stored in the current format here in this file
+
+ex. 
+1,47.23,28.32,Asen's Fortress, It's the fortress of a Bulgarian king ( the second and third params are coordinates)
+
+//****************************************************************************************//
+
+START
+

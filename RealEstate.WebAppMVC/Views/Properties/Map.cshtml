@@ -1,0 +1,248 @@
+﻿<div role="main" class="main pgl-bg-grey">
+    <!-- Begin page top -->
+    <section class="page-top">
+        <div class="container">
+            <div class="page-top-in">
+                @*<h2><span>List Map</span></h2>*@
+            </div>
+        </div>
+    </section>
+    <!-- End page top -->
+    <!-- Begin Advanced Search -->
+    <section class="pgl-advanced-search pgl-bg-light">
+        <div class="container">
+            <form name="advancedsearch">
+                <div class="row">
+                    <div class="col-xs-6 col-sm-3">
+                        <div class="form-group">
+                            <label class="sr-only" for="property-status">Статут на имота</label>
+                            <select id="property-status" name="property-status" data-placeholder="Property Status" class="chosen-select" style="display: none;">
+                                <option selected="selected" value="Property Status">Статут на имота</option>
+                                <option value="sale">За Продажба</option>
+                                <option value="rent">Под наем</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-3">
+                        <div class="form-group">
+                            <label class="sr-only" for="location">Град</label>
+                            <select id="location" name="location" data-placeholder="Location" class="chosen-select" style="display: none;">
+                                <option selected="selected" value="Location">Град</option>
+                                @foreach (var city in ViewBag.Cities)
+                                {
+                                    <option value="@city.CityId">@city.CityName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-3">
+                        <div class="form-group">
+                            <label class="sr-only" for="property-types">Типове имоти</label>
+                            <select id="property-types" name="property-types" data-placeholder="Property Types" class="chosen-select" style="display: none;">
+                                <option selected="selected" value="Property Types">Типове имоти</option>
+                                @foreach (var propertyType in ViewBag.PropertyTypes)
+                                {
+                                    <option value="@propertyType.PropertyTypeId">@propertyType.PropertyTypeName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-3">
+                        <div class="form-group">
+                            <label class="sr-only" for="area-from">Площ</label>
+                            <select id="area-from" name="area-from" data-placeholder="Area From" class="chosen-select" style="display: none;">
+                                <option selected="selected" value="Area From">Площ</option>
+                                <option value="450">над 450кв.м.</option>
+                                <option value="450">до 450кв.м.</option>
+                                <option value="350">до 350кв.м.</option>
+                                <option value="250">до 250кв.м.</option>
+                                <option value="150">до 150кв.м.</option>
+                                <option value="100">до 100кв.м.</option>
+                                <option value="50">до 50кв.м.</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-6 col-sm-3">
+                        <div class="form-group">
+                            <label class="sr-only" for="search-bedrooms">Спални</label>
+                            <select id="search-bedrooms" name="search-bedrooms" data-placeholder="Bedrooms" class="chosen-select" style="display: none;">
+                                <option selected="selected" value="Bedrooms">Спални</option>
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="5plus">5+</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-3">
+                        <div class="form-group">
+                            <label class="sr-only" for="search-bathrooms">Бани</label>
+                            <select id="search-bathrooms" name="search-bathrooms" data-placeholder="Bathrooms" class="chosen-select" style="display: none;">
+                                <option selected="selected" value="Bathrooms">Бани</option>
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="4plus">4+</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-3">
+                        <div class="form-group">
+                            <div class="row pgl-narrow-row">
+                                <div class="col-xs-6">
+                                    <label class="sr-only" for="search-minprice">Цена от</label>
+                                    <select id="search-minprice" name="search-minprice" data-placeholder="Price From" class="chosen-select" style="display: none;">
+                                        <option selected="selected" value="Price From">Цена от</option>
+                                        <option value="0">$0</option>
+                                        <option value="25000">$25000</option>
+                                        <option value="50000">$50000</option>
+                                        <option value="75000">$75000</option>
+                                        <option value="100000">$100000</option>
+                                        <option value="150000">$150000</option>
+                                        <option value="200000">$200000</option>
+                                        <option value="300000">$300000</option>
+                                        <option value="500000">$500000</option>
+                                        <option value="750000">$750000</option>
+                                        <option value="1000000">$1000000</option>
+                                    </select>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label class="sr-only" for="search-maxprice">Цена до</label>
+                                    <select id="search-maxprice" name="search-maxprice" data-placeholder="Price To" class="chosen-select" style="display: none;">
+                                        <option selected="selected" value="Price To">Цена до</option>
+                                        <option value="25000">$25000</option>
+                                        <option value="50000">$50000</option>
+                                        <option value="75000">$75000</option>
+                                        <option value="100000">$100000</option>
+                                        <option value="150000">$150000</option>
+                                        <option value="200000">$200000</option>
+                                        <option value="300000">$300000</option>
+                                        <option value="500000">$500000</option>
+                                        <option value="750000">$750000</option>
+                                        <option value="1000000">$1000000</option>
+                                        <option value="1000000plus">&gt;$1000000</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-3">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-block btn-primary">Намери своя дом</button>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </section>
+    <!-- End Advanced Search -->
+    <!-- Begin Properties -->
+    <section class="pgl-properties-map pgl-bg-grey">
+        <div class="container">
+            <h2>@ViewBag.PropertiesTitle</h2>
+            <div class="properties-full">
+                <div class="listing-header clearfix">
+                    <ul class="list-inline list-icons pull-left">
+                        <li><a href="@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType})"><i class="fa fa-th"></i></a></li>
+                        <li><a href=@Url.Action("ListPropertiesFullWidth", "Properties", new {ViewBag.propertyType})><i class="fa fa-th-list"></i></a></li>
+                        <li class="active"><a href=@Url.Action("Map", "Properties", new {ViewBag.propertyType})><i class="fa fa-map-marker"></i></a></li>
+                    </ul>
+                    <ul class="list-inline list-sort pull-right">
+                        <li><label for="filter-status">Филтър</label></li>
+                        <li style="width: 150px;">
+                            <select id="filter-status" name="filter-status" data-placeholder="Filter" class="chosen-select" onChange="location = this.value" style="width: 100px;">
+                                <option selected="selected" value="@Url.Action("Map", "Properties")">Типове имоти</option>
+                                @foreach (var propertyType in ViewBag.PropertyTypes)
+                                {
+                                    <option value=@Url.Action("Map", "Properties", new {propertyType = propertyType.PropertyTypeId}) >@propertyType.PropertyTypeName</option>
+                                }
+                                
+                                @*<option value=@Url.Action("Map", "Properties", new {ViewBag.propertyType})>Къщи</option>
+                                <option value=@Url.Action("Map", "Properties", new {ViewBag.propertyType})>Апартаменти</option>*@
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="properties_map" class="map pgl-bg-dark" style="position: relative; overflow: hidden;">
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Properties -->
+    <!-- Begin Featured -->
+    <section class="pgl-featured pgl-featured-bottom">
+        <div class="container">
+            <h2>Специални Предложения</h2>
+            <div class="row">
+                <div class="owl-carousel pgl-pro-slide owl-theme owl-carousel-init" data-plugin-options='{"items": 4, "singleItem": false,"autoPlay": false, "pagination": false}' style="display: block; opacity: 1;">
+                    @foreach (var property in ViewBag.FeaturedProperties)
+                    {
+                        <div class="owl-item">
+                            <div class="col-md-12 animation">
+                                <div class="pgl-property featured-item">
+                                    <div class="property-thumb-info">
+                                        <div class="property-thumb-info-image">
+                                            <img alt="" class="img-responsive" src="@property.ImagePath">
+                                        </div>
+                                        <div class="property-thumb-info-content">
+                                            <h3><a href="@Url.Action("Details" , new {id = property.PropertyId})">@property.FullAddress</a></h3>
+                                            <p>@property.PropertyName</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Featured -->
+</div>
+
+@section scripts
+{
+    <script>
+        function myMap() {
+            var mapOptions = {
+                center: new google.maps.LatLng(42.15, 24.75),
+                zoom: 10,
+                mapTypeId: google.maps.MapTypeId.HYBRID
+            }
+            var map = new google.maps.Map(document.getElementById("properties_map"), mapOptions);
+        }
+    </script>
+
+    <!--GoogleMap Setup-->
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRNibRrD3DnsD2EoqbagZhLwnf82GxraU&callback=myMap"></script>
+    
+    @* TODO make filtering by PropertyType !!! With null default parameter (Persist the selected item) *@
+    
+    <script>
+        $(document).ready(() => {
+
+            let filterBy = '@ViewBag.propertyType';
+            let filterUrlParam = '';
+            if (filterBy.length !== 0) {
+                filterUrlParam = filterBy === ' ' ? '' : '?propertyType=' + filterBy;
+            }
+
+            let preSelectOrder = "/Properties/Map" + filterUrlParam;
+
+            console.log(preSelectOrder);
+
+            $('#filter-status').val(preSelectOrder).trigger("chosen:updated");
+        })
+    </script>
+}

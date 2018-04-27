@@ -1,0 +1,259 @@
+﻿<div role="main" class="main pgl-bg-grey">
+    <!-- Begin page top -->
+    <section class="page-top">
+        <div class="container">
+            <div class="page-top-in">
+                <h2><span>Свържи се с нас</span></h2>
+            </div>
+        </div>
+    </section>
+    <!-- End page top -->
+    <!-- Begin content with sidebar -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 content">
+
+                <div class="contact">
+                    <p>Nam nec tellus a odio tincidunt auctor a ornare odio. Sed non  mauris vitae erat consequat auctor eu in elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Mauris in erat justo. Nullam ac urna eu felis dapibus condimentum sit amet a augue. Sed non neque elit.</p>
+                    <div id="contact-map" class="pgl-bg-light" style="position: relative; overflow: hidden;"></div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <strong>Нашият адрес</strong>
+                            <address>България, Асеновград, ул. Пирин №8</address>
+                        </div>
+                        <div class="col-sm-6">
+                            <address>
+                                <strong>Телефон.</strong> +359876 717 000<br>
+                                <strong>Fax.</strong> +359876 717 000<br>
+                                <strong>Email.</strong> sProperties@abv.bg
+                            </address>
+                        </div>
+                    </div>
+                    <hr>
+                    <form id="contact-form" name="form1" method="post" action="send_contact.php" novalidate="novalidate">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label for="name">Вашето име*</label>
+                                    <input name="name" id="name" class="form-control" data-msg-required="Please enter your name." required="" aria-required="true" type="text">
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="customer_mail">Вашата е-поща*</label>
+                                    <input name="customer_mail" id="customer_mail" class="form-control" data-msg-required="Please enter your email address." data-msg-email="Please enter a valid email address." required="" aria-required="true" type="email">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label for="subject">Заглавие*</label>
+                                    <input name="subject" id="subject" class="form-control" data-msg-required="Please enter the subject." required="" aria-required="true" type="text">
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="website">Старница</label>
+                                    <input name="website" id="website" class="form-control" type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="comments">Вашето Съобщение*</label>
+                            <textarea rows="9" name="comments" id="comments" class="form-control" data-msg-required="Please enter your message." required="" aria-required="true"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input value="Изпрати" class="btn btn-primary min-wide" data-loading-text="Изпрещане..." type="submit">
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+            <div class="col-md-3 sidebar">
+
+                <!-- Begin Our Agents -->
+                <aside class="block pgl-agents pgl-bg-light">
+                    <h3>Нашите агенти</h3>
+                    <div class="owl-carousel pgl-pro-slide pgl-agent-item owl-theme owl-carousel-init" data-plugin-options="{&quot;items&quot;: 1, &quot;pagination&quot;: false, &quot;autoHeight&quot;: true}" style="display: block; opacity: 1;">
+                        @foreach (var agent in ViewBag.Agents)
+                        {
+                            <div class="owl-item">
+                                <div class="pgl-agent-item">
+                                    <div class="img-thumbnail-medium">
+                                        <a href="@Url.Action("Details","Agents",new {agentId = agent.AgentId})"><img src="@agent.ImagePath" class="img-responsive" alt=""></a>
+                                    </div>
+                                    <div class="pgl-agent-info">
+                                        <small></small>
+                                        <h4><a href="@Url.Action("Details","Agents",new {agentId = agent.AgentId})">@agent.FullName</a></h4>
+                                        <address>
+                                            <i class="fa fa-map-marker"></i> Office : @agent.OfficePhone<br>
+                                            <i class="fa fa-phone"></i> Mobile : @agent.PhoneNumber<br>
+                                            <i class="fa fa-fax"></i> Fax : @agent.PhoneNumber<br>
+                                            <i class="fa fa-envelope-o"></i> Mail: <a href="mailto:@(agent.Email)">@agent.Email</a>
+                                        </address>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </aside>
+                <!-- End Our Agents -->
+                <!-- Begin Tabs -->
+                <aside class="block tabs pgl-bg-light">
+                    <ul class="nav nav-tabs second-tabs">
+                        <li class=""><a href="#popularPosts" data-toggle="tab"><i class="icon icon-star"></i> Popular</a></li>
+                        <li class="active"><a href="#latestComments" data-toggle="tab">Comments</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane" id="popularPosts">
+                            <ul class="list-unstyled simple-post-list">
+                                <li>
+                                    <div class="post-image">
+                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-7.jpg" alt="Blog"></a>
+                                    </div>
+                                    <div class="post-info">
+                                        <a href="blog-single.html">Proin rutrum nisi eu ante mattis sit amet</a>
+                                        <div class="post-meta">
+                                            <i class="fa fa-eye"></i> 113 views
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="post-image">
+                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-6.jpg" alt="Blog"></a>
+                                    </div>
+                                    <div class="post-info">
+                                        <a href="blog-single.html">Sed non mauris vitae erat consequat</a>
+                                        <div class="post-meta">
+                                            <i class="fa fa-eye"></i> 113 views
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="post-image">
+                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-5.jpg" alt="Blog"></a>
+                                    </div>
+                                    <div class="post-info">
+                                        <a href="blog-single.html">Nullam ac urna eu felis dapibus</a>
+                                        <div class="post-meta">
+                                            <i class="fa fa-eye"></i> 113 views
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="post-image">
+                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-4.jpg" alt="Blog"></a>
+                                    </div>
+                                    <div class="post-info">
+                                        <a href="blog-single.html">Class aptent taciti sociosqu ad litora</a>
+                                        <div class="post-meta">
+                                            <i class="fa fa-eye"></i> 113 views
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="post-image">
+                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-3.jpg" alt="Blog"></a>
+                                    </div>
+                                    <div class="post-info">
+                                        <a href="blog-single.html">Ac urna eu felis condimentum</a>
+                                        <div class="post-meta">
+                                            <i class="fa fa-eye"></i> 113 views
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="tab-pane active" id="latestComments">
+                            <ul class="list-unstyled simple-post-list">
+                                <li>
+                                    <div class="post-image">
+                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-1.jpg" alt="Blog"></a>
+                                    </div>
+                                    <div class="post-info">
+                                        <a href="blog-single.html">Sed non mauris vitae erat consequat</a>
+                                        <div class="post-meta">
+                                            <i class="fa fa-eye"></i> 213 views
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="post-image">
+                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-2.jpg" alt="Blog"></a>
+                                    </div>
+                                    <div class="post-info">
+                                        <a href="blog-single.html">Proin rutrum nisi eu ante mattis sit amet</a>
+                                        <div class="post-meta">
+                                            <i class="fa fa-eye"></i> 117 views
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="post-image">
+                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-3.jpg" alt="Blog"></a>
+                                    </div>
+                                    <div class="post-info">
+                                        <a href="blog-single.html">Nullam ac urna eu felis dapibus</a>
+                                        <div class="post-meta">
+                                            <i class="fa fa-eye"></i> 19 views
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="post-image">
+                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-4.jpg" alt="Blog"></a>
+                                    </div>
+                                    <div class="post-info">
+                                        <a href="blog-single.html">Class aptent taciti sociosqu ad litora</a>
+                                        <div class="post-meta">
+                                            <i class="fa fa-eye"></i> 113 views
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="post-image">
+                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-3.jpg" alt="Blog"></a>
+                                    </div>
+                                    <div class="post-info">
+                                        <a href="blog-single.html">Ac urna eu felis condimentum</a>
+                                        <div class="post-meta">
+                                            <i class="fa fa-eye"></i> 113 views
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </aside>
+                <!-- End Tabs -->
+
+            </div>
+        </div>
+    </div>
+    <!-- End content with sidebar -->
+
+</div>
+
+@section scripts
+{
+<script>
+        function myMap() {
+            var location = new google.maps.LatLng("42.015186", "24.864642");
+
+            var mapOptions = {
+                center: new google.maps.LatLng(42, 24.8),
+                zoom: 10,
+                mapTypeId: google.maps.MapTypeId.HYBRID
+            }
+            var map = new google.maps.Map(document.getElementById("contact-map"), mapOptions);
+
+            let marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                visible: true
+            });
+        }
+</script>
+
+    <!--GoogleMap Setup-->
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRNibRrD3DnsD2EoqbagZhLwnf82GxraU&callback=myMap"></script>
+}

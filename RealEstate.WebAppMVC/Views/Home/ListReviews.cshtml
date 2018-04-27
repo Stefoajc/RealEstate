@@ -1,0 +1,31 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.ListReviewViewModel>
+@{
+    ViewBag.Title = "ListReviews";
+}
+
+<style>
+    .review-item{
+        overflow:no-display;
+    }
+</style>
+
+<p></p>
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-5">
+        <div class="row">
+            @foreach (var review in Model)
+            {
+            <div class="col-md-12">
+                <img class="pull-left" width="75" height="75" src=@review.UserProfileImagePath alt="Photo" />
+                <div>
+                    <div class="review-item"><b> Потребител: </b> @review.ReviewUserFullname</div>
+                    <div class="review-item"><b> Оценка: </b> @review.ReviewScore</div>
+                    <div class="review-item"><b> Коментар: </b> @review.ReviewText</div>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+    <div class="col-md-4"></div>
+</div>

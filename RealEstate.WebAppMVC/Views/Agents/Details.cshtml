@@ -1,0 +1,124 @@
+﻿@model RealEstate.ViewModels.WebMVC.AgentListViewModel
+
+
+<!-- Begin Main -->
+<div role="main" class="main pgl-bg-grey">
+    <!-- Begin page top -->
+    <section class="page-top">
+        <div class="container">
+            <div class="page-top-in">
+                @*<h2><span>Agent Profile</span></h2>*@
+            </div>
+        </div>
+    </section>
+    <!-- End page top -->
+    <!-- Begin Featured Agents -->
+    <section class="pgl-agents">
+        <div class="container">
+            <h2>Профил на брокера</h2>
+            <div class="agent-profile">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="pgl-agent-item pgl-bg-light">
+                            <div class="row pgl-midnarrow-row">
+                                <div class="col-xs-3">
+                                    <div class="img-thumbnail-medium">
+                                        <a href=@Url.Action("Details","Agents", new { id = Model.AgentId})><img src=@Model.ImagePath class="img-responsive" alt=""></a>
+                                    </div>
+                                </div>
+                                <div class="col-xs-9">
+                                    <div class="pgl-agent-info">
+                                        <small>NO.1</small>
+                                        <h4><a href=@Url.Action("Details","Agents", new { id = Model.AgentId})>@Model.FullName</a></h4>
+                                        <address>
+                                            <i class="fa fa-map-marker"></i> Office : @Model.OfficePhone<br>
+                                            <i class="fa fa-phone"></i> Mobile : @Model.PhoneNumber<br>
+                                            <i class="fa fa-fax"></i> Fax : @Model.PhoneNumber<br>
+                                            <i class="fa fa-envelope-o"></i> Mail: <a href="mailto:">@Model.Email</a>
+                                        </address>
+                                        <p>@Model.Description</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Featured Agents -->
+            <!-- Begin Our Agents -->
+            <section class="pgl-properties">
+                <h2>Имоти представлявани от брокера</h2>
+                <div class="properties-full">
+                    @for (int i = 0; i < ViewBag.AgentProperties.Count;)
+                    {
+                        <div class="row">
+                            @for (int j = 0; i < ViewBag.AgentProperties.Count; j++, i++)
+                            {
+                                if (j % 3 == 0 && j != 0)
+                                {
+                                    break;
+                                }
+                                <div class="col-xs-4 animation">
+                                    <div class="pgl-property">
+                                        <div class="property-thumb-info">
+                                            <div class="property-thumb-info-image">
+                                                <img alt="" class="img-responsive" src="@ViewBag.AgentProperties[i].ImagePath">
+                                                <span class="property-thumb-info-label">
+                                                    <span class="label price">@ViewBag.AgentProperties[i].Price</span>
+                                                    <span class="label">@ViewBag.AgentProperties[i].Status</span>
+                                                </span>
+                                            </div>
+                                            <div class="property-thumb-info-content">
+                                                <h3>
+                                                    <a href="@Url.Action("Details","Properties", new { id = ViewBag.AgentProperties[i].PropertyId})">@ViewBag.AgentProperties[i].Info</a>
+                                                </h3>
+                                                <address>Ferris Park, Jersey City Land in Sales</address>
+                                            </div>
+                                            <div class="amenities clearfix">
+                                                <ul class="pull-left">
+                                                    @Html.Raw(ViewBag.AgentProperties[i].BottomLeft)
+                                                    @*<li><strong>Площ:</strong> @ViewBag.AgentProperties[i].AreaInSquareFt<sup>m2</sup></li>*@
+                                                </ul>
+                                                <ul class="pull-right">
+                                                    @Html.Raw(ViewBag.AgentProperties[i].BottomRight)
+                                                    @*<li title="Преглеждания"><i class="fa fa-eye"></i> @ViewBag.AgentProperties[i].Views</li>
+                                                    <li title="Брой спални"><i class="icons icon-bedroom"></i> @ViewBag.AgentProperties[i].BedroomsCount</li>
+                                                    <li title="Брой бани"><i class="icons icon-bathroom"></i> @ViewBag.AgentProperties[i].BathroomsCount</li>*@
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            }
+                        </div>
+                    }
+                    <ul class="pagination">
+                        @if (ViewBag.pageCount > 1)
+                        {
+                            <li><a href="@Url.Action("Details", "Agents", new {ViewBag.agentId, pageCount = (int) ViewBag.pageCount - 1, ViewBag.pageSize})">@(ViewBag.pageCount - 1)</a></li>
+                        }
+                        <li class="active">
+                            <a href="@Url.Action("Details", "Agents", new {ViewBag.agentId, ViewBag.pageCount, ViewBag.pageSize})">
+                                @ViewBag.pageCount
+                                <span class="sr-only">(текуща)</span>
+                            </a>
+                        </li>
+                        @if (ViewBag.LastPage > ViewBag.pageCount)
+                        {
+                            <li><a href="@Url.Action("Details", "Agents", new {ViewBag.agentId, pageCount = (int) ViewBag.pageCount + 1, ViewBag.pageSize})">@(ViewBag.pageCount + 1)</a></li>
+                            if (ViewBag.LastPage > ViewBag.pageCount + 1)
+                            {
+                                <li><a href="@Url.Action("Details", "Agents", new {ViewBag.agentId, pageCount = (int) ViewBag.pageCount + 2, ViewBag.pageSize})">@(ViewBag.pageCount + 2)</a></li>
+                            }
+                            <li><a href="@Url.Action("Details", "Agents", new {ViewBag.agentId, pageCount = (int) ViewBag.pageCount + 1, ViewBag.pageSize})">Следващ</a></li>
+                        }
+                    </ul>
+
+                </div>
+            </section>
+        </div>
+    </section>
+</div>
+
+<!-- End Our Agents -->

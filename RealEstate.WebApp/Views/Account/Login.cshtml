@@ -1,0 +1,47 @@
+﻿@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    @Styles.Render("~/Content/AccountStyleSheets")
+</head>
+
+<body>
+
+<div class="login-page">
+    <div class="form">
+        <form class="login-form">
+            <input type="text" placeholder="username" id="username"/>
+            <input type="password" placeholder="password" id="password"/>
+            <input id="login" type="button" value="Login"/>
+            <p class="message">Not registered? <a href="#">Create an account</a></p>
+        </form>
+    </div>
+</div>
+
+    @section scripts
+    {
+        <script>
+            $(document).ready(function () {
+                $('#login').on('click',function() {
+                    $.post("/Token",
+                        {
+                            grant_type: "password",
+                            username: $('#username').val(),
+                            password: $('#password').val()
+                        },
+                        function(data, status) {
+                            console.log(data);
+                            console.log(status);
+                        }
+                    );
+                });
+            })
+        </script>
+    }
+</body>
+</html>

@@ -1,0 +1,444 @@
+﻿@model RealEstate.ViewModels.WebMVC.DetailsPropertyViewModel
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="Property-Details,property,имот,недвижимо имущество,имущество">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>sProperties</title>
+    @section css{
+        <style>
+            .nonselectable-image {
+                cursor: pointer;
+                user-select: none;
+                -o-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -webkit-user-select: none;
+            }
+        </style>
+    }
+</head>
+<body>
+    <div id="page">
+        <!-- Begin Main -->
+        <div role="main" class="main pgl-bg-grey">
+            <!-- Begin page top -->
+            <section class="page-top">
+                <div class="container">
+                    <div class="page-top-in">
+                        @*<h2><span>Property Detail</span></h2>*@
+                    </div>
+                </div>
+            </section>
+            <!-- End page top -->
+            <!-- Begin content with sidebar -->
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-9 content">
+
+                        <section class="pgl-pro-detail pgl-bg-light">
+                            <div id="slider" class="flexslider">
+                                <ul class="slides">
+                                    @foreach (var image in Model.Images)
+                                    {
+                                        <li>
+                                            <img src="@image" alt="" draggable="false" class="nonselectable-image">
+                                            <span class="property-thumb-info-label">
+                                                <span class="label price">@Model.SellingPrice</span>
+                                                <span class="label forrent">Продажна</span>
+                                            </span>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+
+                            <div id="carousel" class="flexslider">
+
+                                <ul class="slides">
+                                    @foreach (var image in Model.Images)
+                                    {
+                                        <li>
+                                            <img src="@image" alt="" draggable="false" class="nonselectable-image">
+                                        </li>
+                                    }
+
+                                </ul>
+                            </div>
+                            <div class="pgl-detail">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <ul class="list-unstyled amenities amenities-detail">
+                                            <li><strong>Тип: </strong> @Model.PropertyType</li>
+                                            <li><strong>Area:</strong> @Model.AreaInSquareFt<sup>m2</sup></li>
+                                            <li><address><i class="icons icon-location"></i> @Model.Address.FullAddress</address></li>
+                                            @if (!string.IsNullOrEmpty(Model.BedroomsCount))
+                                            {
+                                                <li><i class="icons icon-bedroom"></i> @Model.BedroomsCount Спални</li>
+                                            }
+                                            @if (!string.IsNullOrEmpty(Model.BathroomsCount))
+                                            {
+                                                <li><i class="icons icon-bathroom"></i> @Model.BathroomsCount Бани</li>
+                                            }
+                                            @if (!string.IsNullOrEmpty(Model.RoomCount))
+                                            {
+                                                <li><i class="icons icon-bathroom"></i> @Model.RoomCount Стаи</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <h2>@Model.Address.FullAddress</h2>
+                                        <p><strong>Aliquam vel egestas turpis. Proin sollicitudin imperdiet nisi ac rutrum. Sed imperdiet libero malesuada erat cursus eu pulvinar tellus rhoncus. Ut eget tellus neque, faucibus ornare odio. Fusce sagittis hendrerit mi a sollicitudin.</strong></p>
+                                        <p>@Model.AdditionalDescription</p>
+                                    </div>
+                                </div>
+
+                                <div class="tab-detail">
+                                    <h3>Повече информация</h3>
+                                    <div class="panel-group" id="accordion">
+                                        <div class="panel panel-default pgl-panel">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Допълнителна информация</a> </h4>
+                                            </div>
+                                            <div id="collapseOne" class="panel-collapse collapse in">
+                                                <div class="panel-body">
+                                                    <ul>
+                                                        @foreach (var attribute in Model.Attributes)
+                                                        {
+                                                            <li><strong>@attribute.Key</strong> @attribute.Value</li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel panel-default pgl-panel">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" class="collapsed">Видео</a> </h4>
+                                            </div>
+                                            <div id="collapseTwo" class="panel-collapse collapse">
+                                                <div class="panel-body"> <p>Sed perspiciatis unde omnisiste natus error voluptatem remopa accusantium doloremque laudantium, totam rem aperiam.</p> </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel panel-default pgl-panel">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title">
+                                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" class="collapsed">Карта</a>
+                                                </h4>
+                                            </div>
+                                            <div id="collapseThree" class="panel-collapse collapse">
+                                                <div class="panel-body">
+                                                    @if(Model.Address.Longitude != null && Model.Address.Latitude != null)
+                                                    {
+                                                        <p>Този имот няма информация за местоположение за картата.</p>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div id="contact-map" class="pgl-bg-light"></div>
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel panel-default pgl-panel">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseFouth" class="collapsed">Агент</a> </h4>
+                                            </div>
+                                            <div id="collapseFouth" class="panel-collapse collapse">
+                                                <div class="panel-body">
+                                                    <div class="pgl-agent-item pgl-bg-light">
+                                                        @if (Model.Agent != null)
+                                                        {
+                                                            <div class="row pgl-midnarrow-row">
+                                                                <div class="col-xs-4">
+                                                                    <div class="img-thumbnail-medium">
+                                                                        <a href="@Url.Action("Details", "Agents", new {agentId = Model.Agent.AgentId})">
+                                                                            <img alt="" class="img-responsive" src="@Model.Agent.ImagePath">
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-8">
+                                                                    <div class="pgl-agent-info">
+                                                                        <small></small>
+                                                                        <h4><a href="@Url.Action("Details", "Agents", new {agentId = Model.Agent.AgentId})">@Model.Agent.FullName</a></h4>
+                                                                        <address>
+                                                                            <i class="fa fa-map-marker"></i> Office : @Model.Agent.OfficePhone<br>
+                                                                            <i class="fa fa-phone"></i> Mobile : @Model.Agent.PhoneNumber<br>
+                                                                            <i class="fa fa-fax"></i> Fax : @Model.Agent.PhoneNumber<br>
+                                                                            <i class="fa fa-envelope-o"></i> Mail: <a href="mailto:@(Model.Agent.Email)">@Model.Agent.Email</a>
+                                                                        </address>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel panel-default pgl-panel">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseFive" class="collapsed">Връзка с нас</a> </h4>
+                                            </div>
+                                            <div id="collapseFive" class="panel-collapse collapse">
+                                                <div class="panel-body">
+                                                    <p>Sed perspiciatis unde omnisiste natus error voluptatem remopa accusantium doloremque laudantium, totam rem aperiam.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Begin Related properties -->
+                        <section class="pgl-properties">
+                            <h2>Подобни имоти</h2>
+                            <div class="row">
+                                <div class="owl-carousel pgl-pro-slide owl-theme owl-carousel-init" data-plugin-options="{&quot;items&quot;: 3, &quot;itemsDesktop&quot;: 3, &quot;singleItem&quot;: false, &quot;autoPlay&quot;: false, &quot;pagination&quot;: false}" style="display: block; opacity: 1;">
+
+                                    @foreach (var relatedProperty in ViewBag.RelatedProperties)
+                                    {
+                                        <div class="owl-item">
+                                            <div class="col-md-12 animation">
+                                                <div class="pgl-property">
+                                                    <div class="property-thumb-info">
+                                                        <div class="property-thumb-info-image">
+                                                            <img alt="" class="img-responsive" src="@relatedProperty.ImagePath">
+                                                            <span class="property-thumb-info-label">
+                                                                <span class="label price">@relatedProperty.Price</span>
+                                                                <span class="label forrent">@relatedProperty.Status</span>
+                                                            </span>
+                                                        </div>
+                                                        <div class="property-thumb-info-content">
+                                                            <h3>
+                                                                <a href="@Url.Action("Details","Properties", new { id = relatedProperty.PropertyId})">@relatedProperty.Info</a>
+                                                            </h3>
+                                                            <address>@relatedProperty.FullAddress</address>
+                                                        </div>
+                                                        <div class="amenities clearfix">
+                                                            <ul class="pull-left">
+                                                                @Html.Raw(relatedProperty.BottomLeft)
+                                                            </ul>
+                                                            <ul class="pull-right">
+                                                                @Html.Raw(relatedProperty.BottomRight)
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+                        </section>
+                        <!-- End Related properties -->
+
+                    </div>
+                    <div class="col-md-3 sidebar">
+                        <!-- Begin Advanced Search -->
+                        <aside class="block pgl-advanced-search pgl-bg-light">
+                            <h3>Разширено търсене</h3>
+                            <form name="advancedsearch">
+                                <div class="form-group">
+                                    <label class="sr-only" for="property-status">Статут на имота</label>
+                                    <select id="property-status" name="property-status" data-placeholder="Property Status" class="chosen-select" style="display: none;">
+                                        <option selected="selected" value="Property Status">Статут на имота</option>
+                                        <option value="sale">За продан</option>
+                                        <option value="rent">Под наем</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="location">Град</label>
+                                    <select id="location" name="location" data-placeholder="Location" class="chosen-select" style="display: none;">
+                                        <option selected="selected" value="Location">Град</option>
+                                        @foreach (var city in ViewBag.Cities)
+                                        {
+                                            <option value="@city.CityId">@city.CityName</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="property-types">Типове имоти</label>
+                                    <select id="property-types" name="property-types" data-placeholder="Property Types" class="chosen-select" style="display: none;">
+                                        <option selected="selected" value="Property Types">Типове имоти</option>
+                                        @foreach (var propertyType in ViewBag.PropertyTypes)
+                                        {
+                                            <option value="@((int)propertyType.PropertyTypeId)">@propertyType.PropertyTypeName</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <div class="form-group">
+                                        <label class="sr-only" for="area-from">Площ</label>
+                                        <select id="area-from" name="area-from" data-placeholder="Area From" class="chosen-select" style="display: none;">
+                                            <option selected="selected" value="Area From">Площ</option>
+                                            <option value="450">над 450кв.м.</option>
+                                            <option value="450">до 450кв.м.</option>
+                                            <option value="350">до 350кв.м.</option>
+                                            <option value="250">до 250кв.м.</option>
+                                            <option value="150">до 150кв.м.</option>
+                                            <option value="100">до 100кв.м.</option>
+                                            <option value="50">до 50кв.м.</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="search-bedrooms">Спални</label>
+                                    <select id="search-bedrooms" name="search-bedrooms" data-placeholder="Bedrooms" class="chosen-select" style="display: none;">
+                                        <option selected="selected" value="Bedrooms">Спални</option>
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="5plus">5+</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="search-bathrooms">Бани</label>
+                                    <select id="search-bathrooms" name="search-bathrooms" data-placeholder="Bathrooms" class="chosen-select" style="display: none;">
+                                        <option selected="selected" value="Bathrooms">Бани</option>
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="4plus">4+</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row pgl-narrow-row">
+                                        <div class="col-xs-6">
+                                            <label class="sr-only" for="search-minprice">Цена от</label>
+                                            <select id="search-minprice" name="search-minprice" data-placeholder="Price From" class="chosen-select" style="display: none;">
+                                                <option selected="selected" value="Price From">Цена от</option>
+                                                <option value="0">$0</option>
+                                                <option value="25000">$25000</option>
+                                                <option value="50000">$50000</option>
+                                                <option value="75000">$75000</option>
+                                                <option value="100000">$100000</option>
+                                                <option value="150000">$150000</option>
+                                                <option value="200000">$200000</option>
+                                                <option value="300000">$300000</option>
+                                                <option value="500000">$500000</option>
+                                                <option value="750000">$750000</option>
+                                                <option value="1000000">$1000000</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <label class="sr-only" for="search-maxprice">Цена до</label>
+                                            <select id="search-maxprice" name="search-maxprice" data-placeholder="Price To" class="chosen-select" style="display: none;">
+                                                <option selected="selected" value="Price To">Цена до</option>
+                                                <option value="25000">$25000</option>
+                                                <option value="50000">$50000</option>
+                                                <option value="75000">$75000</option>
+                                                <option value="100000">$100000</option>
+                                                <option value="150000">$150000</option>
+                                                <option value="200000">$200000</option>
+                                                <option value="300000">$300000</option>
+                                                <option value="500000">$500000</option>
+                                                <option value="750000">$750000</option>
+                                                <option value="1000000">$1000000</option>
+                                                <option value="1000000plus">&gt;$1000000</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-block btn-primary">Намери своя дом</button>
+                                </div>
+
+                            </form>
+                        </aside>
+                        <!-- End Advanced Search -->
+                        <!-- Begin Our Agents -->
+                        <aside class="block pgl-agents pgl-bg-light">
+                            <h3>Нашите агенти</h3>
+                            <div class="owl-carousel pgl-pro-slide pgl-agent-item owl-theme owl-carousel-init" data-plugin-options="{&quot;items&quot;: 1, &quot;pagination&quot;: false, &quot;autoHeight&quot;: true}" style="display: block; opacity: 1;">
+                                @foreach (var agent in ViewBag.Agents)
+                                {
+                                    <div class="owl-item" style="width: 223px;">
+                                        <div class="pgl-agent-item">
+                                            <div class="img-thumbnail-medium">
+                                                <a href="@Url.Action("Details","Agents",new {agentId = agent.AgentId})"><img src="@agent.ImagePath" class="img-responsive" alt=""></a>
+                                            </div>
+                                            <div class="pgl-agent-info">
+                                                <small></small>
+                                                <h4><a href="@Url.Action("Details","Agents",new {agentId = agent.AgentId})">@agent.FullName</a></h4>
+                                                <address>
+                                                    <i class="fa fa-map-marker"></i> Office : @agent.OfficePhone<br>
+                                                    <i class="fa fa-phone"></i> Mobile : @agent.PhoneNumber<br>
+                                                    <i class="fa fa-fax"></i> Fax : @agent.PhoneNumber<br>
+                                                    <i class="fa fa-envelope-o"></i> Mail: <a href="mailto:@(agent.Email)">@agent.Email</a>
+                                                </address>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </aside>
+                        <!-- End Our Agents -->
+                        <!-- Begin Advanced Search -->
+                        <aside class="block pgl-bg-dark pgl-testimonials">
+                            <div class="owl-carousel pgl-testimonial owl-theme owl-carousel-init" data-plugin-options="{&quot;items&quot;: 1, &quot;pagination&quot;: false, &quot;autoHeight&quot;: true}" style="display: block; opacity: 1;">
+                                @foreach (var client in ViewBag.HappyClient)
+                                {
+                                    <div class="owl-item">
+                                        <div class="col-md-12">
+                                            <div class="testimonial-author">
+                                                <div class="img-thumbnail-small img-circle">
+                                                    <img src="@client.ImagePath" style="max-height: 110px;max-width: 110px" class="img-circle" alt="@client.FullName">
+                                                </div>
+                                                <h4>@client.FullName</h4>
+                                                <p><strong>Клиент</strong></p>
+                                            </div>
+                                            <div class="divider-quote-sign"><span>“</span></div>
+                                            <blockquote class="testimonial">
+                                                <p>@client.AdditionalInformation</p>
+                                            </blockquote>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </aside>
+                        <!-- End Advanced Search -->
+
+                    </div>
+                </div>
+            </div>
+            <!-- End content with sidebar -->
+
+        </div>
+        <!-- End Main -->
+
+    </div>
+
+
+    @section scripts
+    {
+        <script>
+            function initMap() {
+                var location = new google.maps.LatLng(@Model.Address.Latitude, @Model.Address.Longitude);
+
+                var mapOptions = {
+                    center: location,
+                    zoom: 10,
+                    mapTypeId: 'roadmap'
+                }
+                let map = new google.maps.Map(document.getElementById("contact-map"), mapOptions);
+
+                let marker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    visible: true
+                });
+
+            }
+        </script>
+
+        <!--GoogleMap Setup-->
+        <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRNibRrD3DnsD2EoqbagZhLwnf82GxraU&callback=initMap"></script>
+    }
+
+</body>

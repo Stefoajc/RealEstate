@@ -1,0 +1,290 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/owl")
+    @Styles.Render("~/Content/bootstrapDatePicker")
+    @RenderSection("css", false)
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/owl")
+    @Scripts.Render("~/bundles/modelstate-errors-handling")
+    @Scripts.Render("~/bundles/bootstrapDatePicker")
+
+    <!-- Bootstrap -->
+    @*<link href="/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/css/bootstrap-theme.css" rel="stylesheet">*@
+    <link href="/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Libs CSS -->
+    <link rel="stylesheet" href="/css/font-awesome/font-awesome.min.css" media="screen">
+    <link rel="stylesheet" href="/css/flexslider.css" media="screen">
+    <link rel="stylesheet" href="/css/chosen/chosen.css" media="screen">
+
+    <!-- Theme -->
+    <link href="/css/theme/theme-animate.css" rel="stylesheet">
+    <link href="/css/theme/theme-elements.css" rel="stylesheet">
+    <link href="/css/theme/theme-blog.css" rel="stylesheet">
+    <link href="/css/theme/theme-map.css" rel="stylesheet">
+    <link href="/css/theme/theme.css" rel="stylesheet">
+
+    <!-- Style Switcher-->
+    <link rel="stylesheet" href="/css/style-switcher.css">
+
+    <!-- Theme Responsive-->
+    <link href="/css/theme/theme-responsive.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+    {
+        @Html.AntiForgeryToken()
+    }
+    <header>
+        <div id="top">
+            <div class="container">
+                <p class="pull-left text-note hidden-xs">
+                    <i class="fa fa-phone"></i> Имаш нужда от помощ? +359 876717000
+                </p>
+                <ul class="nav nav-pills nav-top navbar-right">
+                    <li class="login"><a href="javascript:void(0);"><i class="fa fa-user"></i></a></li>
+                    <li><a href="#" title="" data-placement="bottom" data-toggle="tooltip" data-original-title="Email"><i class="fa fa-envelope-o"></i></a></li>
+                    <li><a href="#" title="" data-placement="bottom" data-toggle="tooltip" data-original-title="Facebook"><i class="fa fa-facebook"></i></a></li>
+                    <li><a href="#" title="" data-placement="bottom" data-toggle="tooltip" data-original-title="Twitter"><i class="fa fa-twitter"></i></a></li>
+                    <li><a href="#" title="" data-placement="bottom" data-toggle="tooltip" data-original-title="Google+"><i class="fa fa-google-plus"></i></a></li>
+                </ul>
+            </div>
+        </div>
+        <nav class="navbar navbar-default pgl-navbar-main" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+                    <a class="logo" href="@Url.Action("Index","Home")"><img src="/images/logo.png" alt="Logo"></a>
+                </div>
+
+                <div class="navbar-collapse collapse width">
+                    <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown active">
+                            <a href=@Url.Action("Index", "Home") data-target="#" class="dropdown-toggle disabled" data-toggle="dropdown">Начало</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="@Url.Action("Activity","Home")">Дейност</a></li>
+                                <li><a href="@Url.Action("Team","Home")">Екип</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="/Properties/Index" class="dropdown-toggle disabled" data-toggle="dropdown">Имоти</a>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown">
+                                    <a href=@Url.Action("ListProperties","Properties") class="dropdown-toggle disabled" data-target="#" data-toggle="dropdown">Продажба</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href=@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, pageCount = 1, ViewBag.pageSize, sortBy = "Views", orderBy = "Descending"})>Най-разглеждани</a></li>
+                                        <li><a href=@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, pageCount = 1, ViewBag.pageSize, sortBy = "Date", orderBy = "Descending"})>Най-скорошни</a></li>
+                                        <li><a href=@Url.Action("Map","Properties")>Карта</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href=@Url.Action("ListRentProperties","Properties") class="dropdown-toggle disabled" data-target="#" data-toggle="dropdown">Под наем</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href=@Url.Action("ListRentProperties", "Properties", new {ViewBag.propertyType, pageCount = 1, ViewBag.pageSize, sortBy = "Views", orderBy = "Descending"})>Най-разглеждани</a></li>
+                                        <li><a href=@Url.Action("ListRentProperties", "Properties", new {ViewBag.propertyType, pageCount = 1, ViewBag.pageSize, sortBy = "Date", orderBy = "Descending"})>Най-скорошни</a></li>
+                                        <li><a href=@Url.Action("Map","Properties")>Карта</a></li>
+                                        <li><a href=@Url.Action("Seasonal","Properties")>СЕЗОННИ</a></li>
+                                    </ul>
+                                </li>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <li><a href="@Url.Action("Recommended","Properties")">Препоръчани</a></li>
+                                }
+                                <li><a href="grid-sidebar.html">Изгодни</a></li>
+                                <li><a href="@Url.Action("Search","Properties")">Търсене</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href=@Url.Action("Index","Agents") class="dropdown-toggle disabled" data-toggle="dropdown">Агенти</a>
+                            <ul class="dropdown-menu">
+                                <li><a href=@Url.Action("Index","Agents")>Нашите Агенти</a></li>
+                                <li><a href=@Url.Action("Details","Agents")>Профил на Агент</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle disabled" data-toggle="dropdown">Информация</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="@Url.Action("About","Home")">За нас</a></li>
+                                <li><a href=@Url.Action("FAQ","Home")>Често задавани въпроси</a></li>
+                                <li><a href="@Url.Action("Contact","Home")">Контакти</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle disabled" data-toggle="dropdown">Блог</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="blog.html">Blog Large With Sidebar</a></li>
+                                <li><a href="blog-2-cols.html">Blog 2 Columns</a></li>
+                                <li><a href="blog-2-cols-sidebar.html">Blog 2 Columns With Sidebar</a></li>
+                                <li><a href="blog-single.html">Article detail</a></li>
+                            </ul>
+                        </li>
+                        @if (User.IsInRole("Administrator") || User.IsInRole("Agent") || User.IsInRole("Maintenance"))
+                        {
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle disabled" data-toggle="dropdown">Операции</a>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown">
+                                        <a href="#">Имоти</a>
+                                        <ul class="dropdown-menu" style="left:30px;top:50px;">
+                                            <li>
+                                                <a href="@Url.Action("Create","Properties")">Създаване на имот</a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("List","Properties")">Списък имоти</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown">
+                                        <a href="#">Собственици</a>
+                                        <ul class="dropdown-menu" style="left:30px;top:50px;">
+                                            <li>
+                                                <a href="@Url.Action("RegisterOwner","Account")">Добавяне на Собственик</a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("RegisterOwner","Account")">Списък на Собствениците</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    @if (User.IsInRole("Administrator") || User.IsInRole("Maintenance"))
+                                    {
+                                        <li class="dropdown">
+                                            <a href="#">Агенти</a>
+                                            <ul class="dropdown-menu" style="left:30px;top:50px;">
+                                                <li>
+                                                    <a href="@Url.Action("RegisterAgent","Account")">Добавяне на Агент</a>
+                                                </li>
+                                                <li>
+                                                    <a href="@Url.Action("List","Account")">Списък на Агенти</a>
+                                                </li>
+                                            </ul>
+
+                                        </li>
+
+                                        <li class="dropdown">
+                                            <a href="#">Служители</a>
+                                            <ul class="dropdown-menu" style="left:30px;top:50px;">
+                                                <li>
+                                                    <a href="#">Добавяне на служител</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Списък на служителите</a>
+                                                </li>
+                                            </ul>
+
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+
+                        }
+                        @Html.Partial("_LoginPartial")
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div><!--/.container-fluid -->
+        </nav>
+    </header>
+
+    <div role="main" class="main">
+        @RenderBody()
+        <!-- Begin footer -->
+        <footer class="pgl-footer">
+            <div class="container">
+                <div class="pgl-upper-foot">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h2>Контакти</h2>
+                            <p>При нужда от помощ не се колебайте да се свържите с наш служител на посочените номера и електронна поща, както и в нашият офис.</p>
+                            <address>
+                                <i class="fa fa-map-marker"></i> Офис : 1-800-666-8888<br>
+                                <i class="fa fa-phone"></i> Мобилен : 0800-666-6666<br>
+                                <i class="fa fa-fax"></i> Факс : 1-800-666-8888<br>
+                                <i class="fa fa-envelope-o"></i> E-Mail: <a href="mailto:pixelgeklab@gmail.com">StefanPeevCorp@sPc.bg</a>
+                            </address>
+                        </div>
+                        <div class="col-sm-2">
+                            <h2>полезни линкове</h2>
+                            <ul class="list-unstyled">
+                                <li><a href="#">Помощ и Въпроси</a></li>
+                                <li><a href="#">Цена на имот</a></li>
+                                <li><a href="#">Маркетингов изглед</a></li>
+                                <li><a href="#">Кредити</a></li>
+                                <li><a href="#">Условия и правила</a></li>
+                                <li><a href="#">Политика на защита</a></li>
+                                <li><a href="#">Правила на общноста</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-2">
+                            <h2>Страници</h2>
+                            <ul class="list-unstyled">
+                                <li><a href="#">Font &amp; Color</a></li>
+                                <li><a href="#">Блогове</a></li>
+                                <li><a href="#">Контакти</a></li>
+                                <li><a href="#">404 Page</a></li>
+                                <li><a href="#">Разширено търсене</a></li>
+                                <li><a href="#">Форум</a></li>
+                                <li><a href="#">Google Map</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-4">
+                            <h2>Не пропускайте!</h2>
+                            <p>За да се абонирате за нашите услуги за известяване по Email, които ви известяват за нови имоти и специални предложения, въведете в полето Email вашият адрес</p>
+                            <form class="form-inline pgl-form-newsletter" role="form">
+                                <div class="form-group">
+                                    <label class="sr-only" for="exampleInputEmail2">Email address</label>
+                                    <input class="form-control" id="exampleInputEmail2" placeholder="Въведи Email тук" type="email">
+                                </div>
+                                <button type="submit" class="btn btn-submit"><i class="icons icon-submit"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="pgl-copyrights">
+                    <p>
+                        Copyright © 2018 sProperties.
+                    </p>
+                </div>
+            </div>
+        </footer>
+        <!-- End footer -->
+    </div>
+
+
+    <!--Chosen (DropDowns)-->
+    <script src="/js/chosen/chosen.jquery.min.js"></script>
+
+    <script src="/js/imagesloaded.pkgd.min.js"></script>
+    <script src="/js/masonry.pkgd.min.js"></script>
+
+    <!-- Theme Initializer -->
+    <script src="/js/theme/theme.plugins.js"></script>
+    <script src="/js/theme/theme.js"></script><a class="scroll-to-top" href="#" id="scrollToTop">
+        <i class="icons icon-up"></i>
+    </a>
+
+    <!--Helpers-->
+    <script type="text/javascript" src="/js/variables.js"></script>
+    <script type="text/javascript" src="/js/markerclusterer.min.js"></script>
+    <script type="text/javascript" src="/js/properties.js"></script>
+    <script type="text/javascript" src="/js/script.js"></script>
+
+    <script src="/js/gmap/gmap3.infobox.min.js"></script>
+
+    <!-- Begin Style Switcher -->
+    <script src="/js/jquery/jquery.flexslider-min.js"></script>
+
+    <!-- Style Switcher -->
+    <script type="text/javascript" src="/js/switcher.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

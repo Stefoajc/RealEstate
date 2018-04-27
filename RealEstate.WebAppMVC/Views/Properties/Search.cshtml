@@ -1,0 +1,60 @@
+﻿@model RealEstate.ViewModels.WebMVC.SearchFullViewModel
+
+@{
+    ViewBag.Title = "Търсене";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div role="main" class="main pgl-bg-grey">
+    <!-- Begin page top -->
+    <section class="page-top">
+        <div class="container">
+            <div class="page-top-in">
+                @*<h2><span>Списък имоти</span></h2>*@
+            </div>
+        </div>
+    </section>
+    <!-- End page top -->
+    <!-- Begin Advanced Rental Search -->
+    @Html.Partial("/Views/Properties/SearchRental.cshtml", Model.SearchRental)
+    <!-- End Advanced Rental Search -->
+    <!-- Begin Advanced Sell Search -->
+    @Html.Partial("/Views/Properties/SearchSell.cshtml", Model.SearchSell)
+    <!-- End Advanced Sell Search -->
+    <!-- Begin Id Search-->
+    <section class="pgl-advanced-search pgl-bg-light">
+        <div class="container">
+            @using (Html.BeginForm("Details", "Properties", FormMethod.Get))
+            {
+                <div class="row">
+                    <div class="col-xs-6 col-sm-3 pull-right">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-block btn-primary">Намери по номер</button>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-3 pull-right">
+                        <div class="form-group">
+                            <input name="id" id="propertyId" class="form-control" placeholder="Напишете номера на имота тук" />
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+    <!-- End Id Search-->
+    <!-- Begin Featured -->
+    @Html.Partial("/Views/Properties/FeaturedProperties.cshtml", (List<RealEstate.ViewModels.WebMVC.PropertyBriefInfoViewModel>)ViewBag.FeaturedProperties)
+    <!-- End Featured -->
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('.date').datepicker({
+                format: 'dd-mm-yyyy',
+                language: 'bg',
+                locale: 'bg'
+            });
+        });
+    </script>
+}

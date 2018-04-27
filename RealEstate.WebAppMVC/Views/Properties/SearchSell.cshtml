@@ -1,0 +1,138 @@
+﻿@model RealEstate.ViewModels.WebMVC.SearchSellViewModel
+
+<section class="pgl-advanced-search pgl-bg-light">
+    <div class="container">
+        @using (Html.BeginForm("SearchSell", "Properties", FormMethod.Get))
+        {
+            <div class="row">
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <input readonly="readonly" value="За продажба" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="location">Град</label>
+                        <select id="location" name="cityId" data-placeholder="Location" class="chosen-select" style="display: none;">
+                            <option selected="selected" value="">Град</option>
+                            @foreach (var city in ViewBag.Cities)
+                            {
+                                <option value="@city.CityId">@city.CityName</option>
+                            }
+                        </select>
+                        @Html.ValidationMessage("cityId", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="search-bathrooms">Бани</label>
+                        <select id="search-bathrooms" name="search-bathrooms" data-placeholder="Bathrooms" class="chosen-select" style="display: none;">
+                            <option selected="selected" value="">Бани</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="4plus">4+</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="area">Площ</label>
+                        <select id="area-from" name="area" data-placeholder="Area" class="chosen-select" style="display: none;">
+                            <option selected="selected" value="">Площ</option>
+                            <option value="450">над 450кв.м.</option>
+                            <option value="450">до 450кв.м.</option>
+                            <option value="350">до 350кв.м.</option>
+                            <option value="250">до 250кв.м.</option>
+                            <option value="150">до 150кв.м.</option>
+                            <option value="100">до 100кв.м.</option>
+                            <option value="50">до 50кв.м.</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="propertyType">Типове имоти</label>
+                        <select id="propertyType" name="propertyType" data-placeholder="Property Types" class="chosen-select" style="display: none;">
+                            <option selected="selected" value="">Типове имоти</option>
+                            @foreach (var propertyType in ViewBag.PropertyTypes)
+                            {
+                                <option value="@propertyType.PropertyTypeId">@propertyType.PropertyTypeName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="distanceFromCity">Разстояние от града</label>
+                        <select id="distanceFromCity" name="distanceFromCity" data-placeholder="Разстояние от града" class="chosen-select" style="display: none;">
+                            <option selected="selected" value="">Разстояние от града</option>
+                            <option value="0">0км</option>
+                            <option value="1">5км</option>
+                            <option value="2">10км</option>
+                            <option value="3">20км</option>
+                            <option value="4">30км</option>
+                            <option value="5">50км</option>
+                            <option value="5plus">50+км</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <div class="row pgl-narrow-row">
+                            <div class="col-xs-6">
+                                <label class="sr-only" for="priceFrom">Цена от</label>
+                                <select id="priceFrom" name="priceFrom" data-placeholder="Price From" class="chosen-select" style="display: none;">
+                                    <option selected="selected" value="">Цена от</option>
+                                    <option value="0">0лв.</option>
+                                    <option value="25000">25000лв.</option>
+                                    <option value="50000">50000лв.</option>
+                                    <option value="75000">75000лв.</option>
+                                    <option value="100000">100000лв.</option>
+                                    <option value="150000">150000лв.</option>
+                                    <option value="200000">200000лв.</option>
+                                    <option value="300000">300000лв.</option>
+                                    <option value="500000">500000лв.</option>
+                                    <option value="750000">750000лв.</option>
+                                    <option value="1000000">1000000лв.</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-6">
+                                <label class="sr-only" for="priceTo">Цена до</label>
+                                <select id="priceTo" name="priceTo" data-placeholder="Price To" class="chosen-select" style="display: none;">
+                                    <option selected="selected" value="">Цена до</option>
+                                    <option value="25000">25000лв.</option>
+                                    <option value="50000">50000лв.</option>
+                                    <option value="75000">75000лв.</option>
+                                    <option value="100000">100000лв.</option>
+                                    <option value="150000">150000лв.</option>
+                                    <option value="200000">200000лв.</option>
+                                    <option value="300000">300000лв.</option>
+                                    <option value="500000">500000лв.</option>
+                                    <option value="750000">750000лв.</option>
+                                    <option value="1000000">1000000лв.</option>
+                                    <option value="1000000plus">&gt;1000000лв.</option>
+                                </select>
+                            </div>
+                            @Html.ValidationMessage("priceTo", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-block btn-primary">Намери своя дом</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

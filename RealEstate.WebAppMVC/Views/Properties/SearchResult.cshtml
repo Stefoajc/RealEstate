@@ -1,0 +1,179 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.PropertyInfoViewModel>
+
+<div role="main" class="main pgl-bg-grey">
+    <!-- Begin page top -->
+    <section class="page-top">
+        <div class="container">
+            <div class="page-top-in">
+                @*<h2><span>Списък имоти</span></h2>*@
+            </div>
+        </div>
+    </section>
+    <!-- End page top -->
+    <!-- Begin Featured -->
+    <section class="pgl-featured">
+        <div class="container">
+            <h2>Специални предложения</h2>
+            <div class="row">
+                <div class="owl-carousel pgl-pro-slide owl-theme owl-carousel-init" data-plugin-options='{"items": 4, "singleItem": false,"autoPlay": false, "pagination": false}' style="display: block; opacity: 1;">
+                    @foreach (var property in ViewBag.FeaturedProperties)
+                    {
+                        <div class="owl-item">
+                            <div class="col-md-12 animation">
+                                <div class="pgl-property featured-item">
+                                    <div class="property-thumb-info">
+                                        <div class="property-thumb-info-image">
+                                            <img alt="" class="img-responsive" src="@property.ImagePath">
+                                        </div>
+                                        <div class="property-thumb-info-content">
+                                            <h3><a href="@Url.Action("Details" , new {id = property.PropertyId})">@property.FullAddress</a></h3>
+                                            <p>@property.PropertyName</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Featured -->
+    <!-- Begin Properties -->
+    <section class="pgl-properties pgl-bg-grey">
+        <div class="container">
+            <h2>@ViewBag.PropertiesTitle</h2>
+            <div class="properties-full">
+                <div class="listing-header clearfix">
+                    <ul class="list-inline list-icons pull-left">
+                        <li class="active"><a href="@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, ViewBag.cityId, pageCount = 1, ViewBag.pageSize, ViewBag.sortBy, orderBy = "Descending"})"><i class="fa fa-th"></i></a></li>
+                        <li><a href=@Url.Action("ListPropertiesFullWidth", "Properties", new {ViewBag.propertyType, ViewBag.cityId, pageCount = 1, ViewBag.pageSize, ViewBag.sortBy, orderBy = "Descending"})><i class="fa fa-th-list"></i></a></li>
+                        <li><a href=@Url.Action("Map", "Properties", new {ViewBag.propertyType})><i class="fa fa-map-marker"></i></a></li>
+                    </ul>
+
+                    <ul class="list-inline list-sort pull-right">
+                        <li><label for="order-status">Подредба</label></li>
+                        <li>
+                            <select id="order-status" name="order-status" data-placeholder="Order" class="chosen-select" onChange="location = this.value">
+                                <option value=@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, ViewBag.cityId, pageCount = 1, ViewBag.pageSize, ViewBag.sortBy, orderBy = "Descending"})>Намаляващ ред</option>
+                                <option value=@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, ViewBag.cityId, pageCount = 1, ViewBag.pageSize, ViewBag.sortBy, orderBy = "Ascending"})>Нарастващ ред</option>
+                            </select>
+                        </li>
+                        <li><label for="sortby-status">Сортиране по</label></li>
+                        <li style="width: 130px;">
+                            <select id="sortby-status" name="sortby-status" data-placeholder="Sort by" class="chosen-select" onChange="location = this.value">
+                                <option value=@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, ViewBag.cityId, pageCount = 1, ViewBag.pageSize, sortBy = "PropertyName", ViewBag.orderBy})>Име</option>
+                                <option value=@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, ViewBag.cityId, pageCount = 1, ViewBag.pageSize, sortBy = "Area", ViewBag.orderBy})>Площ</option>
+                                <option value=@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, ViewBag.cityId, pageCount = 1, ViewBag.pageSize, sortBy = "Date", ViewBag.orderBy})>Дата</option>
+                                <option value=@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, ViewBag.cityId, pageCount = 1, ViewBag.pageSize, sortBy = "City", ViewBag.orderBy})>Град</option>
+                                <option value=@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, ViewBag.cityId, pageCount = 1, ViewBag.pageSize, sortBy = "Views", ViewBag.orderBy})>Преглеждания</option>
+                                <option value=@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, ViewBag.cityId, pageCount = 1, ViewBag.pageSize, sortBy = "ReviewScore", ViewBag.orderBy})>Оценка</option>
+                            </select>
+                        </li>
+                    </ul>
+
+                </div>
+
+                @for (int i = 0; i < Model.Count;)
+                {
+                    <div class="row">
+                        @for (int j = 0; i < Model.Count; j++, i++)
+                        {
+                            if (j % 3 == 0 && j != 0)
+                            {
+                                break;
+                            }
+                            <div class="col-xs-4 animation">
+                                <div class="pgl-property">
+                                    <div class="property-thumb-info">
+                                        <div class="property-thumb-info-image">
+                                            <img alt="" class="img-responsive" src="@Model[i].ImagePath">
+                                            <span class="property-thumb-info-label">
+                                                <span class="label price">@Model[i].Price</span>
+                                                <span class="label">@Model[i].Status</span>
+                                            </span>
+                                        </div>
+                                        <div class="property-thumb-info-content">
+                                            <h3>
+                                                <a href="@Url.Action("Details","Properties", new { id = Model[i].PropertyId})">@Model[i].PropertyName</a>
+                                            </h3>
+                                            <address>@Model[i].FullAddress</address>
+                                        </div>
+                                        <div class="amenities clearfix">
+                                            <ul class="pull-left">
+                                                @*<li><strong>Площ:</strong> @Model[i].AreaInSquareFt<sup>m2</sup></li>*@
+                                                @Html.Raw(Model[i].BottomLeft)
+                                            </ul>
+                                            <ul class="pull-right">
+                                                <li title="Преглеждания"><i class="fa fa-eye"></i> @Model[i].Views</li>
+                                                @*@if (Model[i].BedroomsCount != null)
+                                                    {
+                                                        <li title="Брой спални"><i class="icons icon-bedroom"></i> @Model[i].BedroomsCount</li>
+                                                    }
+                                                    @if (Model[i].BathroomsCount != null)
+                                                    {
+                                                        <li title="Брой бани"><i class="icons icon-bathroom"></i> @Model[i].BathroomsCount</li>
+                                                    }*@
+                                                @Html.Raw(Model[i].BottomRight)
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        }
+                    </div>
+                }
+                @if (ViewBag.SearchParams.searchType == "SearchRental")
+                {
+                    <ul class="pagination">
+                        @if (ViewBag.SearchParams.pageCount > 1)
+                        {
+                            <li><a href="@Url.Action(ViewBag.SearchParams.searchType, "Properties",  new { ViewBag.SearchParams.from, ViewBag.SearchParams.to, ViewBag.SearchParams.rentPriceFrom, ViewBag.SearchParams.rentPriceTo , ViewBag.SearchParams.rentPropertyType, ViewBag.SearchParams.rentCityId, ViewBag.SearchParams.rentDistanceFromCity, pageCount = (int) ViewBag.SearchParams.pageCount - 1, ViewBag.SearchParams.pageSize, ViewBag.SearchParams.sortBy, ViewBag.SearchParams.orderBy})">@(ViewBag.SearchParams.pageCount - 1)</a></li>
+                        }
+                        <li class="active">
+                            <a href="@Url.Action(ViewBag.SearchParams.searchType, "Properties",  new { ViewBag.SearchParams.from, ViewBag.SearchParams.to, ViewBag.SearchParams.rentPriceFrom, ViewBag.SearchParams.rentPriceTo , ViewBag.SearchParams.rentPropertyType, ViewBag.SearchParams.rentCityId, ViewBag.SearchParams.rentDistanceFromCity, pageCount = (int) ViewBag.SearchParams.pageCount, ViewBag.SearchParams.pageSize, ViewBag.SearchParams.sortBy, ViewBag.SearchParams.orderBy})">
+                                @ViewBag.SearchParams.pageCount
+                                <span class="sr-only">(текуща)</span>
+                            </a>
+                        </li>
+                        @if (ViewBag.LastPage > ViewBag.SearchParams.pageCount)
+                        {
+                            <li><a href="@Url.Action(ViewBag.SearchParams.searchType, "Properties",  new { ViewBag.SearchParams.from, ViewBag.SearchParams.to, ViewBag.SearchParams.rentPriceFrom, ViewBag.SearchParams.rentPriceTo , ViewBag.SearchParams.rentPropertyType, ViewBag.SearchParams.rentCityId, ViewBag.SearchParams.rentDistanceFromCity, pageCount = (int) ViewBag.SearchParams.pageCount + 1, ViewBag.SearchParams.pageSize, ViewBag.SearchParams.sortBy, ViewBag.SearchParams.orderBy})">@(ViewBag.SearchParams.pageCount + 1)</a></li>
+                            if (ViewBag.LastPage > ViewBag.SearchParams.pageCount + 1)
+                            {
+                                <li><a href="@Url.Action(ViewBag.SearchParams.searchType, "Properties",  new { ViewBag.SearchParams.from, ViewBag.SearchParams.to, ViewBag.SearchParams.rentPriceFrom, ViewBag.SearchParams.rentPriceTo , ViewBag.SearchParams.rentPropertyType, ViewBag.SearchParams.rentCityId, ViewBag.SearchParams.rentDistanceFromCity, pageCount = (int) ViewBag.SearchParams.pageCount + 2, ViewBag.SearchParams.pageSize, ViewBag.SearchParams.sortBy, ViewBag.SearchParams.orderBy})">@(ViewBag.SearchParams.pageCount + 2)</a></li>
+                            }
+                            <li><a href="@Url.Action(ViewBag.SearchParams.searchType, "Properties",  new { ViewBag.SearchParams.from, ViewBag.SearchParams.to, ViewBag.SearchParams.rentPriceFrom, ViewBag.SearchParams.rentPriceTo , ViewBag.SearchParams.rentPropertyType, ViewBag.SearchParams.rentCityId, ViewBag.SearchParams.rentDistanceFromCity, pageCount = (int) ViewBag.SearchParams.pageCount + 1, ViewBag.SearchParams.pageSize, ViewBag.SearchParams.sortBy, ViewBag.SearchParams.orderBy})">Следващ</a></li>
+                        }
+                    </ul>
+                }
+                @if (ViewBag.SearchParams.searchType == "SearchSell")
+                {
+                    <ul class="pagination">
+                        @if (ViewBag.SearchParams.pageCount > 1)
+                        {
+                            <li><a href="@Url.Action(ViewBag.SearchParams.searchType, "Properties",  new { ViewBag.SearchParams.priceFrom, ViewBag.SearchParams.priceTo , ViewBag.SearchParams.propertyType, ViewBag.SearchParams.cityId, ViewBag.SearchParams.distanceFromCity, pageCount = (int) ViewBag.SearchParams.pageCount - 1, ViewBag.SearchParams.pageSize, ViewBag.SearchParams.sortBy, ViewBag.SearchParams.orderBy})">@(ViewBag.SearchParams.pageCount - 1)</a></li>
+                        }
+                        <li class="active">
+                            <a href="@Url.Action(ViewBag.SearchParams.searchType, "Properties",  new {ViewBag.SearchParams.priceFrom, ViewBag.SearchParams.priceTo , ViewBag.SearchParams.propertyType, ViewBag.SearchParams.cityId, ViewBag.SearchParams.distanceFromCity, pageCount = (int) ViewBag.SearchParams.pageCount, ViewBag.SearchParams.pageSize, ViewBag.SearchParams.sortBy, ViewBag.SearchParams.orderBy})">
+                                @ViewBag.SearchParams.pageCount
+                                <span class="sr-only">(текуща)</span>
+                            </a>
+                        </li>
+                        @if (ViewBag.LastPage > ViewBag.SearchParams.pageCount)
+                        {
+                            <li><a href="@Url.Action(ViewBag.SearchParams.searchType, "Properties",  new {ViewBag.SearchParams.priceFrom, ViewBag.SearchParams.priceTo , ViewBag.SearchParams.propertyType, ViewBag.SearchParams.cityId, ViewBag.SearchParams.distanceFromCity, pageCount = (int) ViewBag.SearchParams.pageCount + 1, ViewBag.SearchParams.pageSize, ViewBag.SearchParams.sortBy, ViewBag.SearchParams.orderBy})">@(ViewBag.SearchParams.pageCount + 1)</a></li>
+                            if (ViewBag.LastPage > ViewBag.SearchParams.pageCount + 1)
+                            {
+                                <li><a href="@Url.Action(ViewBag.SearchParams.searchType, "Properties",  new {ViewBag.SearchParams.priceFrom, ViewBag.SearchParams.priceTo , ViewBag.SearchParams.propertyType, ViewBag.SearchParams.cityId, ViewBag.SearchParams.distanceFromCity, pageCount = (int) ViewBag.SearchParams.pageCount + 2, ViewBag.SearchParams.pageSize, ViewBag.SearchParams.sortBy, ViewBag.SearchParams.orderBy})">@(ViewBag.SearchParams.pageCount + 2)</a></li>
+                            }
+                            <li><a href="@Url.Action(ViewBag.SearchParams.searchType, "Properties",  new {ViewBag.SearchParams.priceFrom, ViewBag.SearchParams.priceTo , ViewBag.SearchParams.propertyType, ViewBag.SearchParams.cityId, ViewBag.SearchParams.distanceFromCity, pageCount = (int) ViewBag.SearchParams.pageCount + 1, ViewBag.SearchParams.pageSize, ViewBag.SearchParams.sortBy, ViewBag.SearchParams.orderBy})">Следващ</a></li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </section>
+    <!-- End Properties -->
+</div>
