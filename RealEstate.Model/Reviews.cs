@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RealEstate.Model
@@ -14,6 +15,8 @@ namespace RealEstate.Model
         public string UserId { get; set; }
         public virtual ClientUsers User { get; set; }
 
+        public DateTime CreatedOn { get; private set; } = DateTime.Now;
+
         public int? ReviewScore { get; set; }
         public string ReviewText { get; set; }
     }
@@ -27,7 +30,7 @@ namespace RealEstate.Model
         [ForeignKey("Property")]
         public int PropertyId { get; set; }
 
-        public virtual Properties Property { get; set; }
+        public virtual PropertiesBase Property { get; set; }
     }
 
     /// <summary>

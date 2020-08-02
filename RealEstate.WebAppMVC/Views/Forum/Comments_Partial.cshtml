@@ -1,0 +1,22 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.Forum.CommentSideViewModel>
+
+<div class="tab-pane" id="latestComments">
+    <ul class="list-unstyled simple-post-list">
+        @foreach (var comment in Model)
+        {
+            <li>
+                <div class="post-image">
+                    <a href="@Url.Action("Details", "Posts", new {id = comment.PostId})">
+                        <img class="img-responsive" src="@comment.UserImageUrl" alt="Blog">
+                    </a>
+                </div>
+                <div class="post-info">
+                    <a class="formated-text sidebar-popular-comment-text" href="@Url.Action("Details", "Posts", new {id = comment.PostId})">@Html.Raw(comment.Comment)</a>
+                    <div class="post-meta">
+                        <i class="fa fa-eye"></i> @comment.Views прегл.
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+</div>

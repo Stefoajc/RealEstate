@@ -1,0 +1,33 @@
+﻿@model RealEstate.ViewModels.WebMVC.AddEmailAddressViewModel
+
+@{
+    ViewBag.Title = "Добави Е-мейл адрес - Имоти СПРОПЪРТИС";
+}
+<div class="container-fluid">
+    <div class="col-md-offset-4 top-bottom-marginated">
+        
+        <form action="/Manage/AddEmailAddress" method="post" class="form-horizontal" role="form" id="change-email-form">
+            @Html.AntiForgeryToken()
+            <div style="margin-bottom: 10px; margin-top: 20px" class="">
+                <div class="col-md-6">
+                    <h2 align="center">Въведете е-мейл адрес</h2>
+
+                    <hr />
+
+                    @Html.ValidationSummary("", new { @class = "text-danger" })
+                    <div class="form-group">
+                        <label class="col-md-8 control-label">Телефонен номер</label>
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-primary btn-block" value="Потвърди" />
+                    </div>
+                </div>
+            </div>
+        
+        </form>
+    </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,4 +1,24 @@
-﻿<div role="main" class="main pgl-bg-grey">
+﻿@using RealEstate.Services.Helpers
+@using RealEstate.ViewModels.WebMVC
+@model List<PropertyMapViewModel>
+
+@{
+    ViewBag.Title = "Карта на имоти - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+        .gm-style-iw + div {
+            display: none;
+        }
+
+        .gm-style-iw {
+            text-align: center;
+        }
+    </style>
+}
+
+<div role="main" class="main pgl-bg-grey">
     <!-- Begin page top -->
     <section class="page-top">
         <div class="container">
@@ -9,165 +29,41 @@
     </section>
     <!-- End page top -->
     <!-- Begin Advanced Search -->
-    <section class="pgl-advanced-search pgl-bg-light">
-        <div class="container">
-            <form name="advancedsearch">
-                <div class="row">
-                    <div class="col-xs-6 col-sm-3">
-                        <div class="form-group">
-                            <label class="sr-only" for="property-status">Статут на имота</label>
-                            <select id="property-status" name="property-status" data-placeholder="Property Status" class="chosen-select" style="display: none;">
-                                <option selected="selected" value="Property Status">Статут на имота</option>
-                                <option value="sale">За Продажба</option>
-                                <option value="rent">Под наем</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 col-sm-3">
-                        <div class="form-group">
-                            <label class="sr-only" for="location">Град</label>
-                            <select id="location" name="location" data-placeholder="Location" class="chosen-select" style="display: none;">
-                                <option selected="selected" value="Location">Град</option>
-                                @foreach (var city in ViewBag.Cities)
-                                {
-                                    <option value="@city.CityId">@city.CityName</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 col-sm-3">
-                        <div class="form-group">
-                            <label class="sr-only" for="property-types">Типове имоти</label>
-                            <select id="property-types" name="property-types" data-placeholder="Property Types" class="chosen-select" style="display: none;">
-                                <option selected="selected" value="Property Types">Типове имоти</option>
-                                @foreach (var propertyType in ViewBag.PropertyTypes)
-                                {
-                                    <option value="@propertyType.PropertyTypeId">@propertyType.PropertyTypeName</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 col-sm-3">
-                        <div class="form-group">
-                            <label class="sr-only" for="area-from">Площ</label>
-                            <select id="area-from" name="area-from" data-placeholder="Area From" class="chosen-select" style="display: none;">
-                                <option selected="selected" value="Area From">Площ</option>
-                                <option value="450">над 450кв.м.</option>
-                                <option value="450">до 450кв.м.</option>
-                                <option value="350">до 350кв.м.</option>
-                                <option value="250">до 250кв.м.</option>
-                                <option value="150">до 150кв.м.</option>
-                                <option value="100">до 100кв.м.</option>
-                                <option value="50">до 50кв.м.</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-6 col-sm-3">
-                        <div class="form-group">
-                            <label class="sr-only" for="search-bedrooms">Спални</label>
-                            <select id="search-bedrooms" name="search-bedrooms" data-placeholder="Bedrooms" class="chosen-select" style="display: none;">
-                                <option selected="selected" value="Bedrooms">Спални</option>
-                                <option value="0">0</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="5plus">5+</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 col-sm-3">
-                        <div class="form-group">
-                            <label class="sr-only" for="search-bathrooms">Бани</label>
-                            <select id="search-bathrooms" name="search-bathrooms" data-placeholder="Bathrooms" class="chosen-select" style="display: none;">
-                                <option selected="selected" value="Bathrooms">Бани</option>
-                                <option value="0">0</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="4plus">4+</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 col-sm-3">
-                        <div class="form-group">
-                            <div class="row pgl-narrow-row">
-                                <div class="col-xs-6">
-                                    <label class="sr-only" for="search-minprice">Цена от</label>
-                                    <select id="search-minprice" name="search-minprice" data-placeholder="Price From" class="chosen-select" style="display: none;">
-                                        <option selected="selected" value="Price From">Цена от</option>
-                                        <option value="0">$0</option>
-                                        <option value="25000">$25000</option>
-                                        <option value="50000">$50000</option>
-                                        <option value="75000">$75000</option>
-                                        <option value="100000">$100000</option>
-                                        <option value="150000">$150000</option>
-                                        <option value="200000">$200000</option>
-                                        <option value="300000">$300000</option>
-                                        <option value="500000">$500000</option>
-                                        <option value="750000">$750000</option>
-                                        <option value="1000000">$1000000</option>
-                                    </select>
-                                </div>
-                                <div class="col-xs-6">
-                                    <label class="sr-only" for="search-maxprice">Цена до</label>
-                                    <select id="search-maxprice" name="search-maxprice" data-placeholder="Price To" class="chosen-select" style="display: none;">
-                                        <option selected="selected" value="Price To">Цена до</option>
-                                        <option value="25000">$25000</option>
-                                        <option value="50000">$50000</option>
-                                        <option value="75000">$75000</option>
-                                        <option value="100000">$100000</option>
-                                        <option value="150000">$150000</option>
-                                        <option value="200000">$200000</option>
-                                        <option value="300000">$300000</option>
-                                        <option value="500000">$500000</option>
-                                        <option value="750000">$750000</option>
-                                        <option value="1000000">$1000000</option>
-                                        <option value="1000000plus">&gt;$1000000</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 col-sm-3">
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-block btn-primary">Намери своя дом</button>
-                        </div>
-                    </div>
-                </div>
-
-            </form>
-        </div>
-    </section>
+    @Html.Partial("AdvancedSearchHorizontal_Partial")
     <!-- End Advanced Search -->
     <!-- Begin Properties -->
     <section class="pgl-properties-map pgl-bg-grey">
         <div class="container">
             <h2>@ViewBag.PropertiesTitle</h2>
-            <div class="properties-full">
+            <div id="properties-filtering">
                 <div class="listing-header clearfix">
                     <ul class="list-inline list-icons pull-left">
-                        <li><a href="@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType})"><i class="fa fa-th"></i></a></li>
-                        <li><a href=@Url.Action("ListPropertiesFullWidth", "Properties", new {ViewBag.propertyType})><i class="fa fa-th-list"></i></a></li>
-                        <li class="active"><a href=@Url.Action("Map", "Properties", new {ViewBag.propertyType})><i class="fa fa-map-marker"></i></a></li>
+                        <li><a href="@Url.Action("Index", new SearchAllViewModel(ViewBag.SearchParams, viewType: "ListProperties"))"><i class="fa fa-th"></i></a></li>
+                        <li><a href="@Url.Action("Index", new SearchAllViewModel(model: (SearchMapViewModel)ViewBag.SearchParams, viewType: "ListPropertiesFullWidth"))"><i class="fa fa-th-list"></i></a></li>
+                        <li class="active"><a href="@Url.Action("Map", ViewBag.SearchParams)"><i class="fa fa-map-marker"></i></a></li>
                     </ul>
                     <ul class="list-inline list-sort pull-right">
+                        <li><label for="filter-status">Град</label></li>
+                        <li class="min-width">
+                            <select id="filter-city" name="filter-status" data-placeholder="Filter" class="chosen-select filter-status" onChange="location = this.value + '#properties-filtering'" style="width: 100px;">
+                                <option value="@Url.Action("Map",  new SearchMapViewModel(model:ViewBag.SearchParams, cityId: -1 @*TODO: find way to set to null*@))">Градове</option>
+                                @foreach (var city in ViewBag.Cities)
+                                {
+                                    <option value="@Url.Action("Map", new SearchMapViewModel(model:ViewBag.SearchParams, cityId: city.CityId))">@city.CityName</option>
+                                }
+                            </select>
+                        </li>
                         <li><label for="filter-status">Филтър</label></li>
-                        <li style="width: 150px;">
-                            <select id="filter-status" name="filter-status" data-placeholder="Filter" class="chosen-select" onChange="location = this.value" style="width: 100px;">
-                                <option selected="selected" value="@Url.Action("Map", "Properties")">Типове имоти</option>
+                        <li class="min-width">
+                            <select id="filter-status" name="filter-status" data-placeholder="Filter" class="chosen-select filter-status" onChange="location = this.value + '#properties-filtering'" style="width: 100px;">
+                                <option selected="selected" value="@Url.Action("Map", new SearchMapViewModel(ViewBag.SearchParams, propertyType: -1))">Типове имоти</option>
                                 @foreach (var propertyType in ViewBag.PropertyTypes)
                                 {
-                                    <option value=@Url.Action("Map", "Properties", new {propertyType = propertyType.PropertyTypeId}) >@propertyType.PropertyTypeName</option>
+                                    <option value="@Url.Action("Map", new SearchMapViewModel(ViewBag.SearchParams, propertyType: propertyType.PropertyTypeId))">@propertyType.PropertyTypeName</option>
                                 }
-                                
-                                @*<option value=@Url.Action("Map", "Properties", new {ViewBag.propertyType})>Къщи</option>
-                                <option value=@Url.Action("Map", "Properties", new {ViewBag.propertyType})>Апартаменти</option>*@
+
+                                @*<option value="@Url.Action("Map", "Properties", new {ViewBag.propertyType})">Къщи</option>
+                                    <option value="@Url.Action("Map", "Properties", new {ViewBag.propertyType})">Апартаменти</option>*@
                             </select>
                         </li>
                     </ul>
@@ -192,11 +88,15 @@
                                 <div class="pgl-property featured-item">
                                     <div class="property-thumb-info">
                                         <div class="property-thumb-info-image">
-                                            <img alt="" class="img-responsive" src="@property.ImagePath">
+                                            <picture >
+                                                <source srcset="@(FileHelpers.ChangeFileExtension(property.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                                <source srcset="@property.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(property.ImagePath.Replace(" ", "%20"))">
+                                                <img alt="Снимка" class="img-responsive" style="max-height: 192.867px; max-width: 289.3px;" src="@property.ImagePath.Replace(" ", "%20")">
+                                            </picture>
                                         </div>
                                         <div class="property-thumb-info-content">
-                                            <h3><a href="@Url.Action("Details" , new {id = property.PropertyId})">@property.FullAddress</a></h3>
-                                            <p>@property.PropertyName</p>
+                                            <h3><a href="@Url.Action("Details", "Properties" , new {id = property.PropertyId, isRentSearching = ViewBag.SearchParams.IsForRent})">@property.FullAddress</a></h3>
+                                            <p class="clamp-one">@property.PropertyName</p>
                                         </div>
                                     </div>
                                 </div>
@@ -212,37 +112,139 @@
 
 @section scripts
 {
-    <script>
-        function myMap() {
-            var mapOptions = {
-                center: new google.maps.LatLng(42.15, 24.75),
-                zoom: 10,
-                mapTypeId: google.maps.MapTypeId.HYBRID
-            }
-            var map = new google.maps.Map(document.getElementById("properties_map"), mapOptions);
+<script>
+    function myMap() {
+
+        @{
+            var latitude = ViewBag.City?.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "42.15";
+            var longitude = ViewBag.City?.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "24.75";
         }
-    </script>
+
+
+        var mapOptions = {
+            center: new google.maps.LatLng(@latitude, @longitude),
+            zoom: 12,
+            mapTypeId: google.maps.MapTypeId.HYBRID
+        }
+        var map = new google.maps.Map(document.getElementById("properties_map"), mapOptions);
+
+        @{ var jsonModel = Html.Raw(Json.Encode(Model));}
+        var properties = @jsonModel;
+
+        for (var index in properties) {
+            var marker = new google.maps.Marker({
+                position: new google.maps.LatLng(properties[index].Latitude, properties[index].Longitude),
+                map: map,
+                title: properties[index].PropertyName
+            });
+
+            var contentString =
+                '<div id="property-single-map"> \
+                    <div style="width:257px; height:180px;"> \
+                        <div class="owl-carousel manual pgl-main-slide owl-theme">';
+            for (var img in properties[index].ImagePaths) {
+                contentString +=
+                    '<div class="item">' +
+                        @*'<picture>' +
+                            '<source srcset="@(FileHelpers.ChangeFileExtension(properties[index].ImagePaths[img].Replace(" ", "%20"), ".webp"))" type="image/webp">'+
+                            '<source srcset="' + properties[index].ImagePaths[img].replace(' ', '%20') + '" type="@MimeMapping.GetMimeMapping(property.ImagePath.Replace(" ", "%20"))">' +
+                            '<img alt="Снимка" class="img-responsive" style="height: 180px; width:257px !important;" src="' + properties[index].ImagePaths[img].replace(' ', '%20') + '">'+
+                        '</picture>' +*@
+                        '<img alt="Снимка" style="height: 180px; width:257px !important;" src="' + properties[index].ImagePaths[img].replace(' ','%20') + '" alt="Photo" class="img-responsive">' +
+                    '</div>';
+            }
+            contentString +=
+                        '</div> \
+                    </div> \
+                    <div> \
+                        <a href="/Properties/Details/' + properties[index].PropertyId + '"> \
+                            <div> \
+                                <div> \
+                                    <small> \
+                                        <span>' + properties[index].FullAddress + '</span> \
+                                    </small> \
+                                </div> \
+                            </div> \
+                            <div> \
+                                <div>' + properties[index].PropertyName + '</div> \
+                            </div> \
+                            <div> \
+                                <div> \
+                                    <div> \
+                                        <div> \
+                                            <span> \
+                                                Цена: <span>' + properties[index].Price + 'лв</span>';
+                if (properties[index].Period !== null) {
+                    contentString += '/<span>' + properties[index].Period + '</span>';
+                }
+                contentString += ' </span> \
+                                        </div> \
+                                    </div> \
+                                </div> \
+                            </div> \
+                        </a> \
+                    </div> \
+                </div>';
+
+            var infowindow = null;
+
+            google.maps.event.addListener(marker,'click', (function(marker,content){
+                return function () {
+                    if (infowindow) {
+                        infowindow.close();
+                    }
+                    infowindow = new google.maps.InfoWindow({
+                        maxWidth: 257
+                    });
+
+                    infowindow.setContent(content);
+                    infowindow.open(map, marker);
+
+                    //When the infowindow is attached to the DOM
+                    google.maps.event.addListener(infowindow, 'domready', function(){
+                        $('.manual').owlCarousel({
+                            loop:true,
+                            items:1
+                        }).addClass("owl-carousel-init");
+                    });
+                };
+                })(marker, contentString));
+            }
+
+            google.maps.event.addListener(map, 'click', function() {
+                if (infowindow) {
+                    infowindow.close();
+                }
+            });
+        }
+
+</script>
 
     <!--GoogleMap Setup-->
     <script async defer
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRNibRrD3DnsD2EoqbagZhLwnf82GxraU&callback=myMap"></script>
-    
+
     @* TODO make filtering by PropertyType !!! With null default parameter (Persist the selected item) *@
-    
+
+    <script type="text/javascript" language="javascript" src="/Scripts/propertiesFilteringPersistence.js"></script>
     <script>
-        $(document).ready(() => {
+        $(document).ready(function () {
 
-            let filterBy = '@ViewBag.propertyType';
-            let filterUrlParam = '';
-            if (filterBy.length !== 0) {
-                filterUrlParam = filterBy === ' ' ? '' : '?propertyType=' + filterBy;
-            }
+            updateDropDownMenues('@ViewBag.SearchParams.IsForRent', '@ViewBag.SearchParams.IsShortPeriodRent',
+                '@(ViewBag.SearchParams.From?.ToString("dd.MM.yyyy") ?? "")', '@(ViewBag.SearchParams.To?.ToString("dd.MM.yyyy") ?? "")',
+                '@ViewBag.SearchParams.PropertyType',
+                '@ViewBag.SearchParams.CityId', '@ViewBag.SearchParams.DistanceFromCity',
+                '@ViewBag.SearchParams.AreaFrom', '@ViewBag.SearchParams.AreaTo',
+                '@ViewBag.SearchParams.PriceFrom', '@ViewBag.SearchParams.PriceTo',
+                JSON.parse('@Json.Encode(ViewBag.SearchParams.Extras)'),
+                '', '', '', '',true);
 
-            let preSelectOrder = "/Properties/Map" + filterUrlParam;
-
-            console.log(preSelectOrder);
-
-            $('#filter-status').val(preSelectOrder).trigger("chosen:updated");
-        })
+            @*updateDropDownMenues('@ViewBag.SearchParams.PropertyType',
+                '@ViewBag.SearchParams.CityId', '@ViewBag.SearchParams.DistanceFromCity',
+                '@ViewBag.SearchParams.AreaFrom', '@ViewBag.SearchParams.AreaTo',
+                '@ViewBag.SearchParams.PriceFrom', '@ViewBag.SearchParams.PriceTo',
+                '', '', '', '',
+                '@ViewBag.SearchParams.IsForRent', true);*@
+        });
     </script>
 }

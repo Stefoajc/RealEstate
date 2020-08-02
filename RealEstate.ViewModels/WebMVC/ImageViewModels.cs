@@ -1,4 +1,6 @@
-﻿using System.Web;
+﻿using System.Collections.Generic;
+using System.Web;
+using RealEstate.ViewModels.CustomDataAnnotations;
 
 namespace RealEstate.ViewModels.WebMVC
 {
@@ -8,9 +10,30 @@ namespace RealEstate.ViewModels.WebMVC
         public string ImagePath { get; set; }
     }
 
+    public class ImageEditViewModel
+    {
+        public bool IsForSlider { get; set; }
+        public int ImageId { get; set; }
+        public string ImagePath { get; set; }
+    }
+
     public class ImageCreateViewModel
     {
-        public HttpPostedFileBase ImageFile { get; set; }
-        public object ForeignKey { get; set; } // could be PropertyImageID,SightImageID
+        [EnsureOneItem]
+        public List<HttpPostedFileBase> ImageFiles { get; set; }
+        public string ForeignKey { get; set; } // could be PropertyImageID,SightImageID
     }
+
+    public class UserImageViewModel
+    {
+        public int ImageId { get; set; }
+        public string ImagePath { get; set; }
+    }
+
+    public class ImageFileSystemDTO
+    {
+        public string ImageRelPath { get; set; }
+        public HttpPostedFileBase ImageFile { get; set; }
+    }
+    
 }

@@ -1,0 +1,260 @@
+﻿@model RealEstate.ViewModels.WebMVC.EditRentalInfoViewModel
+@{
+    ViewBag.Title = "Редактирай помещениe";
+}
+
+<style>
+    .attributes {
+        padding-bottom: 7px;
+    }
+
+    .additionalDescriptors {
+        width: 47%;
+        font-size: 14px;
+        line-height: 1.42857143;
+        height: 40px;
+    }
+
+    .rentalDescriptors {
+        margin-top: 20px;
+        height: 301px;
+        overflow-y: auto;
+    }
+
+    .rentalInfoTemplate {
+        margin: 20px;
+        padding-top: 10px;
+        padding-left: 10px;
+    }
+
+    .delete-rental {
+        position: absolute;
+        right: 70px;
+        color: gray;
+        cursor: pointer;
+        z-index: 1;
+    }
+</style>
+
+<br/>
+<h2 align="center">Редакция на помещение от имот <a href="/Properties/Details/@Model.PropertyId" style="text-decoration: underline;">@Model.PropertyName</a></h2>
+
+<div class="rental-fullunit">
+    @using (Html.BeginForm("Delete", "RentalInfoes", FormMethod.Post, new {id = "delete-rental-form"}))
+    {
+        @Html.AntiForgeryToken()
+        @Html.Hidden("RentalInfoId", Model.RentalInfoId)
+        <h1 title="Изтрии отдаваното под наем помещение" id="delete-rental" class="delete-rental">
+            <b>X</b>
+        </h1>
+    }
+    @using (Html.BeginForm("Edit", "RentalInfoes", FormMethod.Post, new { id = "edit-rental-form" }))
+    {
+        <h3 align="center">Помещение № @Model.RentalInfoId</h3>
+        @Html.AntiForgeryToken()
+        @Html.Hidden("RentalInfoId", Model.RentalInfoId)
+        <section class="rentalInfoTemplate form-horizontal">
+            <div class="row">
+                <div class="col-xs-12 col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required"> Вид помещение</label>
+                        <div class="col-md-8">
+                            <select class="form-control unit-type chosen-select" name="UnitTypeId" id="unitType">
+                                @foreach (var unitType in ViewBag.UnitTypeId)
+                                {
+                                    if (unitType.UnitTypeId == Model.UnitTypeId)
+                                    {
+                                        <option selected="selected" value="@unitType.UnitTypeId">@unitType.RentalTypeName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@unitType.UnitTypeId">@unitType.RentalTypeName</option>
+                                    }
+                                }
+                            </select>
+                            @Html.ValidationMessage("UnitTypeId", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required"> Брой помещения </label>
+                        <div class="col-md-8">
+                            <input name="UnitCount" class="form-control rental-info-field" id="beds-count" value="@Model.UnitCount" />
+                            @Html.ValidationMessage("UnitCount", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required"> Наемна цена </label>
+                        <div class="col-md-8">
+                            <input name="RentalPrice" class="form-control rental-info-field" id="rental-price" value="@Model.RentalPrice" />
+                            @Html.ValidationMessage("RentalPrice", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required"> Наемен период </label>
+                        <div class="col-md-8">
+                            <select id="rentalPricePeriod" name="RentalPricePeriodId" class="form-control price-period chosen-select">
+                                @foreach (var item in ViewBag.RentalPeriodId)
+                                {
+                                    if (item.PeriodId == (int)Model.RentalPricePeriodId)
+                                    {
+                                        <option selected="selected" value="@item.PeriodId">
+                                            @item.Period
+                                        </option>
+                                    }
+                                    else
+                                    {
+                                        <option name="RentPricePeriod" value="@item.PeriodId">
+                                            @item.Period
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            @Html.ValidationMessage("RentalsInfo.RentalPricePeriod", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-11 col-md-offset-1 col-xs-12">
+                            <label class="rentalAdditionalInfoLabel">
+                                <b>Допълнителна информация</b>
+                            </label>
+                        </div>
+                        <div class="col-md-11 col-md-offset-1 col-xs-12">
+                            <textarea name="AdditionalInfo" class="form-control rentalAdditionalInfoTextArea rental-info-field">@Model.AdditionalInfo</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-md-6">
+
+                    <section class="col-xs-12 rentalDescriptors">
+                        <label>
+                            <b>Допълнителни описатели</b>
+                        </label>
+                        <div class="rentalDescripotorValues">
+                            @for (int attributeIndex = 0; attributeIndex < Model.Attributes.Count; attributeIndex++)
+                            {
+                                <div class="attributes">
+                                    <input name="Attributes[@attributeIndex].Key" class="additionalDescriptors key rental-info-field" value="@Model.Attributes[attributeIndex].Key" />
+                                    <input name="Attributes[@attributeIndex].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност (пример: 3)" value="@Model.Attributes[attributeIndex].Value" />
+                                </div>
+                            }
+                            <div class="attributes">
+                                <input name="Attributes[@Model.Attributes.Count].Key" class="additionalDescriptors key rental-info-field" value="Описател" />
+                                <input name="Attributes[@Model.Attributes.Count].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност" />
+                            </div>
+
+                            <input type="button" value="Добави нов атрибут" id="add-rental-attribute" class="btn btn-primary rental-info-field" style="float: right; margin-right: 35px" />
+                        </div>
+
+                    </section>
+                </div>
+
+                <div class="col-xs-12 col-md-12">
+                    <div class="row rental-extras">
+                        @for (int extraIndex = 0; extraIndex < ViewBag.RentalExtras.Count; extraIndex++)
+                        {
+                            <div class="col-xs-3">
+                                <input class="rental-info-field" data-val="true" data-val-number="The field ExtraId must be a number." data-val-required="The ExtraId field is required." id="RentalsInfo_@(extraIndex)__ExtraId" name="RentalExtras[@extraIndex].ExtraId" value="@ViewBag.RentalExtras[extraIndex].ExtraId" type="hidden">
+                                @if (Model.RentalExtras.Any(re => re.ExtraId == ViewBag.RentalExtras[extraIndex].ExtraId))
+                                {
+                                    <text><input class="rental-info-field" data-val="true" data-val-required="The IsChecked field is required." id="RentalExtras[@extraIndex].IsChecked" name="RentalExtras[@extraIndex].IsChecked" checked="checked" value="true" type="checkbox">
+                                        <input class="rental-info-field" id="RentalExtras[@extraIndex].IsChecked" name="RentalExtras[@extraIndex].IsChecked" value="false" type="hidden"></text>
+                                }
+                                else
+                                {
+                                    <text><input class="rental-info-field" data-val="true" data-val-required="The IsChecked field is required." id="RentalExtras[@extraIndex].IsChecked" name="RentalExtras[@extraIndex].IsChecked" value="true" type="checkbox">
+                                        <input class="rental-info-field" id="RentalExtras[@extraIndex].IsChecked" name="RentalExtras[@extraIndex].IsChecked" value="false" type="hidden"></text>
+                                }
+                                <label for="RentalExtras[@extraIndex].IsChecked">@ViewBag.RentalExtras[extraIndex].ExtraName</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <input type="submit" class="btn btn-primary col-lg-offset-10 save-rental" value="Запази" />
+            <hr />
+        </section>
+    }
+</div>
+
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+            //Submit rentalInfo Edit
+            $('#edit-rental-form').submit(function(event) {
+                event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                let thisForm = $(this);
+                let formData = new FormData(this);
+
+                removeEmptyAttributes(formData, thisForm);
+
+                $.ajax({
+                    action: this.action,
+                    method: this.method,
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function(data) {
+                        if (data.success) {
+                            showErrorResponse(data, thisForm);
+                        } else {
+                            alertify.success("Успешно редактиран на имот!");
+                            //window.location = "/Properties/Details/" + data;
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                        let shownError = titles ? titles[1] : errorThrown;
+                        alertify.error(shownError);
+                    }
+                });
+            }); 
+
+            //Submit rentalInfo Deletion
+            $('#delete-rental').click(function (event) {
+                event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                let thisForm = $("#delete-rental-form");
+
+                $.ajax({
+                    url: thisForm.attr('action'),
+                    method: thisForm.attr('method'),
+                    data: thisForm.serialize(),
+                    success: function (data) {
+                        if (data.success) {
+                            showErrorResponse(data, thisForm);
+                        } else {
+                            alertify.success("Успешно изтрит имот!");
+                            //window.location = "/Properties/Index?IsForRent=True";
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                        let shownError = titles ? titles[1] : errorThrown;
+                        alertify.error(shownError);
+                    }
+                });
+            });
+
+            function removeEmptyAttributes(formData, htmlJQueryForm) {
+                let attributes = htmlJQueryForm.find('.attributes');
+                for (let i = 0; i < attributes.length; i++) {
+                    var key = $(attributes[i]).find('.key').val();
+                    var value = $(attributes[i]).find('.value').val();
+                    if (key === '' || value === '') {
+                        var keyName = $(attributes[i]).find('.key').attr('name');
+                        var valueName = $(attributes[i]).find('.value').attr('name');
+
+                        formData.delete(keyName);
+                        formData.delete(valueName);
+                    }
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,11 @@
+﻿<aside class="block pgl-bg-light blk-search">
+    @using (Html.BeginForm("Index", "Forum" , FormMethod.Get, new { @class = "form-inline form-search" }))
+    {
+        <input type="hidden" name="viewType" id="viewType" value="@ViewBag.viewType"/>
+        <div class="form-group">
+            <label class="sr-only" for="keyWord">Търсите нещо ?</label>
+            <input type="text" class="form-control" id="keyWord" name="keyWord" placeholder="Търсите нещо ?">
+        </div>
+        <button type="submit" class="btn"><i class="fa fa-search"></i></button>
+    }
+</aside>

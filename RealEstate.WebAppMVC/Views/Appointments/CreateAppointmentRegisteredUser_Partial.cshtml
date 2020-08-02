@@ -1,0 +1,36 @@
+﻿@model RealEstate.ViewModels.WebMVC.AppointmentCreatePartialViewModel
+
+<form action="@Url.Action("Create", "Appointments")" id="create-appointment" method="POST">
+    @Html.AntiForgeryToken()
+    <input id="PropertyId" name="PropertyId" type="hidden" value="@Model.PropertyId" />
+    <input id="AgentId" name="AgentId" type="hidden" value="@Model.AgentId" />
+    <div class="col-md-4 col-xs-12">
+        <div class="form-group">
+            <label class="control-label required" for="date">Изберете дата</label>
+            <div class="input-group date" id="appointment-date">
+                <input class="form-control" id="AppointmentDate" name="AppointmentDate" placeholder="Дата и час на среща" type="text">
+                <span class="input-group-addon" style="">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+            <span class="field-validation-valid text-danger" data-valmsg-for="AppointmentDate" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group">
+            <div class="g-recaptcha not-ready"></div>
+            <span class="field-validation-valid text-danger" data-valmsg-for="reCaptcha" data-valmsg-replace="true"></span>
+        </div>
+    </div>
+    <div class="col-md-8 col-xs-12">
+        <div class="form-group" style="text-align: center;">
+            <label class="control-label" for="AppointmentDescription">Въведете допълнителна информация</label>
+            <textarea class="form-control" data-val="true" id="AppointmentDescription" name="AppointmentDescription" rows="5"></textarea>
+        </div>
+    </div>
+    <div class="col-xs-12">
+        <div class="form-group">
+            <button class="btn btn-primary" style="float: right; margin-bottom: 10px;">
+                Заяви среща
+            </button>
+        </div>
+    </div>
+</form>

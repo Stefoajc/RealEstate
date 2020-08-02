@@ -1,7 +1,5 @@
-﻿@model RealEstate.ViewModels.WebMVC.SearchFullViewModel
-
-@{
-    ViewBag.Title = "Търсене";
+﻿@{
+    ViewBag.Title = "Търсене - Имоти СПРОПЪРТИС";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -16,10 +14,13 @@
     </section>
     <!-- End page top -->
     <!-- Begin Advanced Rental Search -->
-    @Html.Partial("/Views/Properties/SearchRental.cshtml", Model.SearchRental)
+    @Html.Partial("/Views/Properties/SearchRentalLong.cshtml")
+    <!-- End Advanced Rental Search -->
+    <!-- Begin Advanced Rental Search -->
+    @Html.Partial("/Views/Properties/SearchRental.cshtml")
     <!-- End Advanced Rental Search -->
     <!-- Begin Advanced Sell Search -->
-    @Html.Partial("/Views/Properties/SearchSell.cshtml", Model.SearchSell)
+    @Html.Partial("/Views/Properties/SearchSell.cshtml")
     <!-- End Advanced Sell Search -->
     <!-- Begin Id Search-->
     <section class="pgl-advanced-search pgl-bg-light">
@@ -49,11 +50,54 @@
 
 @section scripts{
     <script type="text/javascript">
-        $(function () {
-            $('.date').datepicker({
-                format: 'dd-mm-yyyy',
-                language: 'bg',
-                locale: 'bg'
+        $(document).ready(function () {
+            function addDays(date, days) {
+                var result = new Date(date);
+                result.setDate(result.getDate() + days);
+                return result;
+            }
+
+            jQuery.datetimepicker.setLocale('bg');
+
+            jQuery(function(){
+                jQuery('#from').datetimepicker({
+                    format: 'd.m.Y',
+                    locale: 'bg',
+                    minDate: addDays(new Date(), 1),
+                    onShow: function (ct) {
+                        var maxDate = jQuery('#to').val();
+                        if (maxDate) {
+                            var pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
+                            maxDate = maxDate.replace(pattern, '$3-$2-$1');
+
+                        } else {
+                            maxDate = false;
+                        }
+                        this.setOptions({
+                            maxDate: maxDate
+                        });
+                    },
+                    timepicker:false
+                });
+                jQuery('#to').datetimepicker({
+                    format: 'd.m.Y',
+                    locale: 'bg',
+                    minDate: addDays(new Date(), 2),
+                    onShow: function (ct) {
+                        var minDate = jQuery('#from').val();
+                        if (minDate) {
+                            var pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
+                            minDate = minDate.replace(pattern, '$3-$2-$1');
+
+                        } else {
+                            minDate = false;
+                        }
+                        this.setOptions({
+                            minDate: minDate
+                        });
+                    },
+                    timepicker:false
+                });
             });
         });
     </script>

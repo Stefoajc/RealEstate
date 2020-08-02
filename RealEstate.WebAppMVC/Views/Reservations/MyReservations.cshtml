@@ -1,0 +1,292 @@
+﻿@using RealEstate.Services.Helpers
+@model List<RealEstate.ViewModels.WebMVC.ListReservationViewModel>
+
+@{
+    ViewBag.Title = "Мой резервации - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+        .regular-image-container {
+            width: 360px;
+            height: 240px;
+        }
+
+            .regular-image-container > .regular-image {
+                width: 396px;
+                height: 264px;
+            }
+
+        .appointment-date-info {
+            line-height: 1.8em;
+            font-size: 18px;
+            padding-top: 4px;
+            display: inline-block;
+        }
+
+        .appointment-property-info {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 7em;
+        }
+
+        .panel-group {
+            margin-top: 20px;
+        }
+
+
+        .pgl-property {
+            margin: 0px !important;
+        }
+
+        @@media screen and (max-width: 992px) {
+            #buttons > form {
+                margin-bottom: 5px;
+            }
+        }
+
+        @@media screen and (min-width:992px) {
+            .col-md-3-5 {
+                width: 29.16667% !important;
+            }
+
+            .col-md-8-5 {
+                width: 70.83333% !important;
+            }
+        }
+
+        .font-twelve {
+            font-size: 12px;
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    <br />
+    <h1 align="center">Всички заявки за срещи/огледи</h1>
+    <!-- Begin FAQs -->
+    <div class="panel-group pgl-group-faqs" id="accordion">
+        @if (Model != null)
+        {
+            if (Model.Count != 0)
+            {
+                for (int i = 0; i < Model.Count; i++)
+                {
+
+                    <div class="panel panel-default pgl-panel">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@i" class="collapsed appointment-heading">Резервация на @(Model[i].Property.PropertyName) (@(Model[i].From.ToString("dd.MM.yyyy")) - @(Model[i].To.ToString("dd.MM.yyyy")))</a>
+                            </h4>
+                        </div>
+                        <div id="collapse-@i" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="pgl-property animation">
+                                    <div class="row">
+                                        <div class="col-md-3 col-md-3-5 col-xs-12">
+                                            <div class="property-thumb-info-image">
+                                                <picture>
+                                                    <source srcset="@(FileHelpers.ChangeFileExtension(Model[i].Property.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                                    <source srcset="@Model[i].Property.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(Model[i].Property.ImagePath.Replace(" ", "%20"))">
+                                                    <img alt="Снимка" class="img-responsive img-ratio1" src="@Model[i].Property.ImagePath.Replace(" ", "%20")">
+                                                </picture>
+                                                <span class="property-thumb-info-label">
+                                                    <span class="label price">@Model[i].Property.Price</span>
+                                                    <span class="label">@(Model[i].Property.Status)</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-9 col-md-8-5 col-xs-12">
+                                            <div class="row">
+                                                <div class="col-md-6 col-xs-12">
+                                                    <div class="property-thumb-info">
+                                                        <div class="property-thumb-info-content" style="height: 197.8px;">
+                                                            <h3 class="h3-one-line">
+                                                                <a class="clamp-one" href="@Url.Action("Details", "Properties", new {id = Model[i].Property.PropertyId})">@Model[i].Property.PropertyName</a>
+                                                            </h3>
+                                                            <address>@Model[i].Property.FullAddress</address>
+                                                            <p class="clamp-four">@Model[i].Property.Info</p>
+                                                        </div>
+                                                        <div class="amenities clearfix" style="padding-bottom: 5px; padding-top: 6px;">
+                                                            <ul class="pull-left">
+                                                                <li><strong>Площ:</strong> @Model[i].Property.AreaInSquareMeters<sup>m2</sup></li>
+                                                            </ul>
+                                                            <ul class="pull-right">
+                                                                <li title="Преглеждания"><i class="fa fa-eye"></i> @Model[i].Property.Views</li>
+                                                                @Html.Raw(Model[i].Property.BottomRight)
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-xs-12">
+                                                    <div class="property-thumb-info">
+                                                        <div class="property-thumb-info-content" style="height: 197.8px;">
+                                                            <h3 style="margin-bottom: 8px;">Заявена резервация: (@(Model[i].PaymentStatus != "Платено" && Model[i].From < DateTime.Now ? "Изтекла" : Model[i].PaymentStatus)) </h3>
+                                                            <div class="appointer-info">
+                                                                <span>Заявена на: </span><label>@Model[i].CreatedOn.ToString("dd.MM.yyyy HH:mm")</label>
+                                                                <br/>
+                                                                <div id="reservation-period">
+                                                                    <span>
+                                                                        <span class="col-xs-12 col-sm-6" style="padding: 5px 0;">
+                                                                            <span>От: </span><label>@Model[i].From.ToString("dd.MM.yyyy HH:mm")</label>
+                                                                        </span>
+                                                                        <span class="col-xs-12  col-sm-6" style="padding: 5px 0;">
+                                                                            <span>До: </span><label>@Model[i].To.ToString("dd.MM.yyyy HH:mm")</label>
+                                                                        </span>
+                                                                    </span>
+                                                                </div>
+                                                                <div id="reservation-price">
+                                                                    <span>
+                                                                        <span class="col-xs-12 col-sm-6" style="padding: 5px 0;">
+                                                                            <span>Капаро: </span><label>@(Model[i].CaparoPrice)лв.</label>
+                                                                        </span>
+                                                                        <span class="col-xs-12  col-sm-6" style="padding: 5px 0;">
+                                                                            <span>Пълна цена: </span><label>@(Model[i].FullPrice)лв.</label>
+                                                                        </span>
+                                                                    </span>
+                                                                </div>
+
+                                                                @*<div class="form-group">
+
+                                                                        @if (Model[i].PaymentStatus != null)
+                                                                        {
+                                                                            <button class="btn btn-success col-xs-12">Потвърдена среща</button>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <form method="post" action="@Url.Action("Delete", "Appointments")" id="remove-appointment-form">
+                                                                                @Html.AntiForgeryToken()
+                                                                                <input id="appointment-@i" name="id" value="@Model[i].AppointmentId" type="hidden" />
+                                                                                <button id="remove-appointment-btn" class="btn btn-primary col-xs-12">Отмени срещата</button>
+                                                                            </form>
+                                                                        }
+                                                                        <div class="clearfix"></div>
+                                                                </div>*@
+                                                            </div>
+                                                        </div>
+                                                        <div id="buttons" class="row" style="padding: 0 20px 0 20px;">
+
+                                                            @if (Model[i].PaymentStatus != "Платено" && Model[i].From > DateTime.Now)
+                                                            {
+                                                                <form class="col-xs-12 col-md-5" method="post" action="@Url.Action("PayReservation", "Reservations")" id="paycaparo-reservation-form" style="display: inline-block; padding-left: 0;">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <input type="hidden" name="UrlOk" id="IsCaparoPayed" value="@Url.Action("PayReservation", "Reservations")"/>
+                                                                    <input type="hidden" name="UrlCancel" id="IsCaparoPayed" value="@Url.Action("PayReservation", "Reservations")"/>
+                                                                    <input type="hidden" name="Id" id="Id" value="@Model[i].ReservationId"/>
+                                                                    <input type="hidden" name="IsCaparoPayed" id="IsCaparoPayed" value="false"/>
+                                                                    <button class="btn btn-primary font-twelve col-xs-12">Плати резервация</button>
+                                                                </form>
+
+                                                                if (Model[i].PaymentStatus != "Платено капаро")
+                                                                {
+                                                                    <form method="post" class="col-xs-12 col-md-4" action="@Url.Action("PayReservation", "Reservations")" id="payfull-reservation-form" style="display: inline-block; padding-left: 0;">
+                                                                        @Html.AntiForgeryToken()
+                                                                        <input type="hidden" name="UrlOk" id="IsCaparoPayed" value="@Url.Action("PayReservation", "Reservations")"/>
+                                                                        <input type="hidden" name="UrlCancel" id="IsCaparoPayed" value="@Url.Action("PayReservation", "Reservations")"/>
+                                                                        <input type="hidden" name="Id" id="Id" value="@Model[i].ReservationId"/>
+                                                                        <input type="hidden" name="IsCaparoPayed" id="IsCaparoPayed" value="true"/>
+                                                                        <button class="btn btn-primary font-twelve col-xs-12">Плати капаро</button>
+                                                                    </form>
+                                                                }
+
+                                                                <form method="post" class="col-xs-12 col-md-3" action="@Url.Action("Delete", "Reservations")" id="remove-reservation-form" style="display: inline-block; padding-left: 0;">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <input type="hidden" name="reservationId" id="reservationId" value="@Model[i].ReservationId"/>
+                                                                    <button class="btn btn-primary font-twelve col-xs-12">Откажи</button>
+                                                                </form>
+                                                            }
+                                                            else if (Model[i].PaymentStatus != "Платено" && Model[i].From < DateTime.Now)
+                                                            {
+                                                                <button class="btn btn-primary font-twelve col-xs-12">Изтекла резервация</button>
+                                                            }
+                                                            else
+                                                            {
+                                                                <button class="btn btn-success font-twelve col-xs-12">Платена резервация</button>
+                                                            }
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            }
+            else
+            {
+                <h3 align="center">Тук ще се покажат направените от вас резервации за почивки. </h3>
+                <h4 align="center">
+                    Заявка за резервация се прави от страницата на всеки отделен имот, който се отдава на дневна база от бутона
+                    <button class="btn btn-primary">Резервирай имота</button>
+                </h4>
+            }
+        }
+        else
+        {
+            <h3 align="center">Тук ще се покажат направените от вас резервации за почивки. </h3>
+            <h4 align="center">
+                Заявка за резервация се прави от страницата на всеки отделен имот, който се отдава на дневна база от бутона
+                <button class="btn btn-primary">Резервирай имота</button>
+            </h4>
+        }
+    </div>
+    <!-- End FAQs -->
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(document).on('submit',
+                "#remove-reservation-form",
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                    var thisForm = $(this);
+
+                    window.alertify.confirm('Изтриване на резервация',
+                        'Сигурни ли сте че искате да изтриете резервацията, която сте направили ?',
+                        function () {
+                            $.ajax({
+                                url: thisForm.attr('action'),
+                                method: thisForm.attr('method'),
+                                data: thisForm.serialize(),
+                                success: function (result) {
+                                    if (result === 'STATUS_OK') {
+                                        //Remove deleted appointment accordion panel
+                                        thisForm.closest('.panel').remove();
+                                        window.alertify.success('Успешно изтрита резервация!');
+                                    } else {
+                                        window.alertify.error('Проблем при изтриване моля опитайте по късно!');
+                                    }
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                                    let shownError = titles ? titles[1] : errorThrown;
+                                    window.alertify.error(shownError);
+                                }
+                            });
+                        },
+                        function () { })
+                        .set('labels', { ok: 'Потвърди', cancel: 'Откажи' });
+
+                });
+
+            //TODO: Create functionality for Pay and PayCaparo
+            $(document).on('submit',
+                '#payfull-reservation-form , #paycaparo-reservation-form',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                    var thisForm = $(this);
+
+                    window.alertify.paymentMethodDialog("Начин на плащане", thisForm.attr('action'), thisForm);
+                });
+        });
+    </script>
+}

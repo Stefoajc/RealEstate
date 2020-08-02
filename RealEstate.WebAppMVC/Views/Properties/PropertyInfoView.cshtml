@@ -1,0 +1,42 @@
+﻿@using RealEstate.Model
+@using RealEstate.Services.Helpers
+@model RealEstate.ViewModels.WebMVC.PropertyInfoViewModel
+
+<div class="col-xs-12 col-sm-6 col-md-4 animation">
+    <div class="pgl-property">
+        <div class="property-thumb-info">
+            <a style="display: block;" href="@Url.Action("Details", "Properties", new { id = Model.PropertyId, isRentSearching = Model.Status != "Продажна" })" class="property-thumb-info-image">
+                <picture >
+                    <source srcset="@(FileHelpers.ChangeFileExtension(Model.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                    <source srcset="@Model.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(Model.ImagePath.Replace(" ", "%20"))">
+                    <img alt="Снимка" class="img-responsive img-ratio1" src="@Model.ImagePath.Replace(" ", "%20")">
+                </picture>
+                <span class="property-thumb-info-label">
+                    @if ((PropertyState)Model.PropertyState != PropertyState.Available)
+                    {
+                        <span class="label price">@((PropertyState)Model.PropertyState == PropertyState.Sold ? "Продаден" : "Нает")</span>
+                    }
+                    else
+                    {
+                        <span class="label price">@(Model.Price.ToString("0"))лв.</span>
+                        <span class="label forrent">@Model.Status</span>
+                    }
+                </span>
+            </a>
+            <div class="property-thumb-info-content">
+                <h3>
+                    <a class="clamp-two" href="@Url.Action("Details", "Properties", new { id = Model.PropertyId, isRentSearching = Model.Status != "Продажна" })">@Model.PropertyName</a>
+                </h3>
+                <address style="height: 2.85714286em; overflow: hidden;">@Model.FullAddress</address>
+            </div>
+            <div class="amenities clearfix">
+                <ul class="pull-left">
+                    @Html.Raw(Model.BottomLeft)
+                </ul>
+                <ul class="pull-right">
+                    @Html.Raw(Model.BottomRight)
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

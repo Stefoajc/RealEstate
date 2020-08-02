@@ -1,0 +1,11 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.Forum.ForumCategoriesLinkViewModel>
+
+<aside class="block pgl-cat pgl-bg-light">
+    <h3>Постове по категории</h3>
+    <ul class="list-unstyled list-cat">
+        @foreach (var category in Model)
+        {
+            <li><a href="@Url.Action("Index","Forum", new {categoryId = category.ForumCategoryId, ViewBag.viewType})">@category.Name </a> <span>@category.PostCount </span></li>
+        }
+    </ul>
+</aside>

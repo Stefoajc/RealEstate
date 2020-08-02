@@ -1,0 +1,164 @@
+﻿<!-- Begin Advanced Search -->
+<section class="pgl-advanced-search pgl-bg-light">
+    <div class="container">
+        <form id="adv-search-horizontal-form" name="adv-search-horizontal-form">
+            <div class="row">
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="adv-search-horizontal-property-status">Статут на имота</label>
+                        <select id="adv-search-horizontal-property-status" name="adv-search-horizontal-property-status" class="chosen-select">
+                            <option value="all">Всички</option>
+                            <option value="sale">За продан</option>
+                            <option value="rent">Под наем</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="adv-search-horizontal-property-types">Типове имоти</label>
+                        <select id="adv-search-horizontal-property-types" name="adv-search-horizontal-property-types" class="chosen-select">
+                            <option selected="selected" value="">Тип имот</option>
+                            @foreach (var propertyType in ViewBag.PropertyTypes)
+                            {
+                                <option value="@((int)propertyType.PropertyTypeId)">@propertyType.PropertyTypeName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="adv-search-horizontal-area-from">Площ от</label>
+                        <select id="adv-search-horizontal-area-from" name="adv-search-horizontal-area-from" class="chosen-select">
+                            <option selected="selected" value="">Площ от</option>
+                            <option value="0">от 0м&sup2;</option>
+                            <option value="50">от 50м&sup2;</option>
+                            <option value="100">от 100м&sup2;</option>
+                            <option value="150">от 150м&sup2;</option>
+                            <option value="250">от 250м&sup2;</option>
+                            <option value="350">от 350м&sup2;</option>
+                            <option value="450">от 450м&sup2;</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="adv-search-horizontal-area-to">Площ до</label>
+                        <select id="adv-search-horizontal-area-to" name="adv-search-horizontal-area-to" class="chosen-select">
+                            <option selected="selected" value="">Площ до</option>
+                            <option value="50">до 50м&sup2;</option>
+                            <option value="100">до 100м&sup2;</option>
+                            <option value="150">до 150м&sup2;</option>
+                            <option value="250">до 250м&sup2;</option>
+                            <option value="350">до 350м&sup2;</option>
+                            <option value="450">до 450м&sup2;</option>
+                            <option value="450">над 450м&sup2;</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="adv-search-horizontal-location">Град</label>
+                        <select id="adv-search-horizontal-location" name="adv-search-horizontal-location" class="chosen-select">
+                            <option selected="selected" value="">Град</option>
+                            @foreach (var city in ViewBag.Cities)
+                            {
+                                <option value="@city.CityId">@city.CityName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="adv-search-horizontal-distancefromcity">Разстояние от града</label>
+                        <select id="adv-search-horizontal-distancefromcity" name="distanceFromCity" class="chosen-select">
+                            <option selected="selected" value="">Разстояние от града</option>
+                            <option value="0">0км</option>
+                            <option value="5">5км</option>
+                            <option value="10">10км</option>
+                            <option value="20">20км</option>
+                            <option value="30">30км</option>
+                            <option value="50">50км</option>
+                        </select>
+                        @Html.ValidationMessage("distanceFromCity", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-3">
+                    <div id="adv-search-horizontal-sell-price-ranges" class="form-group">
+                        <div class="row pgl-narrow-row">
+                            <div class="col-xs-6">
+                                <label class="sr-only" for="adv-search-horizontal-search-sell-minprice">Цена от</label>
+                                <select id="adv-search-horizontal-search-sell-minprice" name="adv-search-horizontal-search-sell-minprice" class="chosen-select">
+                                    <option selected="selected" value="">Цена от</option>
+                                    <option value="0">0лв.</option>
+                                    <option value="25000">25000лв.</option>
+                                    <option value="50000">50000лв.</option>
+                                    <option value="75000">75000лв.</option>
+                                    <option value="100000">100000лв.</option>
+                                    <option value="150000">150000лв.</option>
+                                    <option value="200000">200000лв.</option>
+                                    <option value="300000">300000лв.</option>
+                                    <option value="500000">500000лв.</option>
+                                    <option value="750000">750000лв.</option>
+                                    <option value="1000000">1000000лв.</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-6">
+                                <label class="sr-only" for="adv-search-horizontal-search-sell-maxprice">Цена до</label>
+                                <select id="adv-search-horizontal-search-sell-maxprice" name="adv-search-horizontal-search-sell-maxprice" class="chosen-select" >
+                                    <option selected="selected" value="">Цена до</option>
+                                    <option value="25000">25000лв.</option>
+                                    <option value="50000">50000лв.</option>
+                                    <option value="75000">75000лв.</option>
+                                    <option value="100000">100000лв.</option>
+                                    <option value="150000">150000лв.</option>
+                                    <option value="200000">200000лв.</option>
+                                    <option value="300000">300000лв.</option>
+                                    <option value="500000">500000лв.</option>
+                                    <option value="750000">750000лв.</option>
+                                    <option value="1000000">1000000лв.</option>
+                                    <option value="1000000plus">&gt;1000000лв.</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="adv-search-horizontal-rental-price-ranges" class="form-group" style="display: none;">
+                        <div class="row pgl-narrow-row">
+                            <div class="col-xs-6">
+                                <label class="sr-only" for="adv-search-horizontal-search-rent-minprice">Цена от</label>
+                                <select id="adv-search-horizontal-search-rent-minprice" name="adv-search-horizontal-search-rent-minprice" class="chosen-select">
+                                    <option selected="selected" value="">Цена от</option>
+                                    @for (int i = 0; i <= 1000; i += 100)
+                                    {
+                                        <option value="@i">@(i)лв.</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-xs-6">
+                                <label class="sr-only" for="adv-search-horizontal-search-rent-maxprice">Цена до</label>
+                                <select id="adv-search-horizontal-search-rent-maxprice" name="priceTo" class="chosen-select">
+                                    <option selected="selected" value="">Цена до</option>
+                                    @for (int i = 100; i <= 1000; i += 100)
+                                    {
+                                        <option value="@i">@(i)лв.</option>
+                                    }
+                                    <option value="1000plus">&gt;1000лв.</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-block btn-primary">Намери своя дом</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</section>
+<!-- End Advanced Search -->

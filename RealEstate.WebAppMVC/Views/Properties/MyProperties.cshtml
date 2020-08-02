@@ -1,0 +1,164 @@
+﻿@using RealEstate.Services.Helpers
+@model RealEstate.ViewModels.WebMVC.PropertiesInfoViewModel
+
+@{
+    ViewBag.Title = "Моите имоти - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+        .control-buttons {
+            position: relative;
+            float: right;
+            font-size: 24px;
+            right: -20px;
+        }
+
+        .delete-property-btn {
+            cursor: pointer;
+        }
+    </style>
+}
+
+<div role="main" class="main pgl-bg-grey">
+    <!-- Begin page top -->
+    <section class="page-top">
+        <div class="container">
+            <div class="page-top-in">
+                @*<h2><span>Списък имоти</span></h2>*@
+            </div>
+        </div>
+    </section>
+    <!-- Begin Properties -->
+    <section class="pgl-properties pgl-bg-grey">
+        <div class="container">
+            <h2>Моите имоти</h2>
+            <div id="properties-filtering" class="properties-listing properties-listfull">
+                
+                @if (!Model.Properties.Any())
+                {
+                    <h1 align="center">Нямате имоти</h1>
+                }
+
+                @* Properties horizontal *@
+                @foreach (var property in Model.Properties)
+                {
+                    <div class="pgl-property animation">
+                        <div class="row">
+                            <div class="col-sm-6 col-md-4">
+                                <div class="property-thumb-info-image regular-image-container">
+                                    <picture>
+                                        <source srcset="@(FileHelpers.ChangeFileExtension(property.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                        <source srcset="@property.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(property.ImagePath.Replace(" ", "%20"))">
+                                        <img alt="Снимка" class="img-responsive regular-image" src="@property.ImagePath.Replace(" ", "%20")">
+                                    </picture>
+                                    <span class="property-thumb-info-label">
+                                        <span class="label price">@property.Price</span>
+                                        <span class="label">@property.Status</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-8">
+                                <div class="property-thumb-info">
+                                    <div class="control-buttons">
+                                        <a title="Напиши доклад" href="@Url.Action("Create", "Reports", new { propertyId = property.PropertyId })"><span class="glyphicon glyphicon-list-alt"></span></a>
+                                        @{
+                                            string editLink = property.IsRentalProperty
+                                                ? Url.Action("Edit", "RentalInfoes", new {id = property.PropertyId})
+                                                : Url.Action("EditPropertyInfo", "Properties", new {id = property.PropertyId});
+                                        }
+                                        <a title="Редактирай" href="@editLink"><span class="glyphicon glyphicon-edit"></span></a>
+                                        <a title="Изтрии" href="@Url.Action("Delete", "Properties", new {id = property.PropertyId})" class="delete-property-btn"><span class="glyphicon glyphicon-remove"></span></a>
+                                    </div>
+                                    <div class="property-thumb-info-content">
+                                        <h3 class="h3-one-line">
+                                            <a class="clamp-two" href="@Url.Action("Details", "Properties", new {id = property.PropertyId, isRentSearching = property.Status != "Продажна"})">@property.PropertyName</a>
+                                        </h3>
+                                        <address>
+                                            <i class="fa fa-map-marker"></i>
+                                            @property.FullAddress
+                                        </address>
+                                        <p class="clamp-four">@Html.Raw(property.Info)</p>
+                                    </div>
+                                    <div class="amenities clearfix">
+                                        <ul class="pull-left">
+                                            <li><strong>Площ:</strong> @property.AreaInSquareMeters<sup>m2</sup></li>
+                                        </ul>
+                                        <ul class="pull-right">
+                                            <li title="Преглеждания"><i class="fa fa-eye"></i> @property.Views</li>&nbsp;
+                                            @Html.Raw(property.BottomRight)
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function() {
+
+            var propertyToDelete = {};
+
+            $(document).on('click',
+                '.delete-property-btn',
+                function(event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                    //getting the property for which the delete is initiated
+                    propertyToDelete = $(this).closest('.pgl-property');
+
+                    var link = this.href;
+                    createAndShowModal({
+                        title: 'Изтриване на имот',
+                        body: '<div style="text-align:center;"> \
+                                    <label style="font-size: 1.571em;">Найстина ли искате да изтриете имотът от системата ?</label> \
+                                </div>',
+                        footer: '<button id="modal-cancel-btn" class="btn btn-primary pull-right">Отказ</button> \
+                                    <form method="post" id="modal-delete-form" action="' +
+                            link +
+                            '">' +
+                            '@Html.AntiForgeryToken()' +
+                            '<button id="modal-delete-btn" class="btn btn-primary pull-right" style="margin-right:5px;">Изтрии</button> \
+                                 </form>'
+                    });
+                });
+
+            $(document).on('submit',
+                '#modal-delete-form',
+                function(event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    removeClosestModal(this);
+
+                    var thisForm = $(this);
+
+                    $.ajax({
+                        url: this.action,
+                        method: this.method,
+                        data: thisForm.serialize(),
+                        success: function () {
+                            //removing the property from the DOM
+                            propertyToDelete.remove();
+                            //Message
+                            window.alertify.success("Изтрит успешно!");
+                        },
+                        error: function () {
+                            window.alertify.error("Проблем при изтриване!");
+                        }
+                    });
+
+                });
+
+            $(document).on('click',
+                '#modal-cancel-btn',
+                function() {
+                    removeClosestModal(this);
+                });
+        })
+    </script>
+}

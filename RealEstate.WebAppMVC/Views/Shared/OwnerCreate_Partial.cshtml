@@ -1,42 +1,59 @@
-﻿@model RealEstate.ViewModels.WebMVC.OwnerCreateViewMode
+﻿@model RealEstate.ViewModels.WebMVC.OwnerCreateViewModel
 
 
-@using (Html.BeginForm("CreateOwnerMock", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "create-owner-form" }))
+@using (Html.BeginForm("CreateOwner", "Account", FormMethod.Post, new {  role = "form", id = "create-owner-form" }))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary("", new { @class = "text-danger" })
 
-    <div class="form-group">
-        <label>Потребителско име</label>
-        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+    <div class="col-xs-12  col-sm-6">
+        <div class="form-group">
+            <label class="required">Потребителско име</label>
+            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control required" })
+            @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+        </div>
+        <div class="form-group">
+            @Html.Label("Име", new { @class = "control-label required" })
+            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "text-danger" })
+        </div>
+        <div class="form-group">
+            @Html.Label("Фамилия", new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Рожденна дата", new { @class = "control-label" })
+            <b title="Това поле се попълва ако искате да имате известия за рожден ден на хората, с който работите. Това би допринесло за връзката и доверието с вас." style="color: black; cursor: pointer;border: 2px solid #7979ff;border-radius: 50%;background: #2d2dc3;width: 16px;height: 16px;display: inline-block;line-height: 11px;text-align: center;">?</b>
+            @Html.TextBoxFor(m => m.BirthDate, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.BirthDate, "", new { @class = "text-danger" })
+        </div>
     </div>
-    <div class="form-group">
-        @Html.Label("Име", new { @class = "control-label" })
-        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.Label("Фамилия", new { @class = "control-label" })
-        @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.Label("Телефон", new { @class = "control-label" })
-        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.Label("Email", new { @class = "control-label" })
-        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.Label("Парола", new { @class = "control-label" })
-        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.Label("Потвърди Парола", new { @class = "control-label" })
-        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+
+    <div class="col-xs-12 col-sm-6">
+        <div class="form-group">
+            @Html.Label("Телефон", new { @class = "control-label required" })
+            @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+        </div>
+        <div class="form-group">
+            @Html.Label("Емейл", new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+        </div>
+        <div class="form-group">
+            @Html.Label("Парола", new { @class = "control-label required" })
+            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+        </div>
+        <div class="form-group">
+            @Html.Label("Потвърди Парола", new { @class = "control-label required" })
+            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+        </div>
     </div>
     <div class="form-group">
         <input id="create-owner-btn" type="button" class="btn btn-block btn-primary" value="Създай собственик">
     </div>
 }
-
-

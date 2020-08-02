@@ -1,124 +1,801 @@
-﻿@model RealEstate.ViewModels.WebMVC.AgentListViewModel
+﻿@model RealEstate.ViewModels.WebMVC.TeamUserListViewModel
+
+@{
+    ViewBag.Title = "Детайли - Имоти СПРОПЪРТИС";
+}
 
 
-<!-- Begin Main -->
-<div role="main" class="main pgl-bg-grey">
-    <!-- Begin page top -->
-    <section class="page-top">
-        <div class="container">
-            <div class="page-top-in">
-                @*<h2><span>Agent Profile</span></h2>*@
+
+
+@section css{
+    <link type="text/css" rel="stylesheet" href="~/Content/account-details.css" />
+    <link type="text/css" rel="stylesheet" href="/Content/reviewStarsManagement.css" />
+    <link rel='stylesheet' href='/Content/fullcalendar.css' />
+    <style>
+        /*time slot for month*/
+        .fc-row.fc-week.fc-widget-content.fc-rigid {
+            height: 127px !important;
+        }
+
+        /*time slot for agendaDay and agendaWeek height*/
+        .fc-time-grid .fc-slats tr {
+            height: 63.7px !important;
+        }
+
+        /*for the left side column which represents the hours (ex. 0:00 , 1:00 ..)*/
+        .fc-axis.fc-time.fc-widget-content {
+            vertical-align: top !important;
+        }
+
+        .img-ratio1 {
+            height: 233px;
+            width: 350px;
+        }
+    </style>
+}
+
+<!------ Include the above in your HEAD tag ---------->
+<div class="container">
+    <div class="col-lg-12 col-sm-12">
+        <div class="card hovercard">
+            <input type="hidden" id="agentId" value="@Model.AgentId" />
+            <div class="card-background">
+                <img class="card-bkimg" alt="Снимка" src="~/Images/Carousel_Placeholder.png">
+            </div>
+            <div class="useravatar">
+                <img alt="Аватар" src="@Model.ImagePath.Replace(" ","%20")">
+            </div>
+            <div class="card-info">
+                <span class="card-title">@Model.FullName</span>
             </div>
         </div>
-    </section>
-    <!-- End page top -->
-    <!-- Begin Featured Agents -->
-    <section class="pgl-agents">
-        <div class="container">
-            <h2>Профил на брокера</h2>
-            <div class="agent-profile">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="pgl-agent-item pgl-bg-light">
-                            <div class="row pgl-midnarrow-row">
-                                <div class="col-xs-3">
-                                    <div class="img-thumbnail-medium">
-                                        <a href=@Url.Action("Details","Agents", new { id = Model.AgentId})><img src=@Model.ImagePath class="img-responsive" alt=""></a>
-                                    </div>
-                                </div>
-                                <div class="col-xs-9">
-                                    <div class="pgl-agent-info">
-                                        <small>NO.1</small>
-                                        <h4><a href=@Url.Action("Details","Agents", new { id = Model.AgentId})>@Model.FullName</a></h4>
-                                        <address>
-                                            <i class="fa fa-map-marker"></i> Office : @Model.OfficePhone<br>
-                                            <i class="fa fa-phone"></i> Mobile : @Model.PhoneNumber<br>
-                                            <i class="fa fa-fax"></i> Fax : @Model.PhoneNumber<br>
-                                            <i class="fa fa-envelope-o"></i> Mail: <a href="mailto:">@Model.Email</a>
-                                        </address>
-                                        <p>@Model.Description</p>
-                                    </div>
-                                </div>
+        <div class="btn-pref btn-group btn-group-justified btn-group-lg" role="group" aria-label="...">
+            <div class="btn-group" role="group">
+                <button type="button" id="personal-info" class="btn btn-primary" href="#agent-info" data-toggle="tab">
+                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                    <div class="hidden-xs">Лична информация</div>
+                </button>
+            </div>
+            <div class="btn-group" role="group">
+                <button type="button" id="properties" class="btn btn-default" href="#agent-properties" data-toggle="tab">
+                    <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+                    <div class="hidden-xs">Имоти</div>
+                </button>
+            </div>
+            <div class="btn-group" role="group">
+                <button type="button" id="social-activity" class="btn btn-default" href="#agent-misc" data-toggle="tab">
+                    <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+                    <div class="hidden-xs">Постове</div>
+                </button>
+            </div>
+            <div class="btn-group" role="group">
+                <button type="button" id="reviews" class="btn btn-default" href="#agent-reviews" data-toggle="tab">
+                    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                    <div class="hidden-xs">Оценки</div>
+                </button>
+            </div>
+            <div class="btn-group" role="group">
+                <button type="button" id="appointmets" class="btn btn-default" href="#agent-appointments" data-toggle="tab">
+                    <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+                    <div class="hidden-xs">График</div>
+                </button>
+            </div>
+        </div>
+        <div class="well">
+            <div class="tab-content">
+                <div class="tab-pane fade in active" id="agent-info">
+                    <div class="col-md-6 col-xs-12">
+                        <div class="pgl-team-item pgl-bg-light">
+                            <div class="img-thumbnail-medium img-ratio-square">
+                                <a href="@Url.Action("Details", "Agents" , new { agentId=Model.AgentId })">
+                                    <img src="@Model.ImagePath.Replace(" ","%20")" class="img-responsive img-centered img-ratio-square" alt="Снимка">
+                                </a>
+                                <ul class="social-links" style="top: 90%;">
+                                    @foreach (var socialAccount in Model.SocialMediaAccounts)
+                                    {
+                                        <li><a href="@socialAccount.SocialMediaAccount"><i class="fa fa-@socialAccount.SocialMedia.ToLower()"></i></a></li>
+                                    }
+                                    <li><a href="mailto:@Model.Email"><i class="fa fa-envelope"></i></a></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <!-- End Featured Agents -->
-            <!-- Begin Our Agents -->
-            <section class="pgl-properties">
-                <h2>Имоти представлявани от брокера</h2>
-                <div class="properties-full">
-                    @for (int i = 0; i < ViewBag.AgentProperties.Count;)
-                    {
-                        <div class="row">
-                            @for (int j = 0; i < ViewBag.AgentProperties.Count; j++, i++)
+                    <div class="col-md-6 col-xs-12" style="margin-top: 20px;">
+                        <h1 class="who-is">Информация за мен</h1>
+                        <div>
+                            <h3 style="display: inline-block; vertical-align: bottom;">Клиентска оценка:</h3>
+                            @if (ViewBag.IsAllowedToRateAgent)
                             {
-                                if (j % 3 == 0 && j != 0)
+                                using (Html.BeginForm("RateAgent", "Agents", new { }, FormMethod.Post, new { id = "create-review" }))
                                 {
-                                    break;
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="AgentId" id="AgentId" value="@Model.AgentId" />
+                                    @Html.Partial("/Views/Shared/ReviewStars_Partial.cshtml", Model.ReviewsInfo, new ViewDataDictionary())
                                 }
-                                <div class="col-xs-4 animation">
-                                    <div class="pgl-property">
-                                        <div class="property-thumb-info">
-                                            <div class="property-thumb-info-image">
-                                                <img alt="" class="img-responsive" src="@ViewBag.AgentProperties[i].ImagePath">
-                                                <span class="property-thumb-info-label">
-                                                    <span class="label price">@ViewBag.AgentProperties[i].Price</span>
-                                                    <span class="label">@ViewBag.AgentProperties[i].Status</span>
-                                                </span>
-                                            </div>
-                                            <div class="property-thumb-info-content">
-                                                <h3>
-                                                    <a href="@Url.Action("Details","Properties", new { id = ViewBag.AgentProperties[i].PropertyId})">@ViewBag.AgentProperties[i].Info</a>
-                                                </h3>
-                                                <address>Ferris Park, Jersey City Land in Sales</address>
-                                            </div>
-                                            <div class="amenities clearfix">
-                                                <ul class="pull-left">
-                                                    @Html.Raw(ViewBag.AgentProperties[i].BottomLeft)
-                                                    @*<li><strong>Площ:</strong> @ViewBag.AgentProperties[i].AreaInSquareFt<sup>m2</sup></li>*@
-                                                </ul>
-                                                <ul class="pull-right">
-                                                    @Html.Raw(ViewBag.AgentProperties[i].BottomRight)
-                                                    @*<li title="Преглеждания"><i class="fa fa-eye"></i> @ViewBag.AgentProperties[i].Views</li>
-                                                    <li title="Брой спални"><i class="icons icon-bedroom"></i> @ViewBag.AgentProperties[i].BedroomsCount</li>
-                                                    <li title="Брой бани"><i class="icons icon-bathroom"></i> @ViewBag.AgentProperties[i].BathroomsCount</li>*@
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
+                            }
+                            else
+                            {
+                                @Html.Partial("/Views/Shared/ReviewStarsInactive_Partial.cshtml", Model.ReviewsInfo, new ViewDataDictionary())
                             }
                         </div>
-                    }
-                    <ul class="pagination">
-                        @if (ViewBag.pageCount > 1)
-                        {
-                            <li><a href="@Url.Action("Details", "Agents", new {ViewBag.agentId, pageCount = (int) ViewBag.pageCount - 1, ViewBag.pageSize})">@(ViewBag.pageCount - 1)</a></li>
-                        }
-                        <li class="active">
-                            <a href="@Url.Action("Details", "Agents", new {ViewBag.agentId, ViewBag.pageCount, ViewBag.pageSize})">
-                                @ViewBag.pageCount
-                                <span class="sr-only">(текуща)</span>
-                            </a>
-                        </li>
-                        @if (ViewBag.LastPage > ViewBag.pageCount)
-                        {
-                            <li><a href="@Url.Action("Details", "Agents", new {ViewBag.agentId, pageCount = (int) ViewBag.pageCount + 1, ViewBag.pageSize})">@(ViewBag.pageCount + 1)</a></li>
-                            if (ViewBag.LastPage > ViewBag.pageCount + 1)
-                            {
-                                <li><a href="@Url.Action("Details", "Agents", new {ViewBag.agentId, pageCount = (int) ViewBag.pageCount + 2, ViewBag.pageSize})">@(ViewBag.pageCount + 2)</a></li>
-                            }
-                            <li><a href="@Url.Action("Details", "Agents", new {ViewBag.agentId, pageCount = (int) ViewBag.pageCount + 1, ViewBag.pageSize})">Следващ</a></li>
-                        }
-                    </ul>
-
+                        <div class="additionalDescription">
+                            @Html.Raw(Model.AdditionalDescription)
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
                 </div>
-            </section>
+                <div class="tab-pane fade in" id="agent-properties">
+                    <h1 align="center" style="margin-bottom: 10px;">Представлявани имоти</h1>
+                    <hr />
+                    <section class="pgl-properties"></section>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="tab-pane fade in" id="agent-misc">
+                    <h1 align="center" style="margin-bottom: 10px;">Постове в форума</h1>
+                    <hr />
+                    <div class="col-xs-12">
+                        <div class="agent-posts"></div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="tab-pane fade in" id="agent-reviews">
+                    <h1 align="center" style="margin-bottom: 10px;">Оценки получени от клиенти</h1>
+                    <hr />
+                    <ul id="reviews-container" class="reviews"></ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="tab-pane fade in" id="agent-appointments">
+                    <div id="calendar" class="agent-calendar"></div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
         </div>
-    </section>
+    </div>
 </div>
 
-<!-- End Our Agents -->
+@* Modal for creating appointment in the Calendar *@
+<div id="modal-body" hidden="hidden">
+    <form action="/Appointments/Create" method="POST">
+        @Html.AntiForgeryToken()
+        <div class="col-md-8 col-xs-12">
+            <div class="form-group">
+                <label class="control-label required" for="ClientName">Въведете вашето име</label>
+                <input class="form-control" data-val="true" data-val-required="Въведете име!" id="ClientName" name="ClientName" value="" type="text">
+                <span class="field-validation-valid text-danger" data-valmsg-for="ClientName" data-valmsg-replace="true"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label required" for="ClientPhoneNumber">Въведете вашият телефон</label>
+                <input class="form-control" data-val="true" data-val-required="Въведете телефон!" id="ClientPhoneNumber" name="ClientPhoneNumber" value="" type="text">
+                <span class="field-validation-valid text-danger" data-valmsg-for="ClientPhoneNumber" data-valmsg-replace="true"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="ClientEmail">Въведете вашият емейл </label>
+                <input class="form-control" data-val="true" data-val-required="Въведете емейл!" id="ClientEmail" name="ClientEmail" value="" type="text">
+                <span class="field-validation-valid text-danger" data-valmsg-for="ClientEmail" data-valmsg-replace="true"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label required" for="PropertyId">Изберете имот</label>
+                <select class="form-control" data-val="true" data-val-required="Изберете имот!" id="PropertyId" name="PropertyId"></select>
+                <span class="field-validation-valid text-danger" data-valmsg-for="PropertyId" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+        <div class="col-md-4 col-xs-12">
+            <div class="form-group" style="text-align: center;">
+                <label class="control-label" for="AppointmentDescription">Въведете допълнителна информация</label>
+                <textarea class="form-control" data-val="true" id="AppointmentDescription" name="AppointmentDescription" rows="13"></textarea>
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="form-group">
+                <button class="btn btn-primary" style="">
+                    Заяви среща
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(".btn-pref .btn").click(function () {
+                $(".btn-pref .btn").removeClass("btn-primary").addClass("btn-default");
+                // $(".tab").addClass("active"); // instead of this do the below
+                $(this).removeClass("btn-default").addClass("btn-primary");
+            });
+
+            let agentPropertiesId = $('#agentId').val();
+
+            var _uiTemplates = {
+                propertyTemplate: function (property) {
+                    return '<div class="col-xs-12 col-sm-6 col-md-4 animation property"> \
+                                        <div class="pgl-property"> \
+                                            <div class="property-thumb-info"> \
+                                                <div class="property-thumb-info-image"> \
+                                                    <img alt="Снимка" class="img-responsive img-ratio1" src="' +
+                        property.ImagePath.replace(' ', '%20') +
+                        '"> \
+                                                    <span class="property-thumb-info-label"> \
+                                                        <span class="label price">' +
+                        property.Price +
+                        'лв</span> \
+                                                        <span class="label">' +
+                        property.Status +
+                        '</span> \
+                                                    </span> \
+                                                </div> \
+                                                <div class="property-thumb-info-content"> \
+                                                    <h3  style="height: 3.3em;overflow: hidden;text-overflow: ellipsis;"> \
+                                                        <a href="/Properties/Details/' +
+                        property.PropertyId +
+                        '">' +
+                        (property.PropertyName !== null ? property.PropertyName + '</br>' : '') +
+                        (property.Info !== null ? property.Info : '') +
+                        '</a> \
+                                                    </h3> \
+                                                    <address class="clamp-one">' +
+                        property.FullAddress +
+                        '</address> \
+                                                </div> \
+                                                <div class="amenities clearfix"> \
+                                                    <ul class="pull-left">' +
+                        property.BottomLeft +
+                        '</ul> \
+                                                    <ul class="pull-right"> \
+                                                        <li title="Преглеждания"><i class="fa fa-eye"></i>' +
+                        property.Views +
+                        '  </li>' +
+                        property.BottomRight +
+                        '</ul> \
+                                                </div> \
+                                            </div> \
+                                        </div> \
+                                    </div>';
+                },
+                postTemplate: function (post) {
+                    var result = '<div class="col-md-6 col-xs-12"> \
+                                            <article class="post post-large" style="position:relative;">';
+                    if (post.ImageUrls.length > 0) {
+                        result += '<div class="post-image">';
+                        if (post.ImageUrls.length === 1) {
+                            result += '<a href="/Posts/Details/' +
+                                post.PostId +
+                                '"> \
+                                                <img class="img-responsive" src="' +
+                                post.ImageUrls[0].replace(' ', '%20') +
+                                '" alt="Blog" style="max-height: 380px;" width="100%"> \
+                                               </a>';
+                        } else {
+                            result +=
+                                "<div class=\"owl-carousel pgl-pro-slide pgl-img-slide\" data-plugin-options='{\"items\": 1, \"pagination\": false, \"autoHeight\": false}'>";
+                            for (let imageIndex in post.ImageUrls) {
+                                if (post.ImageUrls.hasOwnProperty(imageIndex)) {
+                                    result += '<div class="item"> \
+                                                        <img class="img-responsive" src="' +
+                                        post.ImageUrls[imageIndex].replace(' ', '%20') +
+                                        '" alt="Blog" style="max-height: 380px;" width="100%"> \
+                                                        <div class="item-caption"> \
+                                                            <p> \
+                                                                <small>' +
+                                        post.Title +
+                                        '</small> \
+                                                            </p> \
+                                                        </div> \
+                                                    </div> ';
+                                }
+                            }
+                            result += '</div>';
+                        }
+                        result += '</div>';
+                    } else {
+                        if (post.VideoUrl) {
+                            result += '<div class="post-video youtube"> \
+                                                    <iframe allowfullscreen frameborder="0" height="488" src="' +
+                                post.VideoUrl +
+                                '" width="100%"></iframe> \
+                                               </div>';
+                        }
+                        // Post with no video or image
+                    }
+                    var postDate = window.moment(post.CreatedOn).toDate();
+                    result += '<span class="post-date" style="left: 0; top: 0;"> \
+                                                    <span class="day"> ' +
+                        postDate.getDay() +
+                        '</span> \
+                                                    <span class="month-year">' +
+                        window.moment(postDate).format('MMM YYYY') +
+                        'г.</span> \
+                                                   </span> \
+                                                   <div class="post-body"> \
+                                                    <div class="post-content"> \
+                                                        <h3><a href="/Posts/Details/' +
+                        post.PostId +
+                        '">' + post.Title + '</a></h3> \
+                                                        <div class="post-meta"> \
+                                                            <span>От \
+                                                                <a href="/Forum/Index?userId=${post.CreatorId}">' +
+                        post.AuthorName +
+                        '</a> в тема <a href="/Forum/Index?themeId=' +
+                        post.ThemeId +
+                        '">' +
+                        post.ThemeName +
+                        '</a></span> \
+                                                                <span><i class="fa fa-comment-o"></i> <a href="/Posts/Details/' +
+                        post.PostId +
+                        '#comments">' +
+                        post.CommentsCount +
+                        ' Коментара</a></span> \
+                                                        </div> \
+                                                        <div style="max-height: 100px; overflow: hidden;">' +
+                        post.Body +
+                        '</div> \
+                                                        <div style="text-align: right;"> \
+                                                            <a class="btn btn-default btn-sm" style="margin-top: 10px;" href="/Posts/Details/' +
+                        post.PostId +
+                        '">Виж още</a> \
+                                                        </div> \
+                                                    </div> \
+                                                </div> \
+                                            </article> \
+                                        </div>';
+
+                    return result;
+                },
+                reviewTemplate: function (review) {
+                    var reviewDate = moment(review.CreatedOn).toDate();
+                    var createdReview = '<li> \
+                                                    <div class="comment"> \
+                                                        <div class="img-circle pull-left" style="margin-right: 7px;"> \
+                                                            <img class="avatar" width="70" alt="Аватар" src="' +
+                        review.ClientReviewer.ImagePath.replace(' ', '%20') +
+                        '"> \
+                                                        </div> \
+                                                        <div class="comment-block"> \
+                                                            <div> \
+                                                                <span class="comment-by" style="margin-left: 5px;"> <strong>' +
+                        review.ClientReviewer.Name +
+                        '</strong></span> \
+                                                                <span class="date"><small><i class="fa fa-clock-o"></i>' +
+                        moment().format("DD MMM YYYY") +
+                        '</small></span> \
+                                                            </div> \
+                                                            <fieldset class="rating-inactive"> \
+                                                                <div class="pull-left"> \
+                                                                    <input type="radio" id="star5" name="score" value="10" ' +
+                        (review.ReviewScore === 10 ? 'checked="checked"' : '') +
+                        '/> \
+                                                                    <label class="full" for="star5" title="Превъзходно - 5 звезди"></label> \
+                                                                    <input type="radio" id="star4half" name="score" value="9" ' +
+                        (review.ReviewScore === 9 ? 'checked="checked"' : '') +
+                        '/> \
+                                                                    <label class="half" for="star4half" title="Отлично - 4.5 звезди"></label> \
+                                                                    <input type="radio" id="star4" name="score" value="8" ' +
+                        (review.ReviewScore === 8 ? 'checked="checked"' : '') +
+                        ' /> \
+                                                                    <label class="full" for="star4" title="Много добре - 4 звезди"></label> \
+                                                                    <input type="radio" id="star3half" name="score" value="7" ' +
+                        (review.ReviewScore === 7 ? 'checked="checked"' : '') +
+                        ' /> \
+                                                                    <label class="half" for="star3half" title="Добро - 3.5 звезди"></label> \
+                                                                    <input type="radio" id="star3" name="score" value="6" ' +
+                        (review.ReviewScore === 6 ? 'checked="checked"' : '') +
+                        ' /> \
+                                                                    <label class="full" for="star3" title="Добро - 3 звезди"></label> \
+                                                                    <input type="radio" id="star2half" name="score" value="5" ' +
+                        (review.ReviewScore === 5 ? 'checked="checked"' : '') +
+                        ' /> \
+                                                                    <label class="half" for="star2half" title="Средно - 2.5 звезди"></label> \
+                                                                    <input type="radio" id="star2" name="score" value="4" ' +
+                        (review.ReviewScore === 4 ? 'checked="checked"' : '') +
+                        ' /> \
+                                                                    <label class="full" for="star2" title="Средно - 2 звезди"></label> \
+                                                                    <input type = "radio" id = "star1half" name = "score" value = "3" ' +
+                        (review.ReviewScore === 3 ? 'checked = "checked"' : '') +
+                        ' /> \
+                                                                    <label class="half" for="star1half" title="Зле - 1.5 звезди"></label> \
+                                                                    <input type = "radio" id = "star1" name = "score" value = "2" ' +
+                        (review.ReviewScore === 2 ? 'checked = "checked"' : '') +
+                        ' /> \
+                                                                    <label class="full" for="star1" title="Много зле - 1 звезда"></label> \
+                                                                    <input type = "radio" id = "starhalf" name = "score" value = "1" ' +
+                        (review.ReviewScore === 1 ? 'checked = "checked"' : '') +
+                        ' /> \
+                                                                    <label class="half" for="starhalf" title="Много зле - 0.5 звезда"></label> \
+                                                                </div> \
+                                                            </fieldset> \
+                                                        <p class="comment-body">' +
+                        review.ReviewText +
+                        '</p> \
+                                                    </div> \
+                                                </div> \
+                                            </li>';
+                    return createdReview;
+                }
+            };
+            //Fill the properties tab with the first page
+            (function () {
+                $.ajax({
+                    url: '/Properties/GetAgentProperties',
+                    method: 'GET',
+                    data: { agentId: agentPropertiesId },
+                    success: function (properties) {
+                        if (properties.Count === 0) {
+                            $('.pgl-properties')
+                                .append('<h3 align="center">Този брокер все още не е представлява нито един имот</h3>');
+                        } else {
+                            $(properties.Properties).each(function (index, property) {
+                                $('.pgl-properties').append(_uiTemplates.propertyTemplate(property));
+                            });
+
+                            $('.clamp-one').each(function () { $clamp(this, { clamp: 1 }) });
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                        let shownError = titles ? titles[1] : errorThrown;
+                        window.alertify.error(shownError);
+                    }
+                });
+            })();
+
+            //Fill the reviews tab with the first page
+            (function () {
+                $.ajax({
+                    url: '/Agents/GetReviews',
+                    method: 'GET',
+                    data: { agentId: agentPropertiesId },
+                    success: function (reviews) {
+                        if (reviews.length > 0) {
+                            $(reviews).each(function (index, review) {
+                                $('#reviews-container').append(_uiTemplates.reviewTemplate(review));
+                            });
+                        } else {
+                            $('#reviews-container')
+                                .append("<h3 align='center'>Този брокер Все още няма оценки от потребителите</h3>");
+                        }
+                    }
+                });
+            })();
+
+            //Fill the posts tab with the first page
+            (function () {
+                $.ajax({
+                    url: '/Forum/GetUserPosts',
+                    method: 'GET',
+                    data: { userId: agentPropertiesId },
+                    success: function (posts) {
+                        if (posts.length === 0) {
+                            $('.agent-posts')
+                                .append(
+                                    '<h3 align="center">Този брокер все още не е създал пост във форума на системата</h3>');
+                        } else {
+                            $(posts).each(function (index, post) {
+                                $('.agent-posts').append(_uiTemplates.postTemplate(post));
+
+                                //init the owl carousel for the post images
+                                $("div.owl-carousel:not(.manual.owl-carousel-init)").each(function () {
+                                    $(this).owlCarousel(owlDefaultOptions).addClass("owl-carousel-init");
+                                });
+                            });
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                        let shownError = titles ? titles[1] : errorThrown;
+                        window.alertify.error(shownError);
+                    }
+                });
+            })();
+
+            var isAgentPropertiesLastPage = false;
+            var agentPropertiesPage = 2;
+            var isAgentPostsLastPage = false;
+            var agentPostsPage = 2;
+
+            var onscrollFunction = function () {
+                if ((scrollY / (scrollMaxY - 452)) * 100 > 95) {
+                    if ($('#agent-properties').hasClass('active')) {
+                        window.onscroll = function () { };
+                        // on last page scroll event stops
+                        if (!isAgentPropertiesLastPage) {
+                            $.ajax({
+                                url: '/Properties/GetAgentProperties',
+                                type: 'GET',
+                                data: { agentId: agentPropertiesId, pageCount: agentPropertiesPage },
+                                success: function (properties) {
+                                    isAgentPropertiesLastPage = (properties.Properties.lenght === 0);
+                                    $(properties.Properties).each(function (index, property) {
+                                        $('.pgl-properties').append(_uiTemplates.propertyTemplate(property));
+                                    });
+
+                                    $('.clamp-one').each(function () { $clamp(this, { clamp: 1 }) });
+
+                                    agentPropertiesPage++;
+                                    window.onscroll = onscrollFunction;
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                                    let shownError = titles ? titles[1] : errorThrown;
+                                    window.alertify.error(shownError);
+                                }
+                            });
+                        }
+                    } else if ($('#agent-misc').hasClass('active')) {
+                        window.onscroll = function () { };
+                        // on last page scroll event stops
+                        if (!isAgentPostsLastPage) {
+                            $.ajax({
+                                url: '/Forum/GetUserPosts',
+                                type: 'GET',
+                                data: { userId: agentPropertiesId, page: agentPostsPage },
+                                success: function (posts) {
+                                    isAgentPropertiesLastPage = (posts.lenght === 0);
+                                    $(posts).each(function (index, post) {
+                                        $('.agent-posts').append(_uiTemplates.postTemplate(post));
+                                        //init the owl carousel for the post images
+                                        $("div.owl-carousel:not(.manual.owl-carousel-init)").each(function () {
+                                            $(this).owlCarousel(owlDefaultOptions).addClass("owl-carousel-init");
+                                        });
+                                    });
+                                    agentPostsPage++;
+                                    window.onscroll = onscrollFunction;
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                                    let shownError = titles ? titles[1] : errorThrown;
+                                    window.alertify.error(shownError);
+                                }
+                            });
+                        }
+                    }
+                }
+            };
+            window.onscroll = onscrollFunction;
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $(document).on('click',
+                '.rating-inactive',
+                function() {
+                    if (window.g_isUserAuthenticated) {
+                        if ('@ViewBag.IsAllowedToRateAgent' !== 'True') {
+                            window.alertify.error(
+                                'Трябва да сте организирали среща за оглед, която да е преминала преди да дадете оценка.');
+                        }
+                    } else {
+                        window.alertify.error('Влезте в акаунта си за да дадете оценка.');
+                    }
+                });
+        });
+    </script>
+
+    @* Calendar prerequisites *@
+    <script src='/Scripts/fullcalendar/fullcalendar.js'></script>
+    <script src='/Scripts/fullcalendar/locale/bg.js'></script>
+    @* Calendar prerequisites *@
+    @*Calendar page setup*@
+    <script>
+        $(document).ready(function() {
+            var properties = '';
+            //Get properties as DropDown Options
+            $.get('/Properties/GetPropertiesDropDown?agentId' + '@Model.AgentId',
+                function(data) {
+                    $.each(data,
+                        function(i, property) {
+                            properties += '<option value="' +
+                                property.PropertyId +
+                                '">' +
+                                property.PropertyName +
+                                '</option>';
+                        });
+                });
+
+            // page is now ready, initialize the calendar...
+            $('#calendar').fullCalendar({
+                customButtons: {
+                    infoButton: {
+                        text: 'Информация',
+                        click: function() {
+                            alertify.alert("Информация за календара",
+                                    "<p>За да заявите час за среща натиснете върху часът от календара, който желаете! Часове могат да се запазват само в Седмичния и Дневния график на адвокатът, като часът ви ще бъде създаден и показван в календарът на Брокерът само когато, той го удобри. Брокерът ще получи известие за вашата заявка, веднага след като сте запазили часът. Очаквайте връзка от брокерът след заявката.</p> <p style=\"text-align:center; margin:0\"><b>(При работа с календарът вие се съгласявате да предоставите вашият телефонен номер и емейл адрес на Брокерът за да се свържи с вас!)</b></p>")
+                                .set('closable', false);
+                        }
+                    }
+                },
+
+                defaultView: 'month',
+                header: {
+                    left: 'month,agendaWeek,agendaDay infoButton',
+                    center: 'title',
+                    right: 'today prev,next'
+                },
+                titleFormat: 'MMMM YYYY', //Title of the Header
+                minTime: "08:00:00", //Start of the agendaDay/Week calendar hour
+                maxTime: "20:00:00", //End of the agendaDay/Week calendar hour
+                views: {
+                    month: { // name of view
+                        columnHeaderFormat: 'dddd' // Display format of the column headers
+                        // other view-specific options here
+                    },
+                    agenda: {
+                        slotDuration: '01:00:00',
+                        columnHeaderFormat: 'dddd DD.MM' // Display format of the column headers
+                        // options apply to agendaWeek and agendaDay views
+                    },
+                    week: {
+                        slotDuration: '01:00:00',
+                        columnHeaderFormat: 'dddd DD.MM'
+                        // options apply to basicWeek and agendaWeek views
+                    },
+                    day: {
+                        slotDuration: '01:00:00',
+                        columnHeaderFormat: 'dddd DD.MM'
+                        // options apply to basicDay and agendaDay views
+                    }
+                },
+                businessHours: [// specify an array instead
+                    {
+                        dow: [1, 2, 3, 4, 5], // Monday, Tuesday, Wednesday, Thursday, Friday
+                        start: '08:00', // 8am
+                        end: '17:00' // 6pm
+                    },
+                    {
+                        dow: [0, 6], // Sunday, Saturday
+                        start: '10:00', // 10am
+                        end: '16:00' // 4pm
+                    }
+                ],
+
+                smallTimeFormat: 'H:mm', // for agendaWeek and agendaDay Hour displaying in the rows
+                allDaySlot: false,
+                buttonIcons: false, // show the prev/next text
+                navLinks: true, // can click day/week names to navigate views
+                editable: false,
+                selectable: false, // Make time slots unselectable
+                eventLimit: true, // allow "more" link when too many events
+
+                //When click on event
+                eventClick: function() {},
+
+                //when click on time slot
+                dayClick: function(date, jsEvent, view) {
+                    if (window.g_isUserAuthenticated) {
+                        if (view.name !== 'month') {
+                            $('#calendar').fullCalendar('select', date.format(), date.add(1, 'hours').format());
+
+                            var modalBody =
+                                '<form action="/Appointments/Create" id="create-appointment" method="POST">' +
+                                    '@Html.AntiForgeryToken()' +
+                                    '<input id="AppointmentDate" name="AppointmentDate" type="hidden" value="' +
+                                    date.add(-1, 'hours').toISOString() +
+                                    '"/>\
+                                            <input id="AgentId" name="AgentId" type="hidden" value="' +
+                                    '@Model.AgentId' +
+                                    '"/> \
+                                            <div class="col-md-8 col-xs-12"> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label required" for="ClientName">Въведете вашето име</label> \
+                                                    <input class="form-control" data-val="true" data-val-required="Въведете име!" id="ClientName" name="ClientName" value="" type="text"> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="ClientName" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label required" for="ClientPhoneNumber">Въведете вашият телефон</label> \
+                                                    <input class="form-control" data-val="true" data-val-required="Въведете телефон!" id="ClientPhoneNumber" name="ClientPhoneNumber" value="" type="text"> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="ClientPhoneNumber" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label" for="ClientEmail">Въведете вашият емейл </label> \
+                                                    <input class="form-control" data-val="true" data-val-required="Въведете емейл!" id="ClientEmail" name="ClientEmail" value="" type="text"> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="ClientEmail" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label required" for="PropertyId">Изберете имот</label> \
+                                                    <select class="form-control" data-val="true" data-val-required="Изберете имот!" id="PropertyId" name="PropertyId">' +
+                                    properties +
+                                    '</select> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="PropertyId" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                            </div> \
+                                            <div class="col-md-4 col-xs-12"> \
+                                                <div class="form-group"  style="text-align: center;"> \
+                                                    <label class="control-label" for="AppointmentDescription">Въведете допълнителна информация</label> \
+                                                    <textarea class="form-control" data-val="true" id="AppointmentDescription" name="AppointmentDescription" rows="9"></textarea> \
+                                                </div> \
+                                                <div class="form-group"  style="text-align: center;"> \
+                                                    <div class="g-recaptcha not-ready"></div> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="reCaptcha" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                            </div> \
+                                            <div class="col-xs-12"> \
+                                                <div class="form-group"> \
+                                                    <button class="btn btn-primary" style="float: right; margin-bottom: 10px;"> \
+                                                        Заяви среща \
+                                                    </button> \
+                                                </div> \
+                                            </div> \
+                                        </form>';
+
+                            createAndShowModal({
+                                title: 'Заяви час за среща с ' +
+                                    '@Model.FullName' +
+                                    ' в ' +
+                                    date.format('DD.MM.YYYY HH:mm'),
+                                body: modalBody
+                            });
+
+                            $('body').on('submit',
+                                '#create-appointment',
+                                function(event) {
+                                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                                    var thisForm = $(this);
+                                    $.ajax({
+                                        url: this.action,
+                                        data: thisForm.serialize(),
+                                        method: this.method,
+                                        success: function(data) {
+                                            if (data.success) {
+                                                showErrorResponse(data, $('#create-appointment'));
+                                            } else {
+                                                //remove the modal window
+                                                removeClosestModal(thisForm);
+                                                var newEvent = { id: data, title: "Среща с клиент", start: date };
+                                                $('#calendar').fullCalendar('renderEvent', newEvent);
+                                            }
+                                        },
+                                        error: function(jqXHR, textStatus, errorThrown) {
+                                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                                            let shownError = titles ? titles[1] : errorThrown;
+                                            window.alertify.error(shownError);
+                                        }
+                                    });
+                                });
+
+
+                            window.recaptchaHelpers.initRecaptcha($('.g-recaptcha.not-ready'));
+
+                        } else {
+                            window.alertify.error("Може да направите заяка за среща само в седмичен и дневен изглед.");
+                        }
+                    } else {
+                        window.alertify.error("Влезте в акаунта си за да заявите час за оглед.");
+                    }
+                },
+
+                eventConstraint: "businessHours",
+
+//startParam and endParam will be automaticaly included which are the start and end period
+//of the period you look for ex: 01.01.2010 / 31.01.2010
+                eventSources: [
+// your event source
+                    {
+                        url: '/Appointments/GetAppointments',
+                        type: 'GET',
+                        data: {
+                            agentId: '@Model.AgentId'
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        },
+                        color: 'blue', // a non-ajax option
+                        textColor: 'white', // a non-ajax option
+                        allDayDefault: false
+                    }
+
+// any other sources...
+                ]
+
+// put your options and callbacks here
+            });
+
+        });
+    </script>
+    @*Calendar page setup*@
+
+    @*Check Out*@
+    @*https://fullcalendar.io/docs/localization*@
+}

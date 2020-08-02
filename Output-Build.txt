@@ -1,0 +1,7 @@
+﻿1>------ Build started: Project: RealEstate.WebAppMVC, Configuration: Debug Any CPU ------
+1>D:\RealEstate\RealEstate.WebAppMVC\Controllers\ReservationsController.cs(88,41,88,50): warning CS1998: This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
+1>D:\RealEstate\RealEstate.WebAppMVC\Controllers\ReservationsController.cs(93,41,93,53): warning CS1998: This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
+1>D:\RealEstate\RealEstate.WebAppMVC\Controllers\Forum\ThemesController.cs(23,27,23,32): warning CS1998: This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
+1>D:\RealEstate\RealEstate.WebAppMVC\Controllers\HomeController.cs(249,17,249,20): warning CS0219: The variable 'bla' is assigned but its value is never used
+1>  RealEstate.WebAppMVC -> D:\RealEstate\RealEstate.WebAppMVC\bin\RealEstate.WebAppMVC.dll
+========== Build: 1 succeeded, 0 failed, 8 up-to-date, 0 skipped ==========

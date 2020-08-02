@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
+using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using Ninject;
 using RealEstate.Model;
 using RealEstate.Repositories.Interfaces;
+using RealEstate.Services.Helpers;
 using RealEstate.ViewModels.WebMVC;
 
 namespace RealEstate.Services
@@ -19,129 +22,108 @@ namespace RealEstate.Services
     {
 
         [Inject]
-        public ImageServices(IUnitOfWork unitOfWork, IPrincipal user, ApplicationUserManager userMgr) : base(unitOfWork, user, userMgr)
-        {
-        }
-
-        /// <summary>
-        /// Get image by id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public string GetImage(int id)
-        {
-            return UnitOfWork.ImagesRepository.FindBy(i => i.ImageId == id).Select(i => i.ImagePath).FirstOrDefault();
-        }
-
-        /// <summary>
-        /// Get all images path, based on their path
-        /// </summary>
-        /// <param name="type">Type of the images</param>
-        /// <returns></returns>
-        public List<string> GetImages(Type type)
-        {
-            var queryImages = UnitOfWork.ImagesRepository.GetAll();
-            switch (type.Name)
-            {
-                case "PropertyImages":
-                    queryImages = queryImages.Where(i => i is PropertyImages);
-                    break;
-                case "SightImages":
-                    queryImages = queryImages.Where(i => i is SightImages);
-                    break;
-                case "UserImages":
-                    queryImages = queryImages.Where(i => i is UserImages);
-                    break;
-                case "CityImages":
-                    queryImages = queryImages.Where(i => i is CityImages);
-                    break;
-                case "Images":
-                    // do not filter by anything, this will get all images
-                    break;
-                default:
-                    throw new ArgumentException("No such image type");
-            }
-
-            return queryImages.Select(i => i.ImagePath).ToList();
-        }
+        public ImageServices(IUnitOfWork unitOfWork, ApplicationUserManager userMgr) 
+            : base(unitOfWork, userMgr){}
 
         /// <summary>
         /// Factory for creating Images
         /// </summary>
         /// <param name="imagesToAdd">images model to be added</param>
         /// <param name="imageType">PropertyImages/SightImages/UserImages/CityImages</param>
-        public ISet<Images> CreateImagesFactory(IEnumerable<ImageCreateViewModel> imagesToAdd, string imageType)
-        {
-            ISet<Images> images = new HashSet<Images>();
-            foreach (ImageCreateViewModel imageToAdd in imagesToAdd)
+        public ISet<Images> CreateImagesFactory(ImageCreateViewModel imagesToAdd, string imageType, string userName)
+        {            
+            string callerName;
+            switch (imageType) // Caller Determining
             {
-                Images image;
-                string callerName;
+                case "PropertyImages":
+                    int propertyId = int.Parse(imagesToAdd.ForeignKey);
+                    callerName = unitOfWork.PropertiesRepository
+                        .Where(p => p.Id == propertyId).Select(p => p.Owner.UserName)
+                        .FirstOrDefault();
+                    //If property not found
+                    if (string.IsNullOrEmpty(callerName)) throw new ArgumentException("No such Property");
+                    break;
+                case "SightImages":
+                    int sightId = int.Parse(imagesToAdd.ForeignKey);
+                    callerName = unitOfWork.SightsRepository
+                        .Where(p => p.SightId == sightId).Select(p => p.SightName)
+                        .FirstOrDefault();
+                    //If property not found
+                    if (string.IsNullOrEmpty(callerName)) throw new ArgumentException("No such Sight");
+                    break;
+                case "UserImages":
+                    callerName = userName;
+                    //If property not found
+                    if (string.IsNullOrEmpty(callerName)) throw new ArgumentException("No such user");
+                    break;
+                case "CityImages":
+                    int cityId = int.Parse(imagesToAdd.ForeignKey);
+                    callerName = unitOfWork.CitiesRepository
+                        .Where(p => p.CityId == cityId).Select(p => p.CityName)
+                        .FirstOrDefault();
+                    //If property not found
+                    if (string.IsNullOrEmpty(callerName)) throw new ArgumentException("No such city");
+                    break;
+                default:
+                    throw new ArgumentException("No such image type");
+            }
+
+            ISet<Images> images = new HashSet<Images>();
+            foreach (HttpPostedFileBase imageToAdd in imagesToAdd.ImageFiles)
+            {
+                Images image = null;
                 switch (imageType)
                 {
                     case "PropertyImages":
-                        callerName = UnitOfWork.PropertiesRepository
-                            .FindBy(p => p.PropertyId == (int)imageToAdd.ForeignKey).Select(p => p.PropertyName)
-                            .FirstOrDefault();
-                        //If property not found
-                        if (string.IsNullOrEmpty(callerName)) throw new ArgumentException("No such Property");
-
                         image = new PropertyImages
                         {
-                            ImageType = imageToAdd.ImageFile.ContentType,
-                            ImagePath = PathManager.CreateUserPropertyImagePath(callerName, imageToAdd.ImageFile.FileName),
-                            PropertyId = (int)imageToAdd.ForeignKey
+                            ImagePath = PathManager.CreateUserPropertyImagePath(callerName, imageToAdd.FileName),
+                            PropertyId = int.Parse(imagesToAdd.ForeignKey)
                         };
                         break;
                     case "SightImages":
-                        callerName = UnitOfWork.SightsRepository
-                            .FindBy(p => p.SightId == (int)imageToAdd.ForeignKey).Select(p => p.SightName)
-                            .FirstOrDefault();
-                        //If property not found
-                        if (string.IsNullOrEmpty(callerName)) throw new ArgumentException("No such Sight");
-
-                        image = new SightImages()
+                        image = new SightImages
                         {
-                            ImageType = imageToAdd.ImageFile.ContentType,
-                            ImagePath = PathManager.CreateSightImagePath(callerName, imageToAdd.ImageFile.FileName),
-                            SightId = (int)imageToAdd.ForeignKey
+                            ImagePath = PathManager.CreateSightImagePath(callerName, imageToAdd.FileName),
+                            SightId = int.Parse(imagesToAdd.ForeignKey)
                         };
                         break;
                     case "UserImages":
-                        callerName = User.Identity.GetUserName();
-                        //If property not found
-                        if (string.IsNullOrEmpty(callerName)) throw new ArgumentException("No such user");
-
-                        image = new UserImages()
+                        image = new UserImages
                         {
-                            ImageType = imageToAdd.ImageFile.ContentType,
-                            ImagePath = PathManager.CreateUserProfileImagePath(callerName, imageToAdd.ImageFile.FileName),
-                            UserId = (string)imageToAdd.ForeignKey
+                            ImagePath = PathManager.CreateUserProfileImagePath(callerName, imageToAdd.FileName),
+                            UserId = (string)imagesToAdd.ForeignKey
                         };
                         break;
                     case "CityImages":
-                        callerName = UnitOfWork.CitiesRepository
-                            .FindBy(p => p.CityId == (int)imageToAdd.ForeignKey).Select(p => p.CityName)
-                            .FirstOrDefault();
-                        //If property not found
-                        if (string.IsNullOrEmpty(callerName)) throw new ArgumentException("No such city");
-
-                        image = new CityImages()
+                        image = new CityImages
                         {
-                            ImageType = imageToAdd.ImageFile.ContentType,
-                            ImagePath = PathManager.CreateCityImagePath(callerName, imageToAdd.ImageFile.FileName),
-                            CityId = (int)imageToAdd.ForeignKey
+                            ImagePath = PathManager.CreateCityImagePath(callerName, imageToAdd.FileName),
+                            CityId = int.Parse(imagesToAdd.ForeignKey)
                         };
                         break;
                     default:
                         throw new ArgumentException("No such image type");
                 }
+                image.ImageType = imageToAdd.ContentType;
 
                 var physicalPath = Path.Combine(HttpRuntime.AppDomainAppPath.TrimEnd('\\'), image.ImagePath.TrimStart('\\'));
-                imageToAdd.ImageFile.SaveAs(physicalPath);
+                var physicalDirPath = Path.GetDirectoryName(physicalPath);
+                if (!Directory.Exists(physicalDirPath))
+                {
+                    DirectoryHelpers.CreateDirectory(physicalDirPath);
+                }
+                imageToAdd.SaveAs(physicalPath);
 
-                Image img = Image.FromStream(imageToAdd.ImageFile.InputStream);
+                //Add Image to FileSystem
+                Image img = Image.FromStream(imageToAdd.InputStream);
                 image.ImageRatio = (float)img.Width / img.Height;
+
+                //Adding image to DataBase
+                unitOfWork.ImagesRepository.Add(image);
+                unitOfWork.Save();
+
+                //Add Image to returned set
                 images.Add(image);
             }
 
@@ -149,98 +131,173 @@ namespace RealEstate.Services
         }
 
 
+        public async Task<List<Images>> CreateUserImages(List<HttpPostedFileBase> images, string userId)
+        {
+            string callerName = await userManager.Users
+                .Where(u => u.Id == userId)
+                .Select(u => u.UserName)
+                .FirstOrDefaultAsync()
+                ?? throw new ArgumentException("Не е намерен потребителят.");
+
+
+            float GetSizeRatio(HttpPostedFileBase imageFile)
+            {
+                using (Image img = Image.FromStream(imageFile.InputStream))
+                {
+                    return (float)img.Width / img.Height;
+                }
+            }
+
+            var imagesToAdd = images
+                .Select(i => (Images)new UserImages
+                {
+                    ImagePath = PathManager.CreateUserProfileImagePath(callerName, i.FileName),
+                    UserId = userId,
+                    ImageRatio = GetSizeRatio(i),
+                    ImageType = i.ContentType
+                })
+                .ToList();
+
+            unitOfWork.ImagesRepository.AddRange(imagesToAdd);
+            await unitOfWork.SaveAsync();
+
+            //Add images to FileSystem
+            foreach (HttpPostedFileBase imageToAdd in images)
+            {
+                var physicalPath = Path.Combine(HttpRuntime.AppDomainAppPath.TrimEnd('\\'), PathManager.CreateUserProfileImagePath(callerName, imageToAdd.FileName).TrimStart('\\'));
+                var physicalDirPath = Path.GetDirectoryName(physicalPath);
+                if (!Directory.Exists(physicalDirPath))
+                {
+                    DirectoryHelpers.CreateDirectory(physicalDirPath);
+                }
+                imageToAdd.SaveAs(physicalPath);
+
+                using (Image img = Image.FromStream(imageToAdd.InputStream))
+                {
+                    ImageHelpers.SaveAsWebP(img, physicalPath, img.Width, img.Height);
+                }
+            }
+
+            return imagesToAdd;
+        }
+
         /// <summary>
         /// Method for adding images into Property (house,hotel..)
         /// Directly into its navigation property
         /// </summary>
         /// <param name="imagesToAdd"></param>
         /// <param name="isForSlider">determines the image type to resize to</param>
-        public ISet<PropertyImages> CreatePropertyImages(IEnumerable<HttpPostedFileBase> imagesToAdd, bool isForSlider = false)
+        public IList<PropertyImages> CreatePropertyImagesSet(IEnumerable<HttpPostedFileBase> imagesToAdd, string userName, bool isForSlider = false)
         {
-            ISet<PropertyImages> images = new HashSet<PropertyImages>();
-            foreach (var imageToAdd in imagesToAdd)
-            {
-                if (imageToAdd == null)
+            var propertyImages = imagesToAdd as HttpPostedFileBase[] ?? imagesToAdd.ToArray();
+
+            var imagesForFileSystem = propertyImages
+                .Select(i => new ImageFileSystemDTO
                 {
-                    continue;
-                }
-                var propertyImage = new PropertyImages()
+                    ImageRelPath = PathManager.CreateUserPropertyImagePath(userName, i.FileName, isForSlider: isForSlider),
+                    ImageFile = i
+                })
+                .ToList();
+
+            SaveToFileSystem(imagesForFileSystem, isForSlider);
+
+            var images = propertyImages
+                .Select(p => new PropertyImages
                 {
-                    ImagePath = PathManager.CreateUserPropertyImagePath(User.Identity.Name, imageToAdd.FileName),
-                    ImageType = imageToAdd.ContentType,
-                };
-
-
-                Image img = Image.FromStream(imageToAdd.InputStream);
-                Image imgResized = isForSlider ? ResizeImage(img, new Size(2200, 800)) : ResizeImage(img, new Size(870, 580));
-
-                propertyImage.ImageRatio = (float)img.Width / img.Height;
-
-                var physicalPath = Path.Combine(HttpRuntime.AppDomainAppPath.TrimEnd('\\'), propertyImage.ImagePath.TrimStart('\\'));
-                imgResized.Save(physicalPath,ImageFormat.Bmp);
-                images.Add(propertyImage);
-            }
+                    ImagePath = PathManager.CreateUserPropertyImagePath(userName, p.FileName),
+                    ImageType = p.ContentType,
+                    ImageRatio = isForSlider ? (float)2200 / 800 : (float)870 / 580,
+                })
+                .ToList();
 
             return images;
         }
 
+        public void SaveToFileSystem(List<ImageFileSystemDTO> images, bool isForSlider)
+        {
+            var physicalDirPath = Path.GetDirectoryName(Path.Combine(HttpRuntime.AppDomainAppPath.TrimEnd('\\'), images[0].ImageRelPath.TrimStart('\\')));
+            DirectoryHelpers.CreateDirectory(physicalDirPath);
+
+            foreach (var image in images)
+            {
+                var physicalImagePath =
+                    Path.Combine(HttpRuntime.AppDomainAppPath.TrimEnd('\\'), image.ImageRelPath.TrimStart('\\'));
+                using (Image img = Image.FromStream(image.ImageFile.InputStream))
+                {
+                    //Resize image for usage in the site
+                    var width = isForSlider ? 2200 : 870;
+                    var height = isForSlider ? 800 : 580;
+
+                    //SaveOriginal Image
+                    ImageHelpers.SaveOriginal(img, physicalImagePath);
+                    //Save image in webP format
+                    ImageHelpers.SaveAsWebP(img, physicalImagePath, width, height);
+                    //Resize the image and Save It
+                    ImageHelpers.SaveToFileSystem(img, physicalImagePath, height, width, ImageFormat.Jpeg);
+                }
+            }
+        }
 
 
         /// <summary>
         /// Delete images from db and fileSystem
         /// </summary>
         /// <param name="id"></param>
-        public void DeleteImage(int id)
+        /// <param name="userId"></param>
+        public async Task DeleteImage(int id, string userId)
         {
-            var imageToDelete = UnitOfWork.ImagesRepository.FindBy(i => i.ImageId == id).FirstOrDefault() ?? throw new ArgumentNullException();
+            var imageToDelete = await unitOfWork.ImagesRepository
+                .Where(i => i.ImageId == id)
+                .FirstOrDefaultAsync() 
+                ?? throw new ArgumentNullException();
+
             switch (imageToDelete.GetType().Name)
             {
                 case "UserImages":
-                    IsImageOfCurrentUser(imageToDelete);
+                    IsImageOfCurrentUser(imageToDelete, userId);
                     break;
                 case "PropertyImages":
-                    IsCurrentUserOwnerOfTheProperty(imageToDelete);
+                    IsCurrentUserOwnerOfTheProperty(imageToDelete, userId);
                     break;
                 case "SightImages":
-                    IsCurrentUserMaintanance();
-                    break;
                 case "CityImages":
-                    IsCurrentUserMaintanance();
+                    await IsCurrentUserMaintanance(userId);
                     break;
             }
             //Delete file from File system
-            File.Delete(imageToDelete.ImagePath);
+            var physicalPath = Path.Combine(HttpRuntime.AppDomainAppPath.TrimEnd('\\'), imageToDelete.ImagePath.TrimStart('\\'));
+            File.Delete(physicalPath);
             //Delete file from Database
-            UnitOfWork.ImagesRepository.Delete(imageToDelete);
-            UnitOfWork.Save();
+            unitOfWork.ImagesRepository.Delete(imageToDelete);
+            await unitOfWork.SaveAsync();
         }
 
         #region DeleteImage Helpers
 
-        private void IsImageOfCurrentUser(Images imageToDelete)
+        private void IsImageOfCurrentUser(Images imageToDelete, string userId)
         {
-            if (((UserImages)imageToDelete).UserId != User.Identity.GetUserId())
+            if (((UserImages)imageToDelete).UserId != userId)
             {
                 throw new AccessViolationException();
             }
         }
 
-        private void IsCurrentUserMaintanance()
+        private async Task IsCurrentUserMaintanance(string userId)
         {
-            if (!User.IsInRole("Maintanance"))
+            if (!await userManager.IsInRoleAsync(userId, "Maintanance"))
             {
                 throw new AccessViolationException();
             }
         }
 
-        private void IsCurrentUserOwnerOfTheProperty(Images imageToDelete)
+        private void IsCurrentUserOwnerOfTheProperty(Images imageToDelete, string userId)
         {
             //Check if the logged user is one of the owners of the properties then he is allowed to delete the image
-            var property = UnitOfWork.PropertiesRepository
-                               .FindBy(p => p.PropertyId == ((PropertyImages)imageToDelete).PropertyId)
+            var property = unitOfWork.PropertiesRepository
+                               .Where(p => p.Id == ((PropertyImages)imageToDelete).PropertyId)
                                .FirstOrDefault() ?? throw new ArgumentNullException();
-            var currUserId = User.Identity.GetUserId();
-            if (property.Owner.Id == currUserId)
+
+            if (property.Owner.Id == userId)
             {
                 throw new AccessViolationException();
             }
@@ -248,45 +305,5 @@ namespace RealEstate.Services
 
         #endregion
 
-        #region Helpers
-
-        /// <summary>
-        /// Resize the image to the specified width and height.
-        /// </summary>
-        /// <param name="image">The image to resize.</param>
-        /// <param name="width">The width to resize to.</param>
-        /// <param name="height">The height to resize to.</param>
-        /// <returns>The resized image.</returns>
-        static Bitmap ResizeImage(Image image, int width, int height)
-        {
-            var destRect = new Rectangle(0, 0, width, height);
-            var destImage = new Bitmap(image, width, height);
-
-            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-
-            using (var graphics = Graphics.FromImage(destImage))
-            {
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-                using (var wrapMode = new ImageAttributes())
-                {
-                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
-                }
-            }
-
-            return destImage;
-        }
-
-
-        static Image ResizeImage(Image imgToResize, Size size)
-        {
-            return (Image) (new Bitmap(imgToResize, size));
-        }
-        #endregion
     }
 }

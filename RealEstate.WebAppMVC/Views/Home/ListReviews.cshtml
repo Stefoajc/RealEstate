@@ -1,6 +1,6 @@
 ﻿@model List<RealEstate.ViewModels.WebMVC.ListReviewViewModel>
 @{
-    ViewBag.Title = "ListReviews";
+    ViewBag.Title = "Списък ревюта - Имоти СПРОПЪРТИС";
 }
 
 <style>
@@ -17,7 +17,7 @@
             @foreach (var review in Model)
             {
             <div class="col-md-12">
-                <img class="pull-left" width="75" height="75" src=@review.UserProfileImagePath alt="Photo" />
+                <img class="pull-left" width="75" height="75" src=@review.UserProfileImagePath.Replace(" ","%20") alt="Photo" />
                 <div>
                     <div class="review-item"><b> Потребител: </b> @review.ReviewUserFullname</div>
                     <div class="review-item"><b> Оценка: </b> @review.ReviewScore</div>

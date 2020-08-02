@@ -1,7 +1,7 @@
 ﻿@model RealEstate.ViewModels.WebMVC.RegisterOwnerViewModel
 
 @{
-    ViewBag.Title = "Регистрация на собственик";
+    ViewBag.Title = "Регистрация на собственик - Имоти СПРОПЪРТИС";
 }
 
 @section css{
@@ -9,6 +9,10 @@
         .receive-offers, .terms {
             margin-bottom: 5px;
             font-weight: bold;
+        }
+
+        .registerOwner {
+            margin-top: 15px;
         }
     </style>
 }
@@ -23,42 +27,53 @@
         </div>
     </section>
     <section class="registerOwner">
-        <div class="container">
-            <div class="col-md-4 col-lg-offset-4">
-                <!-- End page top -->
-                @using (Html.BeginForm("RegisterOwner", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.ValidationSummary("", new { @class = "text-danger" })
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4 col-md-offset-4">
+                    <!-- End page top -->
+                    @using (Html.BeginForm("RegisterOwner", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
 
-                    <div class="form-group">
-                        <label>Потребителско име</label>
-                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
-                    </div>
-                    <div class="form-group">
-                        @Html.Label("Е-мейл", new { @class = "control-label" })
-                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-                    </div>
-                    <div class="form-group">
-                        @Html.Label("Парола", new { @class = "control-label" })
-                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-                    </div>
-                    <div class="form-group">
-                        @Html.Label("Потвърди Парола", new { @class = "control-label" })
-                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
-                    </div>
-                    <div class="form-group">
-                        @Html.Label("Регистрационен код", new { @class = "control-label" })
-                        @Html.TextBoxFor(m => m.RegisterCode, new { @class = "form-control" })
-                    </div>
-                    <div class="form-group">
-                        <p class="terms"><input type="checkbox" name="remember"> <a href="#">Съгласен съм с условията и правилата на ползване.</a></p>
-                        <p class="receive-offers"><input type="checkbox" name="remember"> <a href="#">Искам да получавам новини и оферти.</a></p>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-block btn-primary">Регистрирай се</button>
-                    </div>
-                }
+                        <div class="form-group">
+                            <label class="required">Потребителско име</label>
+                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group">
+                            @Html.Label("Е-мейл", new { @class = "control-label required" })
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group">
+                            @Html.Label("Парола", new { @class = "control-label required" })
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group">
+                            @Html.Label("Потвърди Парола", new { @class = "control-label required" })
+                            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group">
+                            @Html.Label("Регистрационен код", new { @class = "control-label required" })
+                            @Html.TextBoxFor(m => m.RegisterCode, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.RegisterCode, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group">
+                            <p class="terms">
+                                <input type="checkbox" name="IsTermsAgreed"> Съгласен съм с <a href="@Url.Action("TermsAndConditions", "Home")" target="_blank" class="required">общите условия</a>.
+                            </p>
+                            @Html.ValidationMessageFor(m => m.IsTermsAgreed, "", new { @class = "text-danger", style = "display:block" })
+                            <p class="receive-offers">
+                                <input type="checkbox" name="IsSubscribed"> Искам да получавам новини и оферти.
+                            </p>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-block btn-primary">Регистрирай се</button>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </section>

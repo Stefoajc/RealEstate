@@ -1,444 +1,1146 @@
-﻿@model RealEstate.ViewModels.WebMVC.DetailsPropertyViewModel
+﻿@using System.Text.RegularExpressions
+@using Microsoft.AspNet.Identity
+@using RealEstate.Model
+@using RealEstate.Services.Extentions
+@using RealEstate.Services.Helpers
+@using RealEstate.ViewModels.WebMVC
+@model DetailsPropertyViewModel
 
-<head>
-    <meta charset="utf-8">
+@{
+    ViewBag.Title = "Детайли на имот - Имоти СПРОПЪРТИС";
+}
+
+
+@section meta{
+    <meta property="og:title" content="@Model.PropertyName">
+    <meta property="og:description" content="@Regex.Replace(Model.AdditionalDescription ?? "", "<[^>]*>", string.Empty)">
     <meta name="keywords" content="Property-Details,property,имот,недвижимо имущество,имущество">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>sProperties</title>
-    @section css{
-        <style>
-            .nonselectable-image {
-                cursor: pointer;
-                user-select: none;
-                -o-user-select: none;
-                -khtml-user-select: none;
-                -moz-user-select: none;
-                -webkit-user-select: none;
-            }
-        </style>
-    }
-</head>
-<body>
-    <div id="page">
-        <!-- Begin Main -->
-        <div role="main" class="main pgl-bg-grey">
-            <!-- Begin page top -->
-            <section class="page-top">
-                <div class="container">
-                    <div class="page-top-in">
-                        @*<h2><span>Property Detail</span></h2>*@
+}
+
+@section css{
+    <style type="text/css">
+        .property-thumb-info-label-left {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        .property-single-extra,
+        .property-single-attribute {
+            margin-right: 10px;
+            display: inline-block;
+        }
+    </style>
+
+    <link type="text/css" rel="stylesheet" href="/Content/reviewStarsManagement.css" />
+}
+
+<!-- Begin page top -->
+<section class="page-top">
+    <div class="container">
+        <div class="page-top-in">
+            @*<h2><span>Property Detail</span></h2>*@
+        </div>
+    </div>
+</section>
+<!-- End page top -->
+<!-- Begin content with sidebar -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-9 content">
+
+            <section class="pgl-pro-detail pgl-bg-light">
+                <div id="slider" class="flexslider">
+                    <ul class="slides">
+                        @foreach (var image in Model.Images)
+                        {
+                            <li style="height: 100%">
+                                @*<div style="width: 100%;height: 100%;display: block; background-image: url('@image'); background-size: cover;"></div>*@
+
+
+                                <picture>
+                                    <source srcset="@(FileHelpers.ChangeFileExtension(image, ".webp"))" type="image/webp">
+                                    <source srcset="@image" type="@MimeMapping.GetMimeMapping(image)">
+                                    <img style="height: 565px; width: 848px" class="unselectable img-responsive" alt="Снимка" src="@image">
+                                </picture>
+
+
+                                @if (!Model.IsRentSearch && Model.SellingPrice != null)
+                                {
+                                    <span class="property-thumb-info-label">
+                                        @if ((PropertyState)Model.PropertyState != PropertyState.Available)
+                                        {
+                                            <span class="label price">@((PropertyState)Model.PropertyState == PropertyState.Sold ? "Продаден" : "Нает")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="label price">@(Model.SellingPrice != null ? $"{Model.SellingPrice}лв." : "По договаряне")</span>
+                                            <span class="label forsell">Продажна</span>
+                                        }
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="property-thumb-info-label">
+                                        @if ((PropertyState)Model.PropertyState != PropertyState.Available)
+                                        {
+                                            <span class="label price">@((PropertyState)Model.PropertyState == PropertyState.Sold ? "Продаден" : "Нает")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="label price">@(Model.RentalPrice != null ? $"{Model.RentalPrice}лв." : "По договаряне").</span>
+                                            <span class="label forrent">@(Model.RentalPeriod)</span>
+                                        }
+                                    </span>
+                                }
+
+                                @*<span class="property-thumb-info-label-left">
+                                        <span class="labeRel price">@(Model.RentalPrice)лв.</span>
+                                        <span class="label forrent">Наемна</span>
+                                        <br />
+                                    </span>*@
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                <div id="carousel" class="flexslider">
+                    <ul class="slides">
+                        @foreach (var image in Model.Images)
+                        {
+                            <li>
+                                <picture>
+                                    <source srcset="@(FileHelpers.ChangeFileExtension(image, ".webp"))" type="image/webp">
+                                    <source srcset="@image" type="@MimeMapping.GetMimeMapping(image)">
+                                    <img alt="Снимка" style="height: 98.66px; width: 148px;" class="unselectable" src="@image">
+                                </picture>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <div class="pgl-detail">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="col-xs-12" style="text-align: center; border: 2px solid #333; margin-bottom: 10px;">
+                                <label>Рейтинг:</label>
+                                <div>
+                                    @if (ViewBag.IsAllowedToRateProperty)
+                                    {
+                                        using (Html.BeginForm("CreateReview", "Properties", new { }, FormMethod.Post, new { id = "create-review" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="PropertyId" id="PropertyId" value="@Model.PropertyId" />
+                                            @*<input type="hidden" name="ReviewText" id="ReviewText" value="" />*@
+                                            @Html.Partial("/Views/Shared/ReviewStars_Partial.cshtml", Model.ReviewsInfo, new ViewDataDictionary())
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @Html.Partial("/Views/Shared/ReviewStarsInactive_Partial.cshtml", Model.ReviewsInfo, new ViewDataDictionary())
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="clearfix"></div>
+                            <ul class="list-unstyled amenities amenities-detail" style="margin-bottom: 10px;">
+                                <li><strong>Тип: </strong> @Model.PropertyType</li>
+                                <li><strong>Площ:</strong> @(Model.AreaInSquareMeters)м<sup>2</sup></li>
+                                <li><strong>Имот №:</strong> @Model.PropertyId</li>
+                                <li><address><i class="icons icon-location"></i> @Model.Address.FullAddress</address></li>
+                                @if (!string.IsNullOrEmpty(Model.BedroomsCount))
+                                {
+                                    <li><i class="icons icon-bedroom"></i> @Model.BedroomsCount Спални</li>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.BathroomsCount))
+                                {
+                                    <li><i class="icons icon-bathroom"></i> @Model.BathroomsCount Бани</li>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.RoomsCount))
+                                {
+                                    <li><i class="icons icon-bathroom"></i> @Model.RoomsCount Стаи</li>
+                                }
+                            </ul>
+                            @if (Model.TeamUser?.AgentId == User.Identity.GetUserId() || User.IsInRole("Administrator"))
+                            {
+                                <div class="form-group" style="margin-bottom: 5px;">
+                                    <a id="create-report" href="@Url.Action("Create","Reports", new {propertyId = Model.PropertyId})" class="btn btn-block btn-primary">Напиши доклад</a>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 5px;">
+                                    @if (Model.PropertyParent != null)
+                                    {
+                                        <a id="edit-link" href="@Url.Action("Edit","RentalInfoes", new {id = Model.PropertyId})" class="btn btn-block btn-primary">Редактирай</a>
+                                    }
+                                    else
+                                    {
+                                        <a id="edit-link" href="@Url.Action("EditPropertyInfo","Properties", new {id = Model.PropertyId})" class="btn btn-block btn-primary">Редактирай</a>
+                                    }
+                                </div>
+                                <div class="form-group" style="margin-bottom: 5px;">
+                                    <form id="delete-property-form" action="@Url.Action("Delete","Properties",new {id = Model.PropertyId})" method="post">
+                                        <button id="delete-property-btn" type="submit" class="btn btn-block btn-primary">Изтрии</button>
+                                    </form>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 5px;">
+                                    <form class="change-property-status-form" action="@Url.Action("ChangePropertyStatus","Properties")" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="PropertyId" value="@Model.PropertyId" />
+                                        <input type="hidden" name="State" value="Sold" />
+                                        <button id="delete-property-btn" type="submit" class="btn btn-block @(Model.PropertyState == (int)PropertyState.Sold ? "btn-success" : "btn-primary" )">Продаден</button>
+                                    </form>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 5px;">
+                                    <form class="change-property-status-form" action="@Url.Action("ChangePropertyStatus", "Properties")" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="PropertyId" value="@Model.PropertyId" />
+                                        <input type="hidden" name="State" value="Rented" />
+                                        <button id="delete-property-btn" type="submit" class="btn btn-block @(Model.PropertyState == (int)PropertyState.Rented ? "btn-success" : "btn-primary" )">Нает</button>
+                                    </form>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 5px;">
+                                    <form class="change-property-status-form" action="@Url.Action("ChangePropertyStatus", "Properties")" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="PropertyId" value="@Model.PropertyId" />
+                                        <input type="hidden" name="State" value="Available" />
+                                        <button id="delete-property-btn" type="submit" class="btn btn-block @(Model.PropertyState == (int)PropertyState.Available ? "btn-success" : "btn-primary" )">Наличен</button>
+                                    </form>
+                                </div>
+
+                            }
+                            else
+                            {
+                                if (Model.PropertyState == (int)PropertyState.Available)
+                                {
+                                    if (Model.RentalPeriod == "Дневно" && Model.IsRentSearch)
+                                    {
+                                        using (Html.BeginForm("Create", "Reservations", new { }, FormMethod.Get, new { id = "reservation-create-form" }))
+                                        {
+                                            <div class="form-group">
+                                                <button id="reservation-create-btn" type="submit" class="btn btn-block btn-primary">Резервирай имота</button>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        using (Html.BeginForm("Create", "Appointments", new { }, FormMethod.Get, new { id = "appointment-create-form" }))
+                                        {
+                                            <div class="form-group">
+                                                <button id="appointmets-create-btn" type="submit" class="btn btn-block btn-primary">Резервирай час за оглед</button>
+                                            </div>
+                                        }
+                                    }
+                                }
+                            }
+                        </div>
+                        <div class="col-sm-8">
+                            <h2>@Model.Address.FullAddress</h2>
+                            <div id="property-description">@Html.Raw(Model.AdditionalDescription)</div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="tab-detail">
+                        <h3>Повече информация</h3>
+                        <div class="panel-group" id="accordion">
+                            <div class="panel panel-default pgl-panel">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseExtras">Допълнителна информация</a> </h4>
+                                </div>
+                                <div id="collapseExtras" class="panel-collapse collapse in">
+                                    <div class="panel-body" style="padding: 0 30px 10px 30px;">
+                                        <div class="property-extras">
+
+                                            @foreach (string extra in Model.Extras)
+                                            {
+                                                <div class="property-single-extra">
+                                                    <input style="cursor: pointer;" type="checkbox" checked="checked" disabled="disabled" />
+                                                    <label>@extra</label>
+                                                </div>
+                                            }
+                                        </div>
+
+                                        <div class="property-attributes">
+                                            @foreach (var attribute in Model.Attributes)
+                                            {
+                                                <div class="property-single-attribute">
+                                                    <label>@attribute.Key: </label>
+                                                    <span>@attribute.Value</span>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.VideoUrl))
+                            {
+                                <div class="panel panel-default pgl-panel">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseVideo" class="collapsed">Видео</a> </h4>
+                                    </div>
+                                    <div id="collapseVideo" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <div class="post-video youtube">
+                                                <iframe allowfullscreen frameborder="0" height="488" src="@Model.VideoUrl" width="100%"></iframe>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @if (Model.ClientReviews.Any())
+                            {
+                                <div class="panel panel-default pgl-panel">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseReviews" class="collapsed">Оценки от клиенти</a> </h4>
+                                    </div>
+                                    <div id="collapseReviews" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <ul>
+                                                @foreach (var review in Model.ClientReviews)
+                                                {
+                                                    <li>
+                                                        <div class="comment">
+                                                            <div class="img-circle pull-left" style="margin-right: 7px;">
+                                                                <picture>
+                                                                    <source srcset="@(FileHelpers.ChangeFileExtension(review.ClientReviewer.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                                                    <source srcset="@review.ClientReviewer.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(review.ClientReviewer.ImagePath.Replace(" ", "%20"))">
+                                                                    <img alt="Аватар" style="width: 70px;" class="avatar" src="@review.ClientReviewer.ImagePath.Replace(" ", "%20")">
+                                                                </picture>
+                                                            </div>
+                                                            <div class="comment-block">
+                                                                <div>
+                                                                    <span class="comment-by" style="margin-left: 5px;"> <strong>@review.ClientReviewer.Name</strong></span>
+                                                                    <span class="date"><small><i class="fa fa-clock-o"></i> @review.CreatedOn.ToString("dd MMM yyyy") </small></span>
+                                                                </div>
+                                                                @Html.Partial("/Views/Shared/ReviewStarsInactive_Partial.cshtml", new RealEstate.ViewModels.WebMVC.ReviewsStarsPartialViewModel { AverageScore = review.ReviewScore, ReviewsCount = 1 })
+                                                                <p class="comment-body">@review.ReviewText</p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @if (Model.Address.Longitude != null && Model.Address.Latitude != null)
+                            {
+                                <div class="panel panel-default pgl-panel">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseMap" class="collapsed">Карта</a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseMap" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <div id="contact-map" class="pgl-bg-light"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @if (Model.TeamUser != null)
+                            {
+                                <div class="panel panel-default pgl-panel">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseAgent" class="collapsed">Брокер</a> </h4>
+                                    </div>
+                                    <div id="collapseAgent" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <div class="pgl-agent-item pgl-bg-light">
+                                                <div class="row pgl-midnarrow-row">
+                                                    <div class="col-xs-4">
+                                                        <div class="img-thumbnail-medium">
+                                                            <a href="@Url.Action("Details", "Agents", new {agentId = Model.TeamUser.AgentId})">
+                                                                <picture>
+                                                                    <source srcset="@(FileHelpers.ChangeFileExtension(Model.TeamUser.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                                                    <source srcset="@Model.TeamUser.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(Model.TeamUser.ImagePath.Replace(" ", "%20"))">
+                                                                    <img alt="Снимка" style="width: 202.08px; height: 202.08px;" class="img-responsive" src="@Model.TeamUser.ImagePath.Replace(" ", "%20")">
+                                                                </picture>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-8">
+                                                        <div class="pgl-agent-info">
+                                                            <h4><a href="@Url.Action("Details","Agents",new {agentId = Model.TeamUser.AgentId})">@Model.TeamUser.FullName</a></h4>
+                                                            <div class="clamp-three">@Html.Raw(Model.TeamUser.AdditionalDescription)</div>
+                                                            <address>
+                                                                <i class="fa fa-map-marker"></i> Офис : @Model.TeamUser.OfficePhone<br>
+                                                                <i class="fa fa-phone"></i> Мобилен : @Model.TeamUser.PhoneNumber<br>
+                                                                <i class="fa fa-envelope-o"></i> Емейл: <a href="mailto:@Model.TeamUser.Email">@Model.TeamUser.Email</a>
+                                                            </address>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @if (Model.Owner != null && (User.IsInRole("Agent") || User.IsInRole("Administrator") || User.IsInRole("Maintenance")))
+                            {
+                                <div class="panel panel-default pgl-panel">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseOwner" class="collapsed">Собственик</a> </h4>
+                                    </div>
+                                    <div id="collapseOwner" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <div class="pgl-agent-item pgl-bg-light">
+                                                <div class="row pgl-midnarrow-row">
+                                                    <div class="col-xs-4">
+                                                        <div class="img-thumbnail-medium">
+                                                            <picture>
+                                                                <source srcset="@(FileHelpers.ChangeFileExtension(Model.Owner.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                                                <source srcset="@Model.Owner.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(Model.Owner.ImagePath.Replace(" ", "%20"))">
+                                                                <img alt="Снимка" style="width: 202.08px; height: 202.08px;" class="img-responsive" src="@Model.Owner.ImagePath.Replace(" ", "%20")">
+                                                            </picture>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-8">
+                                                        <div class="pgl-agent-info">
+                                                            <h4>@Model.Owner.Name</h4>
+                                                            <address>
+                                                                <i class="fa fa-phone"></i> Mobile : @Model.Owner.PhoneNumber<br>
+                                                                <i class="fa fa-envelope-o"></i> Mail: <a href="mailto:@Model.Owner.Email">@Model.Owner.Email</a>
+                                                            </address>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            @* Only Rentals can have Parent property *@
+                            @if (Model.PropertyParent != null)
+                            {
+                                <div class="panel panel-default pgl-panel">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseParentProperty" class="collapsed">Имот от който е част</a> </h4>
+                                    </div>
+                                    <div id="collapseParentProperty" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <div class="pgl-property animation">
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-md-4">
+                                                        <div class="property-thumb-info-image regular-image-container">
+                                                            <picture>
+                                                                <source srcset="@(FileHelpers.ChangeFileExtension(Model.PropertyParent.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                                                <source srcset="@Model.PropertyParent.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(Model.PropertyParent.ImagePath.Replace(" ", "%20"))">
+                                                                <img alt="Снимка" class="img-responsive regular-image" src="@Model.PropertyParent.ImagePath.Replace(" ", "%20")">
+                                                            </picture>
+                                                            <span class="property-thumb-info-label">
+                                                                <span class="label price">@Model.PropertyParent.Price</span>
+                                                                <span class="label">@Model.PropertyParent.Status</span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6 col-md-8">
+                                                        <div class="property-thumb-info">
+
+                                                            <div class="property-thumb-info-content">
+                                                                <h3 class="h3-one-line">
+                                                                    <a class="clamp-two" href="@Url.Action("Details", "Properties", new {id = Model.PropertyParent.PropertyId})">@Model.PropertyParent.PropertyName</a>
+                                                                </h3>
+                                                                <address>@Model.PropertyParent.FullAddress</address>
+                                                                <p class="clamp-two">@Model.PropertyParent.Info</p>
+                                                            </div>
+                                                            <div class="amenities clearfix">
+                                                                @if (Model.AreaInSquareMeters != null)
+                                                                {
+                                                                    <ul class="pull-left">
+                                                                        <li><strong>Площ:</strong> @Model.AreaInSquareMeters<sup>m2</sup></li>
+                                                                    </ul>
+                                                                }
+                                                                <ul class="pull-right">
+                                                                    <li title="Преглеждания"><i class="fa fa-eye"></i> @Model.Views</li>
+                                                                    @Html.Raw(Model.PropertyParent.BottomRight)
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            @* Only properties can have Rentals *@
+                            @if (Model.Rentals.Count > 0)
+                            {
+                                <div class="panel panel-default pgl-panel">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseRentals" class="collapsed">Части отдавани под наем</a> </h4>
+                                    </div>
+                                    <div id="collapseRentals" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            @* Properties horizontal *@
+                                            @foreach (var property in Model.Rentals)
+                                            {
+                                                <div class="pgl-property animation">
+                                                    <div class="row">
+                                                        <div class="col-sm-6 col-md-4">
+                                                            <div class="property-thumb-info-image regular-image-container">
+                                                                <picture>
+                                                                    <source srcset="@(FileHelpers.ChangeFileExtension(property.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                                                    <source srcset="@property.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(property.ImagePath.Replace(" ", "%20"))">
+                                                                    <img alt="Снимка" class="img-responsive regular-image" src="@property.ImagePath.Replace(" ", "%20")">
+                                                                </picture>
+                                                                <span class="property-thumb-info-label">
+                                                                    <span class="label price">@property.Price</span>
+                                                                    <span class="label">@property.Status</span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 col-md-8">
+                                                            <div class="property-thumb-info">
+
+                                                                <div class="property-thumb-info-content">
+                                                                    <h3 class="h3-one-line">
+                                                                        <a title="@property.PropertyName" class="clamp-two" href="@Url.Action("Details", "Properties", new {id = property.PropertyId, isRentSearching=true})">@property.PropertyName</a>
+                                                                    </h3>
+                                                                    <address title="@property.FullAddress" class="clamp-two">@property.FullAddress</address>
+                                                                    <p class="clamp-two">@property.Info</p>
+                                                                </div>
+                                                                <div class="amenities clearfix" style="padding: 2px 15px 0 0;">
+                                                                    <ul class="pull-left" style="padding: 0;">
+                                                                        <li><strong>Площ:</strong> @property.AreaInSquareMeters<sup>m2</sup></li>
+                                                                    </ul>
+                                                                    <ul class="pull-right">
+                                                                        <li title="Преглеждания"><i class="fa fa-eye"></i> @property.Views</li>
+                                                                        @Html.Raw(property.BottomRight)
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                            @* Properties horizontal *@
+
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="panel panel-default pgl-panel">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseContact" class="collapsed">Връзка с нас</a> </h4>
+                                </div>
+                                <div id="collapseContact" class="panel-collapse collapse">
+                                    <div class="panel-body">
+
+                                        <div id="map-company-address-pin" style="position: relative; overflow: hidden; height: 300px;" class="pgl-bg-light col-md-8 col-xs-12"></div>
+                                        <div class="col-md-4 col-xs-12">
+                                            <br />
+                                            <h2>Контакти</h2>
+                                            <address>
+                                                <ul class="list-unstyled">
+                                                    <li style="padding: 0"><i class="fa fa-map-marker"></i> Офис : @System.Configuration.ConfigurationManager.AppSettings["OfficePhone"]<br></li>
+                                                    <li style="padding: 0"><i class="fa fa-phone"></i> Мобилен : @System.Configuration.ConfigurationManager.AppSettings["MobilePhone"]<br></li>
+                                                    <li style="padding: 0"><svg style="width: 20px; height: 20px; margin-left: -2px; vertical-align: middle; margin-bottom: 5px;" aria-hidden="true" data-prefix="fab" data-icon="facebook-messenger" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-facebook-messenger fa-w-14 fa-3x"><path fill="currentColor" d="M224 32C15.9 32-77.5 278 84.6 400.6V480l75.7-42c142.2 39.8 285.4-59.9 285.4-198.7C445.8 124.8 346.5 32 224 32zm23.4 278.1L190 250.5 79.6 311.6l121.1-128.5 57.4 59.6 110.4-61.1-121.1 128.5z" class=""></path></svg> Messenger: <a target="_blank" href="https://fb.me/SmartProperties2018">Пишете ни</a></li>
+                                                    <li style="padding: 0"><i class="fa fa-envelope-o"></i> E-Mail: <a href="mailto:@System.Configuration.ConfigurationManager.AppSettings["OfficeEmail"]">@System.Configuration.ConfigurationManager.AppSettings["OfficeEmail"]</a></li>
+                                                </ul>
+                                            </address>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
                     </div>
                 </div>
             </section>
-            <!-- End page top -->
-            <!-- Begin content with sidebar -->
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-9 content">
 
-                        <section class="pgl-pro-detail pgl-bg-light">
-                            <div id="slider" class="flexslider">
-                                <ul class="slides">
-                                    @foreach (var image in Model.Images)
-                                    {
-                                        <li>
-                                            <img src="@image" alt="" draggable="false" class="nonselectable-image">
-                                            <span class="property-thumb-info-label">
-                                                <span class="label price">@Model.SellingPrice</span>
-                                                <span class="label forrent">Продажна</span>
-                                            </span>
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
+            <!-- Begin Related properties -->
+            @if (ViewBag.RelatedProperties.Count > 0)
+            {
+                <section class="pgl-properties">
+                    <h2>Подобни имоти</h2>
+                    <div class="row">
+                        <div class="owl-carousel pgl-pro-slide owl-theme owl-carousel-init" data-plugin-options="{&quot;items&quot;: 3, &quot;itemsDesktop&quot;: 3, &quot;singleItem&quot;: false, &quot;autoPlay&quot;: false, &quot;pagination&quot;: false}" style="display: block; opacity: 1;">
 
-                            <div id="carousel" class="flexslider">
-
-                                <ul class="slides">
-                                    @foreach (var image in Model.Images)
-                                    {
-                                        <li>
-                                            <img src="@image" alt="" draggable="false" class="nonselectable-image">
-                                        </li>
-                                    }
-
-                                </ul>
-                            </div>
-                            <div class="pgl-detail">
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <ul class="list-unstyled amenities amenities-detail">
-                                            <li><strong>Тип: </strong> @Model.PropertyType</li>
-                                            <li><strong>Area:</strong> @Model.AreaInSquareFt<sup>m2</sup></li>
-                                            <li><address><i class="icons icon-location"></i> @Model.Address.FullAddress</address></li>
-                                            @if (!string.IsNullOrEmpty(Model.BedroomsCount))
-                                            {
-                                                <li><i class="icons icon-bedroom"></i> @Model.BedroomsCount Спални</li>
-                                            }
-                                            @if (!string.IsNullOrEmpty(Model.BathroomsCount))
-                                            {
-                                                <li><i class="icons icon-bathroom"></i> @Model.BathroomsCount Бани</li>
-                                            }
-                                            @if (!string.IsNullOrEmpty(Model.RoomCount))
-                                            {
-                                                <li><i class="icons icon-bathroom"></i> @Model.RoomCount Стаи</li>
-                                            }
-                                        </ul>
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <h2>@Model.Address.FullAddress</h2>
-                                        <p><strong>Aliquam vel egestas turpis. Proin sollicitudin imperdiet nisi ac rutrum. Sed imperdiet libero malesuada erat cursus eu pulvinar tellus rhoncus. Ut eget tellus neque, faucibus ornare odio. Fusce sagittis hendrerit mi a sollicitudin.</strong></p>
-                                        <p>@Model.AdditionalDescription</p>
-                                    </div>
-                                </div>
-
-                                <div class="tab-detail">
-                                    <h3>Повече информация</h3>
-                                    <div class="panel-group" id="accordion">
-                                        <div class="panel panel-default pgl-panel">
-                                            <div class="panel-heading">
-                                                <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Допълнителна информация</a> </h4>
-                                            </div>
-                                            <div id="collapseOne" class="panel-collapse collapse in">
-                                                <div class="panel-body">
-                                                    <ul>
-                                                        @foreach (var attribute in Model.Attributes)
-                                                        {
-                                                            <li><strong>@attribute.Key</strong> @attribute.Value</li>
-                                                        }
+                            @foreach (PropertiesRelatedViewModel relatedProperty in ViewBag.RelatedProperties)
+                            {
+                                <div class="owl-item">
+                                    <div class="col-md-12 animation">
+                                        <div class="pgl-property">
+                                            <div class="property-thumb-info">
+                                                <div class="property-thumb-info-image">
+                                                    <picture>
+                                                        <source srcset="@(FileHelpers.ChangeFileExtension(relatedProperty.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                                        <source srcset="@relatedProperty.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(relatedProperty.ImagePath.Replace(" ", "%20"))">
+                                                        <img alt="Снимка" class="img-responsive" style="height: 193px;" src="@relatedProperty.ImagePath.Replace(" ", "%20")">
+                                                    </picture>
+                                                    <span class="property-thumb-info-label">
+                                                        <span class="label price">@relatedProperty.Price</span>
+                                                        <span class="label forrent">@relatedProperty.Status</span>
+                                                    </span>
+                                                </div>
+                                                <div class="property-thumb-info-content">
+                                                    <h3 class="h3-one-line">
+                                                        <a style="display: block;" class="clamp-two" title="@relatedProperty.PropertyName" href="@Url.Action("Details","Properties", new { id = relatedProperty.PropertyId})">@relatedProperty.PropertyName</a>
+                                                    </h3>
+                                                    <address>@relatedProperty.FullAddress</address>
+                                                </div>
+                                                <div class="amenities clearfix">
+                                                    <ul class="pull-left">
+                                                        @Html.Raw(relatedProperty.BottomLeft)
+                                                    </ul>
+                                                    <ul class="pull-right">
+                                                        @Html.Raw(relatedProperty.BottomRight)
                                                     </ul>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="panel panel-default pgl-panel">
-                                            <div class="panel-heading">
-                                                <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" class="collapsed">Видео</a> </h4>
-                                            </div>
-                                            <div id="collapseTwo" class="panel-collapse collapse">
-                                                <div class="panel-body"> <p>Sed perspiciatis unde omnisiste natus error voluptatem remopa accusantium doloremque laudantium, totam rem aperiam.</p> </div>
-                                            </div>
-                                        </div>
-                                        <div class="panel panel-default pgl-panel">
-                                            <div class="panel-heading">
-                                                <h4 class="panel-title">
-                                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" class="collapsed">Карта</a>
-                                                </h4>
-                                            </div>
-                                            <div id="collapseThree" class="panel-collapse collapse">
-                                                <div class="panel-body">
-                                                    @if(Model.Address.Longitude != null && Model.Address.Latitude != null)
-                                                    {
-                                                        <p>Този имот няма информация за местоположение за картата.</p>
-                                                    }
-                                                    else
-                                                    {
-                                                        <div id="contact-map" class="pgl-bg-light"></div>
-                                                    }
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="panel panel-default pgl-panel">
-                                            <div class="panel-heading">
-                                                <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseFouth" class="collapsed">Агент</a> </h4>
-                                            </div>
-                                            <div id="collapseFouth" class="panel-collapse collapse">
-                                                <div class="panel-body">
-                                                    <div class="pgl-agent-item pgl-bg-light">
-                                                        @if (Model.Agent != null)
-                                                        {
-                                                            <div class="row pgl-midnarrow-row">
-                                                                <div class="col-xs-4">
-                                                                    <div class="img-thumbnail-medium">
-                                                                        <a href="@Url.Action("Details", "Agents", new {agentId = Model.Agent.AgentId})">
-                                                                            <img alt="" class="img-responsive" src="@Model.Agent.ImagePath">
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-xs-8">
-                                                                    <div class="pgl-agent-info">
-                                                                        <small></small>
-                                                                        <h4><a href="@Url.Action("Details", "Agents", new {agentId = Model.Agent.AgentId})">@Model.Agent.FullName</a></h4>
-                                                                        <address>
-                                                                            <i class="fa fa-map-marker"></i> Office : @Model.Agent.OfficePhone<br>
-                                                                            <i class="fa fa-phone"></i> Mobile : @Model.Agent.PhoneNumber<br>
-                                                                            <i class="fa fa-fax"></i> Fax : @Model.Agent.PhoneNumber<br>
-                                                                            <i class="fa fa-envelope-o"></i> Mail: <a href="mailto:@(Model.Agent.Email)">@Model.Agent.Email</a>
-                                                                        </address>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="panel panel-default pgl-panel">
-                                            <div class="panel-heading">
-                                                <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseFive" class="collapsed">Връзка с нас</a> </h4>
-                                            </div>
-                                            <div id="collapseFive" class="panel-collapse collapse">
-                                                <div class="panel-body">
-                                                    <p>Sed perspiciatis unde omnisiste natus error voluptatem remopa accusantium doloremque laudantium, totam rem aperiam.</p>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </section>
+                            }
 
-                        <!-- Begin Related properties -->
-                        <section class="pgl-properties">
-                            <h2>Подобни имоти</h2>
-                            <div class="row">
-                                <div class="owl-carousel pgl-pro-slide owl-theme owl-carousel-init" data-plugin-options="{&quot;items&quot;: 3, &quot;itemsDesktop&quot;: 3, &quot;singleItem&quot;: false, &quot;autoPlay&quot;: false, &quot;pagination&quot;: false}" style="display: block; opacity: 1;">
-
-                                    @foreach (var relatedProperty in ViewBag.RelatedProperties)
-                                    {
-                                        <div class="owl-item">
-                                            <div class="col-md-12 animation">
-                                                <div class="pgl-property">
-                                                    <div class="property-thumb-info">
-                                                        <div class="property-thumb-info-image">
-                                                            <img alt="" class="img-responsive" src="@relatedProperty.ImagePath">
-                                                            <span class="property-thumb-info-label">
-                                                                <span class="label price">@relatedProperty.Price</span>
-                                                                <span class="label forrent">@relatedProperty.Status</span>
-                                                            </span>
-                                                        </div>
-                                                        <div class="property-thumb-info-content">
-                                                            <h3>
-                                                                <a href="@Url.Action("Details","Properties", new { id = relatedProperty.PropertyId})">@relatedProperty.Info</a>
-                                                            </h3>
-                                                            <address>@relatedProperty.FullAddress</address>
-                                                        </div>
-                                                        <div class="amenities clearfix">
-                                                            <ul class="pull-left">
-                                                                @Html.Raw(relatedProperty.BottomLeft)
-                                                            </ul>
-                                                            <ul class="pull-right">
-                                                                @Html.Raw(relatedProperty.BottomRight)
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-
-                                </div>
-                            </div>
-                        </section>
-                        <!-- End Related properties -->
-
+                        </div>
                     </div>
-                    <div class="col-md-3 sidebar">
-                        <!-- Begin Advanced Search -->
-                        <aside class="block pgl-advanced-search pgl-bg-light">
-                            <h3>Разширено търсене</h3>
-                            <form name="advancedsearch">
-                                <div class="form-group">
-                                    <label class="sr-only" for="property-status">Статут на имота</label>
-                                    <select id="property-status" name="property-status" data-placeholder="Property Status" class="chosen-select" style="display: none;">
-                                        <option selected="selected" value="Property Status">Статут на имота</option>
-                                        <option value="sale">За продан</option>
-                                        <option value="rent">Под наем</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="sr-only" for="location">Град</label>
-                                    <select id="location" name="location" data-placeholder="Location" class="chosen-select" style="display: none;">
-                                        <option selected="selected" value="Location">Град</option>
-                                        @foreach (var city in ViewBag.Cities)
-                                        {
-                                            <option value="@city.CityId">@city.CityName</option>
-                                        }
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="sr-only" for="property-types">Типове имоти</label>
-                                    <select id="property-types" name="property-types" data-placeholder="Property Types" class="chosen-select" style="display: none;">
-                                        <option selected="selected" value="Property Types">Типове имоти</option>
-                                        @foreach (var propertyType in ViewBag.PropertyTypes)
-                                        {
-                                            <option value="@((int)propertyType.PropertyTypeId)">@propertyType.PropertyTypeName</option>
-                                        }
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <div class="form-group">
-                                        <label class="sr-only" for="area-from">Площ</label>
-                                        <select id="area-from" name="area-from" data-placeholder="Area From" class="chosen-select" style="display: none;">
-                                            <option selected="selected" value="Area From">Площ</option>
-                                            <option value="450">над 450кв.м.</option>
-                                            <option value="450">до 450кв.м.</option>
-                                            <option value="350">до 350кв.м.</option>
-                                            <option value="250">до 250кв.м.</option>
-                                            <option value="150">до 150кв.м.</option>
-                                            <option value="100">до 100кв.м.</option>
-                                            <option value="50">до 50кв.м.</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="sr-only" for="search-bedrooms">Спални</label>
-                                    <select id="search-bedrooms" name="search-bedrooms" data-placeholder="Bedrooms" class="chosen-select" style="display: none;">
-                                        <option selected="selected" value="Bedrooms">Спални</option>
-                                        <option value="0">0</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="5plus">5+</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="sr-only" for="search-bathrooms">Бани</label>
-                                    <select id="search-bathrooms" name="search-bathrooms" data-placeholder="Bathrooms" class="chosen-select" style="display: none;">
-                                        <option selected="selected" value="Bathrooms">Бани</option>
-                                        <option value="0">0</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="4plus">4+</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row pgl-narrow-row">
-                                        <div class="col-xs-6">
-                                            <label class="sr-only" for="search-minprice">Цена от</label>
-                                            <select id="search-minprice" name="search-minprice" data-placeholder="Price From" class="chosen-select" style="display: none;">
-                                                <option selected="selected" value="Price From">Цена от</option>
-                                                <option value="0">$0</option>
-                                                <option value="25000">$25000</option>
-                                                <option value="50000">$50000</option>
-                                                <option value="75000">$75000</option>
-                                                <option value="100000">$100000</option>
-                                                <option value="150000">$150000</option>
-                                                <option value="200000">$200000</option>
-                                                <option value="300000">$300000</option>
-                                                <option value="500000">$500000</option>
-                                                <option value="750000">$750000</option>
-                                                <option value="1000000">$1000000</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-xs-6">
-                                            <label class="sr-only" for="search-maxprice">Цена до</label>
-                                            <select id="search-maxprice" name="search-maxprice" data-placeholder="Price To" class="chosen-select" style="display: none;">
-                                                <option selected="selected" value="Price To">Цена до</option>
-                                                <option value="25000">$25000</option>
-                                                <option value="50000">$50000</option>
-                                                <option value="75000">$75000</option>
-                                                <option value="100000">$100000</option>
-                                                <option value="150000">$150000</option>
-                                                <option value="200000">$200000</option>
-                                                <option value="300000">$300000</option>
-                                                <option value="500000">$500000</option>
-                                                <option value="750000">$750000</option>
-                                                <option value="1000000">$1000000</option>
-                                                <option value="1000000plus">&gt;$1000000</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-block btn-primary">Намери своя дом</button>
-                                </div>
-
-                            </form>
-                        </aside>
-                        <!-- End Advanced Search -->
-                        <!-- Begin Our Agents -->
-                        <aside class="block pgl-agents pgl-bg-light">
-                            <h3>Нашите агенти</h3>
-                            <div class="owl-carousel pgl-pro-slide pgl-agent-item owl-theme owl-carousel-init" data-plugin-options="{&quot;items&quot;: 1, &quot;pagination&quot;: false, &quot;autoHeight&quot;: true}" style="display: block; opacity: 1;">
-                                @foreach (var agent in ViewBag.Agents)
-                                {
-                                    <div class="owl-item" style="width: 223px;">
-                                        <div class="pgl-agent-item">
-                                            <div class="img-thumbnail-medium">
-                                                <a href="@Url.Action("Details","Agents",new {agentId = agent.AgentId})"><img src="@agent.ImagePath" class="img-responsive" alt=""></a>
-                                            </div>
-                                            <div class="pgl-agent-info">
-                                                <small></small>
-                                                <h4><a href="@Url.Action("Details","Agents",new {agentId = agent.AgentId})">@agent.FullName</a></h4>
-                                                <address>
-                                                    <i class="fa fa-map-marker"></i> Office : @agent.OfficePhone<br>
-                                                    <i class="fa fa-phone"></i> Mobile : @agent.PhoneNumber<br>
-                                                    <i class="fa fa-fax"></i> Fax : @agent.PhoneNumber<br>
-                                                    <i class="fa fa-envelope-o"></i> Mail: <a href="mailto:@(agent.Email)">@agent.Email</a>
-                                                </address>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        </aside>
-                        <!-- End Our Agents -->
-                        <!-- Begin Advanced Search -->
-                        <aside class="block pgl-bg-dark pgl-testimonials">
-                            <div class="owl-carousel pgl-testimonial owl-theme owl-carousel-init" data-plugin-options="{&quot;items&quot;: 1, &quot;pagination&quot;: false, &quot;autoHeight&quot;: true}" style="display: block; opacity: 1;">
-                                @foreach (var client in ViewBag.HappyClient)
-                                {
-                                    <div class="owl-item">
-                                        <div class="col-md-12">
-                                            <div class="testimonial-author">
-                                                <div class="img-thumbnail-small img-circle">
-                                                    <img src="@client.ImagePath" style="max-height: 110px;max-width: 110px" class="img-circle" alt="@client.FullName">
-                                                </div>
-                                                <h4>@client.FullName</h4>
-                                                <p><strong>Клиент</strong></p>
-                                            </div>
-                                            <div class="divider-quote-sign"><span>“</span></div>
-                                            <blockquote class="testimonial">
-                                                <p>@client.AdditionalInformation</p>
-                                            </blockquote>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        </aside>
-                        <!-- End Advanced Search -->
-
-                    </div>
-                </div>
-            </div>
-            <!-- End content with sidebar -->
+                </section>
+            }
+            <!-- End Related properties -->
 
         </div>
-        <!-- End Main -->
+    <aside class="col-md-3 sidebar">        
 
+        <!-- Begin Advanced Search -->
+        @Html.Partial("/Views/Properties/AdvancedSearchVertical_Partial.cshtml")
+        <!-- End Advanced Search -->
+        <aside class="block pgl-agents pgl-bg-light">
+            <h3>Брокер на връзка</h3>
+            @Html.Partial("TeamUserListViewVertical", Model.TeamUser)
+        </aside>
+        <!-- Begin Our Agents -->
+        @Html.Partial("/Views/Agents/TeamUserCarousel_Partial.cshtml", (List<TeamUserListViewModel>) ViewBag.Agents)
+        <!-- End Our Agents -->
+        <!-- Begin Advanced Search -->
+        @Html.Partial("/Views/Shared/HappyClients_Partial.cshtml", (List<ListReviewViewModel>) ViewBag.HappyClient)
+        <!-- End Advanced Search -->
+
+    </aside>
     </div>
+</div>
+<!-- End content with sidebar -->
+<!-- End Main -->
 
+@section scripts
+    {
+    <script type="text/javascript" src="/Scripts/genericDialog.js"></script>
+    <script type="text/javascript" src="/Scripts/phoneNumbers.js"></script>
+    <script type="text/javascript" language="javascript" src="/Scripts/propertyReviewStarsManagement.js"></script>
+    <script>
+            function initMaps() {
+                initMap();
+                companyMapInit();
+            }
 
-    @section scripts
+            function initMap() {
+                @{
+                    string propertyLongitude = Model.Address.Longitude != null ? Model.Address.Longitude.ToString().Replace(',', '.') : "";
+                    string propertyLatitude = Model.Address.Latitude != null ? Model.Address.Latitude.ToString().Replace(',', '.') : "";
+                }
+                let logitude = '@propertyLongitude';
+                let latitude = '@propertyLatitude';
+                if ((logitude) && (latitude)) {
+                    var propertyLocation = new google.maps.LatLng(latitude, logitude);
+
+                    var propertyMapOptions = {
+                        center: propertyLocation,
+                        zoom: 14,
+                        mapTypeId: 'roadmap'
+                    }
+                    let propertyMap = new google.maps.Map(document.getElementById("contact-map"), propertyMapOptions);
+
+                    let propertyMarker = new google.maps.Marker({
+                        position: propertyLocation,
+                        map: propertyMap,
+                        visible: true
+                    });
+                }
+            }
+    </script>
+    <script>
+        function companyMapInit() {
+            var companyLocation = new google.maps.LatLng("42.015186", "24.864642");
+
+            var mapCompanyOptions = {
+                center: new google.maps.LatLng(42.015186, 24.864642),
+                zoom: 14,
+                mapTypeId: google.maps.MapTypeId.HYBRID
+            }
+            var companyMap =
+                new google.maps.Map(document.getElementById("map-company-address-pin"), mapCompanyOptions);
+
+            let companyMarker = new google.maps.Marker({
+                position: companyLocation,
+                map: companyMap,
+                visible: true
+            });
+        }
+    </script>
+    <!--GoogleMap Setup-->
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRNibRrD3DnsD2EoqbagZhLwnf82GxraU&callback=initMaps"></script>
+
+    @* Appointments *@
+    @if ((Model.RentalPeriod != "Дневно" || !Model.IsRentSearch) && Model.TeamUser?.AgentId != User.Identity.GetUserId())
     {
         <script>
-            function initMap() {
-                var location = new google.maps.LatLng(@Model.Address.Latitude, @Model.Address.Longitude);
+                $(document).ready(function () {
+                    var noPhoneNumber = '@(User.Identity.HasPhoneNumber())' === "False";
+                    $('#appointment-create-form').submit(function(event) {
+                        event.preventDefault ? event.preventDefault() : (event.returnValue = false);
 
-                var mapOptions = {
-                    center: location,
-                    zoom: 10,
-                    mapTypeId: 'roadmap'
-                }
-                let map = new google.maps.Map(document.getElementById("contact-map"), mapOptions);
 
-                let marker = new google.maps.Marker({
-                    position: location,
-                    map: map,
-                    visible: true
+                        var createAppointment = function() {
+
+                            var modalBody = '';
+                            if (window.g_isUserAuthenticated) {
+
+                                modalBody =
+                                    '<form action="' + '@Url.Action("Create", "Appointments")' + '" id="create-appointment" method="POST">'
+                                        + '@Html.AntiForgeryToken()' +
+                                        '<input id="PropertyId" name="PropertyId" type="hidden" value="' + '@Model.PropertyId' + '" /> \
+                                        <input id="AgentId" name="AgentId" type="hidden" value="' + '@(Model.TeamUser?.AgentId)' + '" /> \
+                                        <div class="col-md-4 col-xs-12"> \
+                                            <div class="form-group"> \
+                                                <label class="control-label required" for="date">Изберете дата</label> \
+                                                <div class="input-group date" id="appointment-date"> \
+                                                    <input class="form-control" id="AppointmentDate" name="AppointmentDate" placeholder="Дата и час на среща" type="text"> \
+                                                    <span class="input-group-addon" style=""> \
+                                                        <span class="glyphicon glyphicon-calendar"></span> \
+                                                    </span> \
+                                                </div> \
+                                                <span class="field-validation-valid text-danger" data-valmsg-for="AppointmentDate" data-valmsg-replace="true"></span> \
+                                            </div> \
+                                            <div class="form-group"> \
+                                                <div class="g-recaptcha not-ready"></div> \
+                                                <span class="field-validation-valid text-danger" data-valmsg-for="reCaptcha" data-valmsg-replace="true"></span> \
+                                            </div> \
+                                        </div> \
+                                        <div class="col-md-8 col-xs-12"> \
+                                            <div class="form-group" style="text-align: center;"> \
+                                                <label class="control-label" for="AppointmentDescription">Въведете допълнителна информация</label> \
+                                                <textarea class="form-control" data-val="true" id="AppointmentDescription" name="AppointmentDescription" rows="5"></textarea> \
+                                            </div> \
+                                        </div> \
+                                        <div class="col-xs-12"> \
+                                            <div class="form-group"> \
+                                                <button class="btn btn-primary" style="float: right; margin-bottom: 10px;"> \
+                                                    Заяви среща \
+                                                </button> \
+                                            </div> \
+                                        </div> ' +
+                                    '</form>' ;
+                                } else {
+                                    modalBody =
+                                        '<form action="' + '@Url.Action("Create", "Appointments")' + '" id="create-appointment" method="POST">'
+                                            + '@Html.AntiForgeryToken()' +
+                                            '<input id="PropertyId" name="PropertyId" type="hidden" value="' + '@Model.PropertyId' + '" /> \
+                                            <input id="AgentId" name="AgentId" type="hidden" value="' + '@(Model.TeamUser?.AgentId)' + '" /> \
+                                            <div class="col-md-8 col-xs-12"> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label required" for="ClientName">Въведете вашето име</label> \
+                                                    <input class="form-control" data-val="true" data-val-required="Въведете име!" id="ClientName" name="ClientName" value="" type="text"> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="ClientName" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label required" for="ClientPhoneNumber">Въведете вашият телефон</label> \
+                                                    <input class="form-control" data-val="true" data-val-required="Въведете телефон!" id="ClientPhoneNumber" name="ClientPhoneNumber" value="" type="text"> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="ClientPhoneNumber" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label" for="ClientEmail">Въведете вашият емейл </label> \
+                                                    <input class="form-control" data-val="true" data-val-required="Въведете емейл!" id="ClientEmail" name="ClientEmail" value="" type="text"> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="ClientEmail" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label required" for="AppointmentDate">Изберете дата</label> \
+                                                    <div class="input-group date" id="appointment-date"> \
+                                                        <input class="form-control" id="AppointmentDate" name="AppointmentDate" placeholder="Дата и час на среща" type="text"> \
+                                                        <span class="input-group-addon" for="AppointmentDate"> \
+                                                            <span class="glyphicon glyphicon-calendar"></span> \
+                                                        </span> \
+                                                    </div> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="AppointmentDate" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                            </div> \
+                                            <div class="col-md-4 col-xs-12"> \
+                                                <div class="form-group" style="text-align: center;"> \
+                                                    <label class="control-label" for="AppointmentDescription">Въведете допълнителна информация</label> \
+                                                    <textarea class="form-control" data-val="true" id="AppointmentDescription" name="AppointmentDescription" rows="9"></textarea> \
+                                                </div> \
+                                                <div class="form-group" style="text-align: center;"> \
+                                                    <div class="g-recaptcha not-ready"></div> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="reCaptcha" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                            </div> \
+                                            <div class="col-xs-12"> \
+                                                <div class="form-group"> \
+                                                    <button class="btn btn-primary" style="float: right; margin-bottom: 10px;"> \
+                                                        Заяви среща \
+                                                    </button> \
+                                                </div> \
+                                            </div> ' +
+                                        '</form>';
+                                }
+
+                        createAndShowModal({
+                            title: 'Заяви час за среща с ' +
+                                '@(Model.TeamUser?.FullName)' +
+                                ' за ' +
+                                '@Model.PropertyName',
+                            body: modalBody
+                        });
+
+                        $.datetimepicker.setLocale('bg');
+                        $('#AppointmentDate').datetimepicker({
+                            format: 'd.m.Y H:i',
+                            locale: 'bg',
+                            minDate: new Date()
+                        });
+
+                        window.recaptchaHelpers.initRecaptcha($('.g-recaptcha.not-ready'));
+
+                        }
+
+                        if (window.g_isUserAuthenticated) {
+                            if (noPhoneNumber) {
+                                //TODO: Tell User to fill and confirm PhoneNumber then he can reserve
+                                var requirements = '<p style="text-align: center;">За да създадете резервация е необходимо да предоставите валиден телефонен номер за връзка. Телефонният номер е необходим за последваща връзка с вас, в която резервацията ви да бъде потвърдена. По този начин, ние се подсигуряваме, че вашата резервация е автентична.</p> \
+                                        <p style="text-align: center; margin-bottom:0;font-size: 10px;"><em>Телефонният номер, ще бъде въведен във вашият акаунт, но ще бъде достъпен само за служители от системата.</em></p>';
+
+                                window.alertify.confirm(requirements)
+                                    .set('title', "Изисквания за създаване на резервация")
+                                    .set('labels', { ok: 'Добави номер', cancel: 'Откажи' })
+                                    .set('onok', function () { phoneNumberHelpers.trigger(null, function () {
+                                        noPhoneNumber = false;
+                                        createAppointment();
+                                    }) })
+                                    .set('oncancel', function () { });
+
+                                return;
+                            }
+                        }
+
+                        createAppointment();
+                    });
+
+            $(document).on('submit',
+                '#create-appointment',
+                function(event) {
+                    //2018-09-26T11:00:00 date format
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    var thisForm = $(this);
+                    $.ajax({
+                        url: this.action,
+                        data: thisForm.serialize(),
+                        method: this.method,
+                        success: function(data) {
+                            if (data.success) {
+                                showErrorResponse(data, thisForm);
+                            } else {
+                                //remove the modal window
+                                removeClosestModal(thisForm);
+                                window.alertify.success("Успешно изпратена заявка за среща!");
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+                    });
                 });
 
-            }
+        });
         </script>
-
-        <!--GoogleMap Setup-->
-        <script async defer
-                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRNibRrD3DnsD2EoqbagZhLwnf82GxraU&callback=initMap"></script>
     }
 
-</body>
+    @* Reservations *@
+    @if ((Model.RentalPeriod == "Дневно" || Model.IsRentSearch) && Model.TeamUser?.AgentId != User.Identity.GetUserId())
+    {
+        <script>
+                $(document).ready(function () {
+
+                    var noPhoneNumber = '@(User.Identity.HasPhoneNumber())' === "False";
+                    $(document).on('submit',
+                        '#reservation-create-form',
+                        function(event) {
+                            event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                            var createReservation = function () {
+                                var modalBody;
+                                if (window.g_isUserAuthenticated) {
+                                    modalBody =
+                                        '<form action="' + '@Url.Action("Create", "Reservations")' + '" id="create-reservation" method="POST">'
+                                            + '@Html.AntiForgeryToken()' +
+                                            '<input type="hidden" id="PropertyId" name="PropertyId" value="' + '@(Model.PropertyId)' + '"/> \
+                                            <div class="col-md-5 col-xs-12"> \
+                                                <div class="form-group col-md-6 col-xs-12"> \
+                                                    <label class="control-label required" for="From">От дата </label> \
+                                                    <div class="input-group date" id="reservation-date-from"> \
+                                                        <input class="form-control datetime" id="From" name="From" placeholder="Начална дата" type="text"> \
+                                                        <span class="input-group-addon" for="From"> \
+                                                            <span class="glyphicon glyphicon-calendar"></span> \
+                                                        </span> \
+                                                    </div> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="From" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                                <div class="form-group  col-md-6 col-xs-12"> \
+                                                    <label class="control-label required" for="To">До дата</label> \
+                                                    <div class="input-group date" id="reservation-date-to"> \
+                                                        <input class="form-control datetime" id="To" name="To" placeholder="Крайна дата" type="text"> \
+                                                        <span class="input-group-addon" for="To"> \
+                                                            <span class="glyphicon glyphicon-calendar"></span> \
+                                                        </span> \
+                                                    </div> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="To" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                                <div class="form-group"> \
+                                                    <div class="g-recaptcha not-ready pull-right" style="margin-right: 2.5%;"></div> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="reCaptcha" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                            </div> \
+                                            <div class="col-md-7 col-xs-12"> \
+                                                <div class="form-group" style="text-align: center;"> \
+                                                    <label class="control-label" for="AdditionalDescription">Въведете допълнителна информация</label> \
+                                                    <textarea class="form-control" data-val="true" id="AdditionalDescription" name="AdditionalDescription" rows="5"></textarea> \
+                                                </div> \
+                                            </div> \
+                                            <div class="col-xs-12"> \
+                                                <div class="form-group"> \
+                                                    <button class="btn btn-primary" style="float: right; margin-bottom: 10px;"> \
+                                                        Заяви среща \
+                                                    </button> \
+                                                </div> \
+                                            </div>' +
+                                        '</form>';
+                                }
+                                else
+                                {
+                                    modalBody =
+                                        '<form action="' + '@Url.Action("CreateForUnregistered", "Reservations")' + '" id="create-reservation" method="POST">'
+                                            + '@(Html.AntiForgeryToken())' +
+                                            '<input type="hidden" id="PropertyId" name="PropertyId" value="' + '@(Model.PropertyId)' + '" /> \
+                                            <div class="col-md-8 col-xs-12"> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label required" for="ClientName">Въведете вашето име</label> \
+                                                    <input class="form-control" data-val="true" data-val-required="Въведете име!" id="ClientName" name="ClientName" value="" type="text"> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="ClientName" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label required" for="ClientPhoneNumber">Въведете вашият телефон </label> \
+                                                    <input class="form-control" data-val="true" data-val-required="Въведете телефон!" id="ClientPhoneNumber" name="ClientPhoneNumber" value="" type="text"> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="ClientPhoneNumber" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label" for="ClientEmail">Въведете вашият емейл </label> \
+                                                    <input class="form-control" data-val="true" data-val-required="Въведете емейл!" id="ClientEmail" name="ClientEmail" value="" type="text"> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="ClientEmail" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label required" for="From">От дата </label> \
+                                                    <div class="input-group date" id="reservation-date-from"> \
+                                                        <input class="form-control datetime" id="From" name="From" placeholder="Начална дата" type="text"> \
+                                                        <span class="input-group-addon" for="From"> \
+                                                            <span class="glyphicon glyphicon-calendar"></span> \
+                                                        </span> \
+                                                    </div> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="From" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                                <div class="form-group"> \
+                                                    <label class="control-label required" for="To">До дата </label> \
+                                                    <div class="input-group date" id="reservation-date-to"> \
+                                                        <input class="form-control datetime" id="To" name="To" placeholder="Крайна дата" type="text"> \
+                                                        <span class="input-group-addon" for="To"> \
+                                                            <span class="glyphicon glyphicon-calendar"></span> \
+                                                        </span> \
+                                                    </div> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="To" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                            </div> \
+                                            <div class="col-md-4 col-xs-12"> \
+                                                <div class="form-group" style="text-align: center;"> \
+                                                    <label class="control-label" for="AdditionalDescription">Въведете допълнителна информация</label> \
+                                                    <textarea class="form-control" data-val="true" id="AdditionalDescription" name="AdditionalDescription" rows="13"></textarea> \
+                                                </div> \
+                                                <div class="form-group"> \
+                                                    <div class="g-recaptcha not-ready"></div> \
+                                                    <span class="field-validation-valid text-danger" data-valmsg-for="reCaptcha" data-valmsg-replace="true"></span> \
+                                                </div> \
+                                            </div> \
+                                            <div class="col-xs-12"> \
+                                                <div class="form-group"> \
+                                                    <button class="btn btn-primary" style="float: right; margin-bottom: 10px;"> \
+                                                        Заяви среща \
+                                                    </button> \
+                                                </div> \
+                                            </div>' +
+                                        '</form>';
+                                }
+
+                                createAndShowModal({
+                                    title: 'Резервация на имот ' + '@Model.PropertyName',
+                                    body: modalBody
+                                });
+
+                                $.datetimepicker.setLocale('bg');
+
+                                //TODO: Make end date disabled till the start date is selected
+                                //TODO: Make the end date bigger than the start date !
+                                $('.datetime').datetimepicker({
+                                    format: 'd.m.Y',
+                                    locale: 'bg',
+                                    timepicker: false,
+                                    minDate: new Date()
+                                });
+
+                                window.recaptchaHelpers.initRecaptcha($('.g-recaptcha.not-ready'));
+                            }
+
+                            if (window.g_isUserAuthenticated) {
+                                if (noPhoneNumber) {
+
+                                    var requirements = '<p style="text-align: center;">За да създадете резервация е необходимо да предоставите валиден телефонен номер за връзка. Телефонният номер е необходим за последваща връзка с вас, в която резервацията ви да бъде потвърдена. По този начин, ние се подсигуряваме, че вашата резервация е автентична.</p> \
+                                        <p style="text-align: center; margin-bottom:0;font-size: 10px;"><em>Телефонният номер, ще бъде въведен във вашият акаунт, но ще бъде достъпен само за служители от системата.</em></p>';
+
+                                    window.alertify.confirm(requirements)
+                                        .set('title', "Изисквания за създаване на резервация")
+                                        .set('labels', { ok: 'Добави номер', cancel: 'Откажи' })
+                                        .set('onok', function () {
+                                            phoneNumberHelpers.trigger(null, function() {
+                                            noPhoneNumber = false;
+                                            createReservation();
+                                        })})
+                                        .set('oncancel', function () { });
+
+                                    return;
+                                    }
+                            }
+
+                            createReservation();
+                        });
+
+
+
+                    $(document).on('submit',
+                        '#create-reservation',
+                        function(event) {
+                            event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                            var thisForm = $(this);
+
+                            $.ajax({
+                                url: this.action,
+                                method: this.method,
+                                data: thisForm.serialize(),
+                                success: function(data) {
+                                    if (data.success) {
+                                        showErrorResponse(data, thisForm);
+                                    } else {
+                                        //remove the modal window
+                                        removeClosestModal(thisForm);
+                                        window.alertify.success("Успешно изпратена заявка за резервация!");
+                                    }
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                                    let shownError = titles ? titles[1] : errorThrown;
+                                    window.alertify.error(shownError);
+                                }
+                            });
+                        });
+                });
+        </script>
+    }
+
+    @if (Model.TeamUser?.AgentId == User.Identity.GetUserId())
+    {
+        <script>
+            $(document).ready(function() {
+                $(document).on('submit',
+                    '#delete-property-form',
+                    function(event) {
+                        event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                        var link = $(this).attr('action');
+                        createAndShowModal({
+                            title: 'Изтриване на имот',
+                            body: '<div style="text-align:center;"><label style="font-size: 1.571em;">Найстина ли искате да изтриете имотът от системата ?</label></div>',
+                            footer: '<button id="modal-cancel-btn" class="btn btn-primary pull-right">Отказ</button> \
+                                    <form method="post" id="modal-delete-form" action="' + link + '">'
+                                    + '@Html.AntiForgeryToken()' +
+                                    '<button id="modal-delete-btn" class="btn btn-primary pull-right" style="margin-right:5px;">Изтрии</button> \
+                                 </form>'
+                        });
+                    });
+
+                $(document).on('submit',
+                    '.change-property-status-form',
+                    function(event) {
+                        event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                        var thisForm = $(this);
+                        $.ajax({
+                            url: this.action,
+                            method: this.method,
+                            data: thisForm.serialize(),
+                            success: function() {
+                                window.alertify.success("Статусът е сменен успешно!");
+                            },
+                            error: function() {
+                                window.alertify.error("Проблем при смяна на статусът!");
+                            }
+                        });
+                    });
+
+                $(document).on('submit',
+                    '#modal-delete-form',
+                    function(event) {
+                        event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                        removeClosestModal(this);
+
+                        var thisForm = $(this);
+                        $.ajax({
+                            url: this.action,
+                            method: this.method,
+                            data: thisForm.serialize(),
+                            success: function() {
+                                window.alertify.success("Изтрит успешно!");
+                            },
+                            error: function() {
+                                window.alertify.error("Проблем при изтриване!");
+                            }
+                        });
+
+                    });
+
+                $(document).on('click',
+                    '#modal-cancel-btn',
+                    function() {
+                        removeClosestModal(this);
+                    });
+            })
+        </script>
+    }
+
+
+    <script>
+            $(document).ready(function() {
+                $(document).on('click',
+                    '.rating-inactive',
+                    function() {
+                        if (window.g_isUserAuthenticated) {
+                            if ('@ViewBag.IsAllowedToRateProperty' !== 'True') {
+                                window.alertify.error('Трябва да сте организирали среща за оглед, която да е преминала преди да дадете оценка.');
+                            }
+                        } else {
+                            window.alertify.error('Влезте в акаунта си за да дадете оценка.');
+                        }
+                    });
+            });
+    </script>
+}

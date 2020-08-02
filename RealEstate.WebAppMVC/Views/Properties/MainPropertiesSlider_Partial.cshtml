@@ -1,0 +1,53 @@
+﻿@using RealEstate.Services.Helpers
+@model List<RealEstate.ViewModels.WebMVC.PropertySliderViewModel>
+    
+<section class="main-slide">
+    <div id="owl-main-slide" class="owl-carousel pgl-main-slide owl-theme">
+        @foreach (var sliderProperty in Model)
+        {
+            <div class="owl-item">
+                <picture >
+                    <source srcset="@(FileHelpers.ChangeFileExtension(sliderProperty.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                    <source srcset="@sliderProperty.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(sliderProperty.ImagePath.Replace(" ", "%20"))">
+                    <img alt="Снимка" class="img-responsive img-ratio5" src="@sliderProperty.ImagePath.Replace(" ", "%20")">
+                </picture>
+                <div class="item-caption">
+                    <div class="container">
+                        <div class="property-info">
+                            <span class="property-thumb-info-label">
+                                <span class="label price">@sliderProperty.PriceDescription</span>
+                                <span class="label"><a href="@Url.Action("Details", "Properties", new {id = sliderProperty.PropertyId})" class="btn-more">Още информация</a></span>
+                            </span>
+                            <div class="property-thumb-info-content">
+                                <h2><a href="@Url.Action("Details", "Properties", new {id = sliderProperty.PropertyId})">@Html.Raw(sliderProperty.FullAddress)</a>
+                                </h2>
+
+                                <svg class="fadeout-svg">
+
+                                    <!-- Mask definition -->
+                                    <defs>
+                                        <mask id="mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+                                            <linearGradient id="g" gradientUnits="objectBoundingBox" x2="0" y2="1">
+                                                <stop stop-color="white" stop-opacity="1" offset="0"/>
+                                                <stop stop-color="white" stop-opacity="0" offset="1"/>
+                                            </linearGradient>
+                                            <rect width="100%" height="72px" fill="url(#g)"/>
+                                        </mask>
+                                    </defs>
+
+                                    <foreignObject width="100%" height="72px">
+                                        <div style="height: 72px; overflow: hidden; position: relative">
+                                            @Html.Raw(sliderProperty.AdditionalDescription)
+                                        </div>
+                                    </foreignObject>
+
+                                </svg>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

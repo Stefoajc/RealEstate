@@ -1,0 +1,811 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.AgentQuestions.AgentQuestionListViewModel>
+
+@{
+    ViewBag.Title = "Въпроси и отговори - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+        .hiddenRow {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 2% !important;
+            border-left: 2px black solid;
+            border-right: 2px black solid;
+            border-bottom: 2px black solid;
+        }
+
+        td {
+            border-top: none !important;
+            vertical-align: middle !important;
+        }
+
+        th {
+            border: none !important;
+            /* make text in th not selectable */
+            -webkit-user-select: none; /* Chrome all / Safari all */
+            -moz-user-select: none; /* Firefox all */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Likely future */
+        }
+
+        .table-headers {
+            border: 2px black solid;
+        }
+
+        .accordion-toggle {
+            border-left: 2px black solid;
+            border-right: 2px black solid;
+        }
+
+            .accordion-toggle:hover {
+                background: darkgrey;
+                cursor: pointer;
+            }
+
+        .extended-information {
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        .arrow-up {
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 7px solid black;
+        }
+
+        .arrow-down {
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 7px solid black;
+        }
+
+        .ordering-text {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .ordering:hover, .ordering-ascending:hover, .ordering-descending:hover {
+            color: black;
+        }
+
+        .ordering-ascending, .ordering-descending {
+            cursor: pointer
+        }
+
+            .ordering-ascending:before {
+                content: "▼";
+            }
+
+            .ordering-descending:before {
+                content: "▲";
+            }
+
+
+        .operation:hover {
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+
+        @@media only screen and (min-width: 800px) {
+            .question {
+                width: 60%;
+            }
+        }
+
+        @@media only screen and (max-width: 800px) {
+            .hidden-on-mobile {
+                display: none;
+            }
+
+            .question {
+                width: 80%
+            }
+        }
+    </style>
+}
+
+<div class="container-fluid" style="padding-top: 50px;">
+    <h1 align="center">Въпроси за разясняване</h1>
+    <div class="row">
+        <div class="col-xs-12 col-sm-3 col-md-2">
+            <div class="form-group">
+                <label class="sr-only" for="agents">Всички Брокери</label>
+                <select data-bind="value: agentId" id="agentId" name="agentId" data-placeholder="Всички Брокер" class="chosen-select">
+                    <option selected="selected" value="">Всички Брокери</option>
+                    @foreach (var agent in ViewBag.Agents)
+                    {
+                        <option value="@agent.Id">@agent.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-3 col-md-2">
+            <div class="form-group">
+                <label class="sr-only" for="isAnswered">Състояние на въпрос</label>
+                <select data-bind="value: isAnswered" id="isAnswered" name="isAnswered" data-placeholder="Състояние на въпрос" class="chosen-select">
+                    <option selected="selected" value="">Всички въпроси</option>
+                    <option value="1">Не отговорени</option>
+                    <option value="2">Отговорени</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-3 col-md-2">
+            <div class="form-group">
+                <input class="form-control" id="questionTitle" name="questionTitle" placeholder="Филтрирай по Въпрос" data-bind="value: questionTitle, valueUpdate: 'input'" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-3 col-md-2">
+            <div class="form-group">
+                <input data-bind="click: showAddQuestionModal" class="btn btn-primary btn-block" id="createQuestion" name="createQuestion" type="button" value="Попитай въпрос" />
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-condensed" style="border-collapse:collapse;">
+        <thead>
+            <tr class="table-headers">
+                <th></th>
+                <th class="question">
+                    <span name="Question">Въпрос</span>
+                </th>
+                <th class="hidden-on-mobile"><div class="ordering"><span class="ordering-text" name="AskingAgentName">Брокер</span><span class="ordering-ascending"></span></div></th>
+                <th class="hidden-on-mobile"><div class="ordering"><span class="ordering-text" name="CreatedOn">Създадено</span><span class="ordering-ascending"></span></div></th>
+                <th>
+                    Операции
+                </th>
+            </tr>
+        </thead>
+        <tbody data-bind='foreach:filteredQuestions()'>
+
+            <tr data-toggle="collapse" data-bind="attr: {'data-target': '#accordeon' + $index(), 'data-id': Id}, style: { 'background-color': rowColor }" class="accordion-toggle">
+                <td>
+                    <i class="indicator glyphicon glyphicon-chevron-down  pull-left"></i>
+                </td>
+                <td data-bind='text: Question'></td>
+                <td class="hidden-on-mobile" data-bind='text: AskingAgentName'></td>
+                <td class="hidden-on-mobile" data-bind='text: moment(CreatedOn()).format("DD.MM.YYYY HH:mm") + "ч."'></td>
+                <td>
+                    <!-- ko if: IsAllowedToEditQuestion -->
+                    <i class="fa fa-edit operation" style="font-size: 24px;" data-bind="click: $root.editQuestion"></i>
+                    <!-- /ko -->
+                    <!-- ko if: IsAllowedToDeleteQuestion -->
+                    <i class="fa fa-remove operation" style="font-size: 24px;" data-bind="click: $root.showDeleteQuestionModal"></i>
+                    <!-- /ko -->
+                </td>
+            </tr>
+            <tr>
+                <td colspan="11" class="hiddenRow">
+
+                    <div class="accordion-body collapse" data-bind="attr: {'id': 'accordeon' + $index()}">
+                        <!-- ko if: Answer() != null -->
+                        <div class="extended-information row">
+                            <div class="col-xs-12 col-sm-3 col-md-2" style="text-align: center;">
+                                <div class="row">
+                                    <div class="col-xs-6 col-sm-12">
+                                        <img alt="Снимка" class="img-circle" data-bind='attr: { src: AnsweringAgentImage }' width="120" height="120">
+                                    </div>
+                                    <div class="col-xs-6 col-sm-12">
+                                        <div>
+                                            <a data-bind='text: AnsweringAgentName, attr: {href: "/Agents/Details?agentId=" + AnsweringAgentId}'></a>
+                                        </div>
+                                        <div>
+                                            <b>Отговорено на:</b> <br />
+                                            <span data-bind='text: moment(AnswerCreatedOn()).format("DD.MM.YYYY HH:mm")'></span>
+                                        </div>
+                                        <div>
+                                            <b>Редактиран на:</b> <br />
+                                            <span data-bind='text: moment(AnswerModifiedOn()).format("DD.MM.YYYY HH:mm")'></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-9 col-md-10">
+                                <div class="answer row">
+                                    <div class="col-xs-7 col-sm-9 col-md-10">
+                                        <b>Отговор</b>
+                                    </div>
+                                    <div class="answer-operations col-xs-5 col-sm-3 col-md-2">
+                                        <!-- ko if: IsAllowedToDeleteAnswer -->
+                                        <i class="fa fa-remove operation pull-right" style="font-size: 24px;" data-bind="click: $root.showDeleteAnswerModal"></i>
+                                        <!-- /ko -->
+                                        <!-- ko if: IsAllowedToEditAnswer -->
+                                        <i class="fa fa-edit operation pull-right" style="font-size: 24px;" data-bind="click: $root.showEditAnswerModal"></i>
+                                        <!-- /ko -->
+                                        <!-- ko if: IsAllowedToAccept -->
+                                        <i class="fa fa-check operation pull-right" style="font-size: 24px;" data-bind="click: $root.acceptAnswer"></i>
+                                        <!-- /ko -->
+                                    </div>
+                                    <div class="col-xs-12" data-bind="text: Answer"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                        <!-- ko if: Answer() == null -->
+                        <div class="row">
+                            <h3 align="center" style="margin-top: 15px;">Въпросът все още няма отговор (<a data-bind="click: $root.showAddAnswerModal" style="cursor: pointer; text-decoration: underline;">Отговори</a>)</h3>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+
+@section bottomBody{
+
+    @*Create question modal*@
+    <div class="modal fade" id="modalAddQuestionForm" role="dialog" aria-labelledby="Добави въпрос" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Създаване на въпрос</h4>
+                </div>
+                <div class="modal-body mx-3" data-bind="with: questionToCreate">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label for="questionToAsk" class="required">Въпрос</label>
+                            <textarea rows="5" id="questionToAsk" name="questionToAsk" class="form-control" data-bind="value:Question"></textarea>
+                            <span class="field-validation-valid text-danger" data-valmsg-for="Question" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: addQuestion">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @*Edit question modal*@
+    <div class="modal fade" id="modalEditQuestionForm" role="dialog" aria-labelledby="Редактирай въпрос" aria-hidden="true" >
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Редактиране на въпрос</h4>
+                </div>
+                <div class="modal-body mx-3" data-bind="with: selectedQuestionForEdit">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label for="questionToEdit"  class="required">Въпрос</label>
+                            <textarea rows="5" id="questionToEdit" name="questionToEdit" class="form-control" data-bind="value:Question"></textarea>
+                            <span class="field-validation-valid text-danger" data-valmsg-for="Question" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.saveQuestionChanges">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Delete question modal *@
+    <div class="modal fade" id="modalDeleteQuestionForm" role="dialog" aria-labelledby="Изтрии въпрос" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Найстина ли искате да изтриете този Въпрос ?</h4>
+                </div>
+                <div class="modal-body mx-3" data-bind="with: selectedQuestionForDelete">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label>Въпрос</label>
+                            <p data-bind="text: Question"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.removeQuestion">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* Delete question modal *@
+
+    @*Create create modal*@
+    <div class="modal fade" id="modalCreateAnswerForm" role="dialog" aria-labelledby="Редактирай отговор" aria-hidden="true" >
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Създаване на отговор</h4>
+                </div>
+                <div class="modal-body mx-3">
+                    <div class="row">
+                        <div class="col-xs-12" data-bind="with: questionToCreateAnswerFor">
+                            <label>Въпрос</label>
+                            <p data-bind="text: Question"></p>
+                        </div>
+                        <div class="col-xs-12">
+                            <label class="required" for="answerToCreate">Отговор</label>
+                            <textarea rows="5" id="answerToCreate" name="answerToCreate" class="form-control" data-bind="value:answerToCreate"></textarea>
+                            <span class="field-validation-valid text-danger" data-valmsg-for="Answer" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.addAnswer">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Edit answer modal*@
+    <div class="modal fade" id="modalEditAnswerForm" role="dialog" aria-labelledby="Редактирай отговор" aria-hidden="true" >
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Редактиране на Отговор</h4>
+                </div>
+                <div class="modal-body mx-3">
+                    <div class="row">
+                        <div class="col-xs-12" data-bind="with: selectedQuestionToEditAnswerFor">
+                            <label class="required">Въпрос</label>
+                            <p data-bind="text: Question"></p>
+                        </div>
+                        <div class="col-xs-12">
+                            <label for="answerToEdit">Отговор</label>
+                            <textarea rows="5" id="answerToEdit" name="answerToEdit" class="form-control" data-bind="value: answerToEdit"></textarea>
+                            <span class="field-validation-valid text-danger" data-valmsg-for="Answer" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.editAnswer">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Delete answer modal *@
+    <div class="modal fade" id="modalDeleteAnswerForm" role="dialog" aria-labelledby="Изтрии отговор" aria-hidden="true" >
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Найстина ли искате да изтриете отговорът на този Въпрос ?</h4>
+                </div>
+                <div class="modal-body mx-3" data-bind="with: selectedQuestionToDeleteAnswerFrom">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label>Въпрос</label>
+                            <p data-bind="text: Question"></p>
+                        </div>
+                        <div class="col-xs-12">
+                            <label for="answerToDelete">Отговор</label>
+                            <p id="answerToDelete" name="answerToDelete" data-bind="text: Answer"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.deleteAnswer">Изтрии</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section scripts{
+
+    <script type='text/javascript' src='~/Scripts/knockoutJS/knockout-3.5.0.js'></script>
+    <script type='text/javascript' src='~/Scripts/knockoutJS/knockout-extentions.js'></script>
+    <script>
+        var diaryRecords = @Html.Raw(Json.Encode(Model));
+
+        var QuestionModel = function(question) {
+            this.Id = ko.observable(question.Id);
+            this.CreatedOn = ko.observable(question.CreatedOn);
+            this.Question = ko.observable(question.Question);
+            this.AskingAgentId = ko.observable(question.AskingAgentId);
+            this.AskingAgentName = ko.observable(question.AskingAgentName);
+            this.AskingAgentImage = ko.observable(question.AskingAgentImage);
+            this.AnswerId = ko.observable(question.AnswerId);
+            this.Answer = ko.observable(question.Answer);
+            this.IsAccepted = ko.observable(question.IsAccepted);
+            this.AnswerCreatedOn = ko.observable(question.AnswerCreatedOn);
+            this.AnswerModifiedOn = ko.observable(question.AnswerModifiedOn);
+            this.AnsweringAgentId = ko.observable(question.AnsweringAgentId);
+            this.AnsweringAgentName = ko.observable(question.AnsweringAgentName);
+            this.AnsweringAgentImage = ko.observable(question.AnsweringAgentImage);
+
+            this.IsAllowedToAccept = ko.observable(question.IsAllowedToAccept);
+            this.IsAllowedToEditQuestion = ko.observable(question.IsAllowedToEditQuestion);
+            this.IsAllowedToDeleteQuestion = ko.observable(question.IsAllowedToDeleteQuestion);
+            this.IsAllowedToEditAnswer = ko.observable(question.IsAllowedToEditAnswer);
+            this.IsAllowedToDeleteAnswer = ko.observable(question.IsAllowedToDeleteAnswer);
+
+            this.rowColor = ko.computed(function () {
+                return this.IsAccepted() ? 'lime' : this.Answer() !== null ? 'yellow' : 'transparent';
+            }, this);
+        }
+
+        var CreateQuestionModel = function() {
+            this.Question = ko.observable('');
+        }
+
+
+        var CreateAnswerModel = function() {
+            this.QuestionId = ko.observable('');
+            this.Answer = ko.observable('');
+        }
+
+
+        var PageViewModel = function(questions) {
+
+            var self = this;
+
+            var observableQuestions = [];
+            for (var i = 0; i < questions.length; i++) {
+                observableQuestions.push(new QuestionModel(questions[i]));
+            }
+
+            self.questions = ko.observableArray(observableQuestions);
+
+            //Filters
+            self.agentId = ko.observable('');
+            self.questionTitle = ko.observable('');
+            self.isAnswered = ko.observable('');
+
+            //Ordering
+            self.isSortAsc = ko.observable(true);
+            self.sortBy = ko.observable('CreatedOn');
+
+            self.filteredQuestions = ko.computed(function() {
+                return ko.utils
+                    .arrayFilter(self.questions(),
+                        function(question) {
+                            return ((self.agentId().length === 0 ||
+                                    question.AskingAgentId() === self.agentId()) &&
+                                (self.isAnswered().length === 0 ||
+                                    // 1 - All not answered ; 2 - All answered ; others - All
+                                    (Number(self.isAnswered()) === 1
+                                        ? question.Answer() === null
+                                        : Number(self.isAnswered()) === 2
+                                        ? question.Answer() != null
+                                        ? question.Answer().length > 0
+                                        : false
+                                        : true)) &&
+                                (self.questionTitle().length === 0 ||
+                                    question.Question().toLowerCase().indexOf(self.questionTitle().toLowerCase()) !==
+                                    -1));
+                        })
+                    .sort(function(a, b) {
+
+                        var dateA;
+                        var dateB;
+                        if (self.isSortAsc() === true)
+                            switch (self.sortBy()) {
+                            case 'CreatedOn':
+                                dateA = moment(a["CreatedOn"]()).toDate();
+                                dateB = moment(b["CreatedOn"]()).toDate();
+                                return dateB.getTime() - dateA.getTime();
+                            case 'AskingAgentName':
+                                return a.AskingAgentName() > b.AskingAgentName();
+                            default:
+                            }
+                        else if (self.isSortAsc() === false) {
+                            switch (self.sortBy()) {
+                            case 'CreatedOn':
+                                dateA = moment(a["CreatedOn"]()).toDate();
+                                dateB = moment(b["CreatedOn"]()).toDate();
+                                return dateA.getTime() - dateB.getTime();
+                            case 'AskingAgentName':
+                                return a.AskingAgentName() < b.AskingAgentName();
+                            default:
+                            }
+                        }
+
+                        return a.Id > b.Id;
+                    });
+            });
+
+            //!!Create question funcs!!
+            self.questionToCreate = ko.observable(new CreateQuestionModel());
+            self.showAddQuestionModal = function() {
+                $('#modalAddQuestionForm').modal('show');
+            }
+
+            self.addQuestion = function() {
+                var recordViewModel = ko.toJS(self.questionToCreate);
+
+                $.post('/AgentQuestions/Create',
+                    recordViewModel,
+                    function (data) {
+
+                        var thisForm = $('#modalAddQuestionForm');
+
+                        if (data.success) {
+                            showErrorResponse(data, thisForm);
+                        } else {
+                            self.questions.push(new QuestionModel(data));
+                            thisForm.modal('hide');
+                            self.questionToCreate().Question('');
+
+                            clearFormValidationErrors(thisForm);
+                            window.alertify.success("Успешно добавен въпрос!");
+                        }
+                    });
+            }
+            //!!Create question funcs!!
+
+            //!!Edit question funcs!!
+            self.selectedQuestionForEdit = ko.observable();
+            self.editQuestion = function(question) {
+
+                //Load selected item from table to variable
+                self.selectedQuestionForEdit(question);
+                //Show modal window with the binded data
+                $('#modalEditQuestionForm').modal('show');
+            }
+
+            self.saveQuestionChanges = function() {
+                var editViewModel = {
+                    questionId: self.selectedQuestionForEdit().Id(),
+                    question: self.selectedQuestionForEdit().Question()
+                };
+
+                $.post('/AgentQuestions/Edit',
+                    editViewModel,
+                    function(data) {
+
+                        var thisForm = $('#modalEditQuestionForm');
+
+                        if (data.success) {
+                            showErrorResponse(data, thisForm);
+                        } else {
+                            self.selectedQuestionForEdit().Question(data.Question);
+
+                            self.selectedQuestionForEdit(null);
+                            thisForm.modal('hide');
+
+                            clearFormValidationErrors(thisForm);
+                            window.alertify.success("Успешно редактиран въпрос!");
+                        }
+                    });
+            }
+            //!!Edit question funcs!!
+
+            //!!Delete question funcs!!
+            self.selectedQuestionForDelete = ko.observable();
+            self.showDeleteQuestionModal = function (question) {
+                self.selectedQuestionForDelete(question);
+                $('#modalDeleteQuestionForm').modal('show');
+            }
+
+            self.removeQuestion = function() {
+                $.post('/AgentQuestions/Delete',
+                    { id: self.selectedQuestionForDelete().Id() },
+                    function(data) {
+                        if (data === 'STATUS_OK') {
+                            self.questions.remove(self.selectedQuestionForDelete());
+                            self.selectedQuestionForDelete(null);
+
+                            $('#modalDeleteQuestionForm').modal('hide');
+                            window.alertify.success("Успешно изтрит въпрос!");
+                        } else {
+                            window.alertify.error('Проблем при изтриване на въпросът. Моля опитайте по-късно!');
+                        }
+                    });
+            };
+            //!!Delete question funcs!!
+
+
+            //!!Create answer funcs!!
+            self.questionToCreateAnswerFor = ko.observable();
+            self.answerToCreate = ko.observable();
+            self.showAddAnswerModal = function(question) {
+                $('#modalCreateAnswerForm').modal('show');
+                self.questionToCreateAnswerFor(question);
+            }
+
+            self.addAnswer = function() {
+
+                var addAnswerViewModel = {
+                    questionId: self.questionToCreateAnswerFor().Id(),
+                    answer: self.answerToCreate()
+                };
+
+                $.post('/AgentAnswers/Create',
+                    addAnswerViewModel,
+                    function (data) {
+
+                        var thisForm = $('#modalCreateAnswerForm');
+
+                        if (data.success) {
+                            showErrorResponse(data, thisForm);
+                        } else {
+
+                            self.questionToCreateAnswerFor().Answer(data.Answer);
+                            self.questionToCreateAnswerFor().IsAccepted(data.IsAccepted);
+                            self.questionToCreateAnswerFor().AnswerCreatedOn(data.AnswerCreatedOn);
+                            self.questionToCreateAnswerFor().AnswerModifiedOn(data.AnswerModifiedOn);
+                            self.questionToCreateAnswerFor().AnsweringAgentId(data.AnsweringAgentId);
+                            self.questionToCreateAnswerFor().AnsweringAgentName(data.AnsweringAgentName);
+                            self.questionToCreateAnswerFor().AnswerId(data.AnswerId);
+                            self.questionToCreateAnswerFor().IsAllowedToAccept(data.IsAllowedToAccept);
+                            self.questionToCreateAnswerFor().IsAllowedToEditAnswer(data.IsAllowedToEditAnswer);
+                            self.questionToCreateAnswerFor().IsAllowedToDeleteAnswer(data.IsAllowedToDeleteAnswer);
+
+                            self.questionToCreateAnswerFor(null);
+                            thisForm.modal('hide');
+
+                            clearFormValidationErrors(thisForm);
+                            window.alertify.success("Успешно добавен отговор!");
+                        }
+                    });
+            }
+            //!!Create answer funcs!!
+
+            //!!Edit answer funcs!!
+            self.selectedQuestionToEditAnswerFor = ko.observable();
+            // answerToEditId covers the problem of incidental closing of the modal
+            // which would cause flush of the entered data
+            self.answerToEditId = ko.observable('');
+            self.answerToEdit = ko.observable('');
+            self.showEditAnswerModal = function(question) {
+                $('#modalEditAnswerForm').modal('show');
+                self.selectedQuestionToEditAnswerFor(question);
+                if (self.answerToEdit().length === 0 ||
+                    self.answerToEditId() !== self.selectedQuestionToEditAnswerFor().Id()) {
+                    self.answerToEdit(self.selectedQuestionToEditAnswerFor().Answer());
+                    self.answerToEditId(self.selectedQuestionToEditAnswerFor().Id());
+                }
+            }
+
+            self.editAnswer = function() {
+
+                var editAnswerViewModel = {
+                    Id: self.selectedQuestionToEditAnswerFor().Id(),
+                    answer: self.answerToEdit()
+                };
+
+                $.post('/AgentAnswers/Edit',
+                    editAnswerViewModel,
+                    function (data) {
+
+                        var thisForm = $('#modalEditAnswerForm');
+
+                        if (data.success) {
+                            showErrorResponse(data, thisForm);
+                        } else {
+
+                            self.selectedQuestionToEditAnswerFor().Answer(data.Answer);
+                            self.selectedQuestionToEditAnswerFor().IsAccepted(data.IsAccepted);
+                            self.selectedQuestionToEditAnswerFor().AnswerModifiedOn(data.AnswerModifiedOn);
+                            self.selectedQuestionToEditAnswerFor().IsAllowedToAccept(data.IsAllowedToAccept);
+                            self.selectedQuestionToEditAnswerFor().IsAllowedToEditAnswer(data.IsAllowedToEditAnswer);
+                            self.selectedQuestionToEditAnswerFor().IsAllowedToDeleteAnswer(data.IsAllowedToDeleteAnswer);
+
+                            self.selectedQuestionToEditAnswerFor(null);
+                            thisForm.modal('hide');
+
+                            clearFormValidationErrors(thisForm);
+                            window.alertify.success("Успешно редактиран отговор!");
+                        }
+                    });
+            }
+            //!!Edit answer funcs!!
+
+
+            //!! Delete answer funcs !!
+            self.selectedQuestionToDeleteAnswerFrom = ko.observable();
+            self.showDeleteAnswerModal = function(question) {
+                $('#modalDeleteAnswerForm').modal('show');
+                self.selectedQuestionToDeleteAnswerFrom(question);
+            }
+
+            self.deleteAnswer = function() {
+
+                var answerId = self.selectedQuestionToDeleteAnswerFrom().AnswerId();
+
+                $.post('/AgentAnswers/Delete',
+                    {id: answerId},
+                    function (data) {
+                        self.selectedQuestionToDeleteAnswerFrom().Answer(data.Answer);
+                        self.selectedQuestionToDeleteAnswerFrom().IsAccepted(data.IsAccepted);
+                        self.selectedQuestionToDeleteAnswerFrom().AnswerCreatedOn(data.AnswerCreatedOn);
+                        self.selectedQuestionToDeleteAnswerFrom().AnswerModifiedOn(data.AnswerModifiedOn);
+                        self.selectedQuestionToDeleteAnswerFrom().AnsweringAgentId(data.AnsweringAgentId);
+                        self.selectedQuestionToDeleteAnswerFrom().AnsweringAgentName(data.AnsweringAgentName);
+                        self.selectedQuestionToDeleteAnswerFrom().AnswerId(data.AnswerId);
+                        self.selectedQuestionToDeleteAnswerFrom().IsAllowedToAccept(data.IsAllowedToAccept);
+                        self.selectedQuestionToDeleteAnswerFrom().IsAllowedToEditAnswer(data.IsAllowedToEditAnswer);
+                        self.selectedQuestionToDeleteAnswerFrom().IsAllowedToDeleteAnswer(data.IsAllowedToDeleteAnswer);
+                        self.selectedQuestionToDeleteAnswerFrom().IsAllowedToEditQuestion(data.IsAllowedToEditQuestion);
+                        self.selectedQuestionToDeleteAnswerFrom().IsAllowedToDeleteQuestion(data.IsAllowedToDeleteQuestion);
+
+                        self.selectedQuestionToDeleteAnswerFrom(null);
+                        $('#modalDeleteAnswerForm').modal('hide');
+                    });
+            };
+        }
+        //!! Delete answer funcs !!
+
+        var vm = new PageViewModel(diaryRecords);
+        ko.applyBindings(vm);
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $(document).on('click',
+                '.ordering',
+                function (e) {
+                    var textSpan = $(this).find('.ordering-text');
+                    var property = textSpan.attr('name');
+
+                    var arrowSpan = textSpan.next();
+                    arrowSpan.toggleClass('ordering-ascending ordering-descending');
+
+                    var isOrderAsc = arrowSpan.hasClass('ordering-ascending');
+
+                    vm.isSortAsc(isOrderAsc);
+                    vm.sortBy(property);
+                });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            function toggleChevron(e) {
+                $(e.target)
+                    .closest('tr')
+                    .prev()
+                    .find("i.indicator")
+                    .toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+            }
+
+            $('.table-condensed').on('hidden.bs.collapse', toggleChevron);
+            $('.table-condensed').on('shown.bs.collapse', toggleChevron);
+
+            $(document).on('click',
+                '.table-condensed .operation',
+                (function (e) {
+                    e.stopPropagation();
+                }));
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            var urlString = window.location.href;
+            var url = new URL(urlString);
+            var questionId = url.searchParams.get("questionId");
+
+            if (questionId) {
+                // Using jQuery's animate() method to add smooth page scroll
+                // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
+                var $elementToScrollTo = $('tr[data-id="' + questionId + '"]');
+                if ($elementToScrollTo[0]) {
+
+                    const viewportHeight = window.innerHeight || 0;
+
+                    $('html, body').animate({
+                        scrollTop: $elementToScrollTo.offset().top - viewportHeight / 2
+                    }, 800, function () {
+                        $elementToScrollTo.css('background-color', '#fff9d7');
+                    });
+                }
+            }
+        });
+    </script>
+}

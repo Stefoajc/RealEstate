@@ -1,11 +1,15 @@
-﻿@model List<RealEstate.ViewModels.WebMVC.AgentListViewModel>
+﻿@model List<RealEstate.ViewModels.WebMVC.TeamUserListViewModel>
+
+@{
+    ViewBag.Title = "Екип - Имоти СПРОПЪРТИС";
+}
 
 <div role="main" class="main pgl-bg-grey">
     <!-- Begin page top -->
     <section class="page-top">
         <div class="container">
             <div class="page-top-in">
-                @*<h2><span>Our Agents</span></h2>*@
+                <h2><span>Нашият екип</span></h2>
             </div>
         </div>
     </section>
@@ -13,68 +17,67 @@
     <!-- Begin Featured Agents -->
     <section class="pgl-agents">
         <div class="container">
-            <h2>ТОП АГЕНТИ</h2>
+            <h2>ТОП БРОКЕРИ</h2>
             <div class="featured-agent">
                 <div class="row">
-                    @for (int i = 0; i < ViewBag.FeaturedAgents.Count; i++)
+                    @foreach (var agent in ViewBag.FeaturedAgents)
                     {
                         <div class="col-md-6">
-                            <div class="pgl-agent-item pgl-bg-light">
-                                <div class="row pgl-midnarrow-row">
-                                    <div class="col-xs-5">
-                                        <div class="img-thumbnail-medium">
-                                            <a href="@Url.Action("Details","Agents",new {agentId = ViewBag.FeaturedAgents[i].AgentId})"><img src="@ViewBag.FeaturedAgents[i].ImagePath" class="img-responsive" alt=""></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-7">
-                                        <div class="pgl-agent-info">
-                                            <small>NO.@(i + 1)</small>
-                                            <h4><a href="@Url.Action("Details","Agents",new {agentId = ViewBag.FeaturedAgents[i].AgentId})">@ViewBag.FeaturedAgents[i].FullName</a></h4>
-                                            <p>@ViewBag.FeaturedAgents[i].Description</p>
-                                            <address>
-                                                <i class="fa fa-map-marker"></i> Office : @ViewBag.FeaturedAgents[i].OfficePhone<br>
-                                                <i class="fa fa-phone"></i> Mobile : @ViewBag.FeaturedAgents[i].PhoneNumber<br>
-                                                <i class="fa fa-fax"></i> Fax : @ViewBag.FeaturedAgents[i].PhoneNumber<br>
-                                                <i class="fa fa-envelope-o"></i> Mail: <a href="mailto:@ViewBag.FeaturedAgents[i].Email">@ViewBag.FeaturedAgents[i].Email</a>
-                                            </address>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            @Html.Partial("TeamUserListViewHorizontal", (RealEstate.ViewModels.WebMVC.TeamUserListViewModel)agent)
                         </div>
                     }
                 </div>
             </div>
             <!-- End Featured Agents -->
             <!-- Begin Our Agents -->
-            <div class="grid-agents">
-                <h2>Нашите агенти</h2>
-                <div class="row">
-
-                    @foreach (var agent in ViewBag.Agents)
-                    {
-                        <div class="col-xs-6 col-md-3">
-                            <div class="pgl-agent-item pgl-bg-light">
-                                <div class="img-thumbnail-medium">
-                                    <a href=@Url.Action("Details","Agents",new {agentId = agent.AgentId})><img class="img-responsive" alt="" src="@agent.ImagePath"></a>
-                                </div>
-                                <div class="pgl-agent-info">
-                                    <small>NO.1</small>
-                                    <h4><a href=@Url.Action("Details","Agents",new {agentId = agent.AgentId})>@agent.FullName</a></h4>
-                                    <address>
-                                        <i class="fa fa-map-marker"></i> Office : @agent.OfficePhone<br>
-                                        <i class="fa fa-phone"></i> Mobile : @agent.PhoneNumber<br>
-                                        <i class="fa fa-fax"></i> Fax : @agent.PhoneNumber<br>
-                                        <i class="fa fa-envelope-o"></i> Mail: <a href="mailto:@(agent.Email)">@(agent.Email)</a>
-                                    </address>
-                                </div>
-
+            @if (ViewBag.Agents.Count > 0)
+            {
+                <div class="grid-agents">
+                    <h2>Нашите брокери</h2>
+                    <div class="row">
+                        @foreach (var agent in ViewBag.Agents)
+                        {
+                            <div class="col-xs-6 col-md-3">
+                                @Html.Partial("TeamUserListViewVertical", (RealEstate.ViewModels.WebMVC.TeamUserListViewModel)agent)
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
-            </div>
+            }
+            <!-- End Our Agents -->
+            <!-- Begin Our Marketers -->
+            @if (ViewBag.Marketers.Count > 0)
+            {
+                <div class="grid-agents">
+                    <h2>Нашите маркетолози</h2>
+                    <div class="row">
+                        @foreach (var marketer in ViewBag.Marketers)
+                        {
+                            <div class="col-xs-6 col-md-3">
+                                @Html.Partial("TeamUserListViewVertical", (RealEstate.ViewModels.WebMVC.TeamUserListViewModel)marketer)
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            <!-- End Our Marketers -->
+            <!-- Begin Our Marketers -->
+            @if (ViewBag.Maintenance.Count > 0)
+            {
+                <div class="grid-agents">
+                    <h2>Нашият екип по подръжка</h2>
+                    <div class="row">
+                        @foreach (var maintenance in ViewBag.Maintenance)
+                        {
+                            <div class="col-xs-6 col-md-3">
+                                @Html.Partial("TeamUserListViewVertical", (RealEstate.ViewModels.WebMVC.TeamUserListViewModel)maintenance)
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            <!-- End Our Marketers -->
         </div>
     </section>
-    <!-- End Our Agents -->
+
 </div>

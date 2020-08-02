@@ -1,63 +1,88 @@
-﻿<div role="main" class="main pgl-bg-grey">
-    <!-- Begin page top -->
-    <section class="page-top">
-        <div class="container">
-            <div class="page-top-in">
-                <h2><span>Често задавани въпроси</span></h2>
-            </div>
-        </div>
-    </section>
-    <!-- End page top -->
-    <!-- Begin content with sidebar -->
-    <div class="container">
-        <div class="row">
-            <div class="col-md-9 content">
+﻿@using RealEstate.ViewModels.WebMVC.Forum
+@{
+    ViewBag.Title = "Често задавани въпроси - Имоти СПРОПЪРТИС";
+}
 
-                <!-- Begin FAQs -->
-                <div class="panel-group pgl-group-faqs" id="accordion">
-                    <div class="panel panel-default pgl-panel">
-                        <div class="panel-heading">
-                            <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Proin luctus, erat sed pulvinar bibendum</a> </h4>
-                        </div>
-                        <div id="collapseOne" class="panel-collapse collapse in">
-                            <div class="panel-body">
-                                <p>Sed perspiciatis unde omnisiste natus error voluptatem remopa accusantium doloremque laudantium, totam rem aperiam. Nam sed aliquet tortor. Sed id malesuada ante. Quisque et sagittis nulla. In ut congue lacus, in malesuada nulla. Proin luctus, erat sed pulvinar bibendum, nisi erat dignissim ante, in imperdiet purus dolor sit amet lectus. Nullam luctus euismod purus, nec consequat tellus luctus pharetra. Morbi ut purus tempor, pellentesque felis eu; mollis nisl. Morbi tincidunt ante ipsum, bibendum pulvinar eros luctus sed. Donec non tincidunt quam. Donec nisl eros, sollicitudin a condimentum eget, iaculis non metus. Curabitur rhoncus elit eu rhoncus molestie. Praesent vitae felis et justo malesuada auctor! Aliquam hendrerit ut sem nec euismod. Curabitur vel interdum dui? Nulla tempor interdum suscipit. Nulla tortor orci, iaculis vel enim id, bibendum rutrum orci.</p>
-                                <p>Nunc sagittis dolor et nibh laoreet consequat. Integer pharetra id magna sed laoreet. Pellentesque nec venenatis odio. Praesent aliquet tellus ut nibh semper, at posuere mauris iaculis. Donec mauris arcu; egestas ac neque eu, viverra molestie quam. Morbi eget augue sem. Proin nec pharetra quam. Ut consectetur velit a tincidunt suscipit. Sed eget iaculis mi. Ut fermentum odio urna, eu sagittis augue rhoncus vehicula! In ut nullam sodales.</p>
-                            </div>
+
+<!-- Begin page top -->
+<section class="page-top">
+    <div class="container">
+        <div class="page-top-in">
+            <h2><span>Често задавани въпроси</span></h2>
+        </div>
+    </div>
+</section>
+<!-- End page top -->
+<!-- Begin content with sidebar -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-9 content">
+
+            <!-- Begin FAQs -->
+            <div class="panel-group pgl-group-faqs" id="accordion">
+                <div class="panel panel-default pgl-panel">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Какво дължа за да ми намерите наемател на имота?</a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <p>
+                                За да предлагаме имотът ви на клиентите ни не ни дължите нищо, докато не ви намерим наемател и не сключите договор за наем с него.
+                                Комисионната се плаща когато е налице сключен договор за наем между вас като Наемодател и Наемателя намерен от агенцията ни.
+                                Комисионната се плаща еднократно и е в размер <b>50% /без ДДС/</b> от наемната цена за месец на имота. (пример: При 400лв. месечен наем комисионната е в размер на 200лв./без ДДС/)
+                            </p>
+                            <p style="text-decoration: underline;">Ако вие си намерите наемател, който не е наш клиент (което се доказва с документ за проведен оглед) преди ние да го направим, Комисионна не се дължи !</p>
                         </div>
                     </div>
-                    <div class="panel panel-default pgl-panel">
-                        <div class="panel-heading">
-                            <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" class="collapsed">Morbi ut purus tempor, pellentesque felis eu</a> </h4>
-                        </div>
-                        <div id="collapseTwo" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <p>Sed perspiciatis unde omnisiste natus error voluptatem remopa accusantium doloremque laudantium, totam rem aperiam.<br>Nam sed aliquet tortor. Sed id malesuada ante. Quisque et sagittis nulla. In ut congue lacus, in malesuada nulla. Proin luctus, erat sed pulvinar bibendum, nisi erat dignissim ante, in imperdiet purus dolor sit amet lectus. Nullam luctus euismod purus, nec consequat tellus luctus pharetra. Morbi ut purus tempor, pellentesque felis eu; mollis nisl. Morbi tincidunt ante ipsum, bibendum pulvinar eros luctus sed. Donec non tincidunt quam. Donec nisl eros, sollicitudin a condimentum eget, iaculis non metus. Curabitur rhoncus elit eu rhoncus molestie. Praesent vitae felis et justo malesuada auctor! Aliquam hendrerit ut sem nec euismod. Curabitur vel interdum dui? Nulla tempor interdum suscipit. Nulla tortor orci, iaculis vel enim id, bibendum rutrum orci.</p>
-                            </div>
+                </div>
+                <div class="panel panel-default pgl-panel">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" class="collapsed">Какво да направя за да започнете да ми търсите наемател ?</a>
+                        </h4>
+                    </div>
+                    <div id="collapseTwo" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <p>Първото което трябва е да се свържете с нас на <strong><em>0877811550</em></strong> или на <a href="mailto:office@sproperties.net"><strong><em>office@sproperties.net</em></strong></a>. Може да се свържете с нас също от <a href="/Home/Contact#sendmessage-header">тук</a></p>
+                            <p>
+                                След което ние ще ви представим нашите условия, на които ако сте съгласни, ще се уговори среща за оглед и описване на прелаганият имот.
+                                На срещата ще бъдете запознат/а с договорът за поръчка за отдаване под наем, които за съвместна работа с нас трябва да подпишете.
+                                В договорът се описват задълженията ни и размерът на комисионната ни. След подписване започваме активно да работим в насока търсене на наемател на помещението ви.
+                            </p>
                         </div>
                     </div>
-                    <div class="panel panel-default pgl-panel">
-                        <div class="panel-heading">
-                            <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" class="collapsed">Integer pharetra id magna sed laoreet</a> </h4>
-                        </div>
-                        <div id="collapseThree" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <p>Nunc sagittis dolor et nibh laoreet consequat. Integer pharetra id magna sed laoreet. Pellentesque nec venenatis odio. Praesent aliquet tellus ut nibh semper, at posuere mauris iaculis. Donec mauris arcu; egestas ac neque eu, viverra molestie quam. Morbi eget augue sem. Proin nec pharetra quam. Ut consectetur velit a tincidunt suscipit. Sed eget iaculis mi. Ut fermentum odio urna, eu sagittis augue rhoncus vehicula! In ut nullam sodales.</p>
-                            </div>
+                </div>
+                <div class="panel panel-default pgl-panel">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" class="collapsed">Трябва ли да оставям ключове за имота на Агенцията ?</a>
+                        </h4>
+                    </div>
+                    <div id="collapseThree" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <p>Оставянето на ключ за помещението не е задължително, а по-скоро се прави от гледна точна удобство за вас и за потенциалните наематели проявили интерес и искащи да направят оглед.</p>
+                            <p>
+                                Ако решите да ни оставите ключ няма да се налага да се свързваме с вас всеки път когато правим оглед и да ви привикваме да отключите помещението.
+                                Това решение трябва да вземете с оглед ваше удобство, ако няма да е проблем и сте достъпни постоянно да откликнете на потенциален наемател не е необходимо да предоставяте ключ.
+                            </p>
                         </div>
                     </div>
-                    <div class="panel panel-default pgl-panel">
-                        <div class="panel-heading">
-                            <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseFouth" class="collapsed">Ut fermentum odio urna, eu sagittis augue rhoncus vehicula! In ut nullam sodales</a> </h4>
-                        </div>
-                        <div id="collapseFouth" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <p>Nunc sagittis dolor et nibh laoreet consequat. Integer pharetra id magna sed laoreet. Pellentesque nec venenatis odio. Praesent aliquet tellus ut nibh semper, at posuere mauris iaculis. Donec mauris arcu; egestas ac neque eu, viverra molestie quam. Morbi eget augue sem. Proin nec pharetra quam. Ut consectetur velit a tincidunt suscipit. Sed eget iaculis mi. Ut fermentum odio urna, eu sagittis augue rhoncus vehicula! In ut nullam sodales.</p>
-                                <p>Sed perspiciatis unde omnisiste natus error voluptatem remopa accusantium doloremque laudantium, totam rem aperiam.</p>
-                            </div>
+                </div>
+                <div class="panel panel-default pgl-panel">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseFouth" class="collapsed">Къде е офисът на Агенцията ?</a>
+                        </h4>
+                    </div>
+                    <div id="collapseFouth" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <p>В момента се изгражда офис в Асеновград на ул.Пирин №8, и се надяваме ремонтните дейности да приключат по скоро за да има възможност да се свързвате с нас и в офиса, а до тогава може да се свържете с нас по телефон или е-мейл.</p>
                         </div>
                     </div>
-                    <div class="panel panel-default pgl-panel">
+                </div>
+                @*<div class="panel panel-default pgl-panel">
                         <div class="panel-heading">
                             <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseFive" class="collapsed">Voluptatem remopa accusantium doloremque laudantium</a> </h4>
                         </div>
@@ -99,153 +124,29 @@
                                 <p>Sed perspiciatis unde omnisiste natus error voluptatem remopa accusantium doloremque laudantium, totam rem aperiam.</p>
                             </div>
                         </div>
-                    </div>
+                    </div>*@
+            </div>
+            <!-- End FAQs -->
+
+        </div>
+        <div class="col-md-3 sidebar">
+            <!-- Begin Search by keyword -->
+            @Html.Partial("~/Views/Forum/SearchByKeyword_Partial.cshtml")
+            <!-- End Search by keyword -->
+
+            <aside class="block tabs pgl-bg-light">
+                <ul class="nav nav-tabs second-tabs">
+                    <li class="active"><a href="#popularPosts" data-toggle="tab"><i class="icon icon-star"></i> Популярни</a></li>
+                    <li><a href="#latestComments" data-toggle="tab">Коментари</a></li>
+                </ul>
+                <div class="tab-content">
+                    @Html.Partial("~/Views/Forum/Posts_Partial.cshtml", (List<RealEstate.ViewModels.WebMVC.Forum.PostSideViewModel>)ViewBag.PopularPosts)
+
+                    @Html.Partial("~/Views/Forum/Comments_Partial.cshtml", (List<CommentSideViewModel>)ViewBag.LatestComments)
                 </div>
-                <!-- End FAQs -->
+            </aside>
 
-            </div>
-            <div class="col-md-3 sidebar">
-                <aside class="block pgl-bg-light blk-search">
-                    <form class="form-inline form-search" role="form">
-                        <div class="form-group">
-                            <label class="sr-only" for="textsearch2">Търсите нещо ?</label>
-                            <input class="form-control" id="textsearch2" placeholder="Търсите нещо ?" type="text">
-                        </div>
-                        <button type="submit" class="btn"><i class="fa fa-search"></i></button>
-                    </form>
-                </aside>
-
-                <aside class="block tabs pgl-bg-light">
-                    <ul class="nav nav-tabs second-tabs">
-                        <li class="active"><a href="#popularPosts" data-toggle="tab"><i class="icon icon-star"></i> Популярни</a></li>
-                        <li><a href="#latestComments" data-toggle="tab">Коментари</a></li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane active" id="popularPosts">
-                            <ul class="list-unstyled simple-post-list">
-                                <li>
-                                    <div class="post-image">
-                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-7.jpg" alt="Blog"></a>
-                                    </div>
-                                    <div class="post-info">
-                                        <a href="blog-single.html">Proin rutrum nisi eu ante mattis sit amet</a>
-                                        <div class="post-meta">
-                                            <i class="fa fa-eye"></i> 113 views
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="post-image">
-                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-6.jpg" alt="Blog"></a>
-                                    </div>
-                                    <div class="post-info">
-                                        <a href="blog-single.html">Sed non mauris vitae erat consequat</a>
-                                        <div class="post-meta">
-                                            <i class="fa fa-eye"></i> 113 views
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="post-image">
-                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-5.jpg" alt="Blog"></a>
-                                    </div>
-                                    <div class="post-info">
-                                        <a href="blog-single.html">Nullam ac urna eu felis dapibus</a>
-                                        <div class="post-meta">
-                                            <i class="fa fa-eye"></i> 113 views
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="post-image">
-                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-4.jpg" alt="Blog"></a>
-                                    </div>
-                                    <div class="post-info">
-                                        <a href="blog-single.html">Class aptent taciti sociosqu ad litora</a>
-                                        <div class="post-meta">
-                                            <i class="fa fa-eye"></i> 113 views
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="post-image">
-                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-3.jpg" alt="Blog"></a>
-                                    </div>
-                                    <div class="post-info">
-                                        <a href="blog-single.html">Ac urna eu felis condimentum</a>
-                                        <div class="post-meta">
-                                            <i class="fa fa-eye"></i> 113 views
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="tab-pane" id="latestComments">
-                            <ul class="list-unstyled simple-post-list">
-                                <li>
-                                    <div class="post-image">
-                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-1.jpg" alt="Blog"></a>
-                                    </div>
-                                    <div class="post-info">
-                                        <a href="blog-single.html">Sed non mauris vitae erat consequat</a>
-                                        <div class="post-meta">
-                                            <i class="fa fa-eye"></i> 213 views
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="post-image">
-                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-2.jpg" alt="Blog"></a>
-                                    </div>
-                                    <div class="post-info">
-                                        <a href="blog-single.html">Proin rutrum nisi eu ante mattis sit amet</a>
-                                        <div class="post-meta">
-                                            <i class="fa fa-eye"></i> 117 views
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="post-image">
-                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-3.jpg" alt="Blog"></a>
-                                    </div>
-                                    <div class="post-info">
-                                        <a href="blog-single.html">Nullam ac urna eu felis dapibus</a>
-                                        <div class="post-meta">
-                                            <i class="fa fa-eye"></i> 19 views
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="post-image">
-                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-4.jpg" alt="Blog"></a>
-                                    </div>
-                                    <div class="post-info">
-                                        <a href="blog-single.html">Class aptent taciti sociosqu ad litora</a>
-                                        <div class="post-meta">
-                                            <i class="fa fa-eye"></i> 113 views
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="post-image">
-                                        <a href="blog-single.html"><img class="img-responsive" src="images/blog/demo-thumb-3.jpg" alt="Blog"></a>
-                                    </div>
-                                    <div class="post-info">
-                                        <a href="blog-single.html">Ac urna eu felis condimentum</a>
-                                        <div class="post-meta">
-                                            <i class="fa fa-eye"></i> 113 views
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </aside>
-
-            </div>
         </div>
     </div>
-    <!-- End content with sidebar -->
-
 </div>
+<!-- End content with sidebar -->

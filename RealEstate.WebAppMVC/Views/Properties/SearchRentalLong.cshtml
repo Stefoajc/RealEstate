@@ -1,0 +1,127 @@
+﻿<section class="pgl-advanced-search pgl-bg-light">
+    <div class="container">
+        @using (Html.BeginForm("Index", "Properties", FormMethod.Get))
+        {
+        <div class="row">
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    <input readonly="readonly" value="Под наем" class="form-control" />
+                </div>
+            </div>
+
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    <label class="sr-only" for="property-types">Типове имоти</label>
+                    <select id="property-types" name="propertyType" data-placeholder="Property Types" class="chosen-select">
+                        <option selected="selected" value="">Типове имоти</option>
+                        @foreach (var propertyType in ViewBag.PropertyTypes)
+                {
+                    <option value="@propertyType.PropertyTypeId">@propertyType.PropertyTypeName</option>
+        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    <label class="sr-only" for="area-from">Площ от</label>
+                    <select id="area-from" name="areaFrom" data-placeholder="AreaFrom" class="chosen-select">
+                        <option selected="selected" value="">Площ от</option>
+                        <option value="0">от 0кв.м.</option>
+                        <option value="50">от 50кв.м.</option>
+                        <option value="100">от 100кв.м.</option>
+                        <option value="150">от 150кв.м.</option>
+                        <option value="250">от 250кв.м.</option>
+                        <option value="350">от 350кв.м.</option>
+                        <option value="450">от 450кв.м.</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    <label class="sr-only" for="area-to">Площ до</label>
+                    <select id="area-to" name="areaTo" data-placeholder="AreaTo" class="chosen-select">
+                        <option selected="selected" value="">Площ до</option>
+                        <option value="50">до 50кв.м.</option>
+                        <option value="100">до 100кв.м.</option>
+                        <option value="150">до 150кв.м.</option>
+                        <option value="250">до 250кв.м.</option>
+                        <option value="350">до 350кв.м.</option>
+                        <option value="450">до 450кв.м.</option>
+                        <option value="450">над 450кв.м.</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+            <div class="row">
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="location">Град</label>
+                        <select id="cityId" name="cityId" data-placeholder="Location" class="chosen-select">
+                            <option selected="selected" value="">Град</option>
+                            @foreach (var city in ViewBag.Cities)
+                            {
+                                <option value="@city.CityId">@city.CityName</option>
+                            }
+                        </select>
+                        @Html.ValidationMessage("cityId", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="search-distancefromcity">Разстояние от града</label>
+                        <select id="distanceFromCity" name="distanceFromCity" data-placeholder="Разстояние от града" class="chosen-select">
+                            <option selected="selected" value="">Разстояние от града</option>
+                            <option value="0">0км</option>
+                            <option value="5">5км</option>
+                            <option value="10">10км</option>
+                            <option value="20">20км</option>
+                            <option value="30">30км</option>
+                            <option value="50">50км</option>
+                        </select>
+                        @Html.ValidationMessage("distanceFromCity", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <div class="row pgl-narrow-row">
+                            <div class="col-xs-6">
+                                <label class="sr-only" for="search-minprice">Цена от</label>
+                                <select id="priceFrom" name="priceFrom" data-placeholder="Price From" class="chosen-select">
+                                    <option selected="selected" value="">Цена от</option>
+                                    @for (int i = 0; i <= 1000; i += 100)
+                                    {
+                                        <option value="@i">@(i)лв.</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-xs-6">
+                                <label class="sr-only" for="search-maxprice">Цена до</label>
+                                <select id="priceTo" name="priceTo" data-placeholder="Price To" class="chosen-select">
+                                    <option selected="selected" value="">Цена до</option>
+                                    @for (int i = 100; i <= 1000; i += 100)
+                                    {
+                                        <option value="@i">@(i)лв.</option>
+                                    }
+                                    <option value="1000plus">&gt;1000лв.</option>
+                                </select>
+                            </div>
+                            @Html.ValidationMessage("priceTo", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-block btn-primary">Намери Квартира</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+

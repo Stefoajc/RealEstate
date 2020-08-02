@@ -1,0 +1,183 @@
+﻿@using RealEstate.Services.Helpers
+@model RealEstate.ViewModels.WebMVC.Forum.PostDetailViewModel
+@{
+    ViewBag.Title = "Редакция на пост - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+        body {
+            text-align: center;
+        }
+
+        input {
+            text-align: center;
+        }
+
+        textarea {
+            display: block;
+            width: 100%;
+        }
+
+        #image-main {
+            max-height: 456px;
+            width: 100%;
+            height: 100%;
+            border: black 2px solid;
+        }
+
+        .postImage {
+            width: 45%;
+            height: 18%;
+            padding-bottom: 5px;
+            cursor: pointer;
+        }
+
+        #gallery {
+            height: 416px;
+            border-style: solid;
+            padding-top: 10px;
+            text-align: left;
+        }
+
+        .tagclouds > li > a {
+            margin: 0 5px 0 0;
+            background-color: lightcyan;
+        }
+
+        #tag-container {
+            height: 124px;
+            overflow-y: scroll;
+            border-style: solid;
+            border-width: 1px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            text-align: left;
+        }
+    </style>
+}
+
+@using (Html.BeginForm("Edit", "Posts", FormMethod.Post, new { @class = "container", id = "edit-post" }))
+{
+    <input type="hidden" name="PostId" value="@Model.PostId" />
+    <div class="col-xs-12" style="margin: 30px 0 30px 0;">
+
+        <h1 align="center">Редактиране на пост</h1>
+        <div class="row" style="margin-bottom: 30px;">
+            <div class="col-md-9 col-xs-12">
+                @if (Model.ImageUrls.Any())
+                {
+                    <picture >
+                        <source srcset="@(FileHelpers.ChangeFileExtension(Model.ImageUrls[0].Replace(" ", "%20"), ".webp"))" type="image/webp">
+                        <source srcset="@Model.ImageUrls[0].Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(Model.ImageUrls[0].Replace(" ", "%20"))">
+                        <img alt="No Image" id="image-main" class="img-responsive" src="@Model.ImageUrls[0].Replace(" ", "%20")">
+                    </picture>
+                }
+                else
+                {
+                    <img id="image-main" class="img-responsive" src="/Resources/Blog/no-image-post.png" alt="No Image" />
+                }
+            </div>
+            <div class="col-md-3 col-xs-12">
+                <div id="gallery" class="col-xs-12">
+                    @foreach (var image in Model.ImageUrls)
+                    {
+                        <picture >
+                            <source srcset="@(FileHelpers.ChangeFileExtension(image.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                            <source srcset="@image.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(image.Replace(" ", "%20"))">
+                            <img alt="Снимка" class="postImage" src="@image.Replace(" ", "%20")">
+                        </picture>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-xs-12">
+                <div class="form-group">
+                    <label class="required">Изберете тема</label>
+                    <select name="ThemeId" id="ThemeId" class="chosen-select" disabled="disabled">
+                        <option selected="selected" value="@Model.ThemeId">@Model.ThemeName</option>
+                    </select>
+                    @Html.ValidationMessageFor(model => model.ThemeId, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Заглавие</label>
+                    @Html.EditorFor(m => m.Title, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xs-12">
+                <div class="col-xs-12 form-group">
+                    <label>Тагове</label>
+                    <div id="tag-container" class="col-xs-12">
+                        <ul class="list-inline tagclouds">
+                            @foreach (var tag in Model.Tags)
+                            {
+                                <li><a> @tag.Name </a></li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group col-md-12  col-xs-12">
+                <label class="required">Съдържание на поста</label>
+                @Html.TextAreaFor(m => m.Body, new { @class = "form-control full-textarea" })
+                @*<textarea id="Body" name="Body" class="form-control full-textarea"></textarea>*@
+                @Html.ValidationMessageFor(model => model.Body, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group col-xs-12">
+                <input class="btn btn-primary pull-right" type="submit" value="Редактирай" />
+            </div>
+        </div>
+    </div>
+
+
+}
+
+
+@section scripts{
+    <script type="text/javascript" src="/Scripts/tinymce/js/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript" src="/Scripts/tinymce/tinyMCE_Setup.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#edit-post').on('submit',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    let form = new FormData(this);
+
+                    //Save tinymce editor content to the textarea
+                    form.set('Body', window.tinyMCE.get('Body').getContent());
+
+                    window.alertify.success("Постът се редактира, моля изчакайте!", 5);
+
+                    $.ajax({
+                        url: this.action,
+                        type: this.method,
+                        data: form,
+                        processData: false,
+                        contentType: false,
+                        success: function (data, status) {
+                            if (data.success) {
+                                window.alertify.error("Има грешка в попълнените полета!", 5);
+                                showErrorResponse(data, $('#edit-post'));
+                            } else {
+                                window.location = "/Posts/Details/" + data.PostId;
+                            };
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+                    });
+                });
+        });
+    </script>
+}
+

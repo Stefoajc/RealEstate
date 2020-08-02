@@ -1,0 +1,35 @@
+﻿@model RealEstate.ViewModels.WebMVC.ChangeUserNameViewModel
+@{
+    ViewBag.Title = "Смяна на потребителско име - Имоти СПРОПЪРТИС";
+}
+
+<div class="container-fluid">
+    <div class="col-md-offset-4 col-xs-offset-0 top-bottom-marginated">
+
+        @using (Html.BeginForm("ChangeUsername", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+
+            @Html.AntiForgeryToken()
+            <div class="col-md-6 col-xs-12">
+                <h2 align="center">Въведете потребителско име</h2>
+
+                <hr />
+
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+                <div class="form-group">
+                    <label class="col-md-8 control-label">Потребителско име</label>
+                    <div class="col-md-12">
+                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                    </div>
+                </div>
+                <input type="submit" class="btn btn-primary" value="Потвърди" style="width: 100%" />
+
+            </div>
+
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

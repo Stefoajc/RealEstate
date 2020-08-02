@@ -1,0 +1,801 @@
+﻿@using RealEstate.ViewModels.WebMVC
+@model RealEstate.ViewModels.WebMVC.EditPropertyViewModel
+
+<style type="text/css">
+
+    .basicPropertyInfo {
+        margin-bottom: 20px;
+    }
+
+    #title, .propertyAdditionalInfoLbl, .rentalAdditionalInfoLabel {
+        text-align: center;
+        display: block;
+    }
+
+    .rentalAdditionalInfoTextArea {
+        max-height: 100px;
+        height: 100%;
+    }
+
+    .rentalAdditionalInfoTextArea {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+    }
+
+    .basicPropertyInfo, .additionalInfo {
+        max-width: 100%;
+        height: 100%;
+    }
+
+    .propertyAdditionalInfo {
+        margin-bottom: 20px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .topright {
+        position: relative;
+        top: -33px;
+        right: 20px;
+        font-size: 18px;
+        color: red;
+        cursor: pointer;
+    }
+
+    .imagePlaceholder, .imagePlaceholderSlider {
+        margin: 0 5px 5px 0;
+        width: 80px;
+        height: 80px;
+        padding: 0;
+        position: relative;
+    }
+
+    .imageFieldset, .imageFieldsetSlider, .propertyextras, .owner-info {
+        display: block;
+        padding-top: 0.35em;
+        padding-bottom: 0.625em;
+        border: 2px groove;
+    }
+
+    legend {
+        border-bottom: 0px;
+        width: auto;
+        margin-bottom: 0px;
+        margin-left: 20px;
+    }
+
+    #gallery, #gallerySlider {
+        height: 170px;
+        overflow: hidden;
+    }
+
+    .propertyInfo {
+        margin-top: 20px;
+    }
+
+    .additionalDescriptors {
+        width: 47%;
+        font-size: 14px;
+        line-height: 1.42857143;
+        height: 40px;
+    }
+
+    .propertyDescriptors {
+        margin-top: 20px;
+        height: 410px;
+        overflow-y: auto;
+    }
+
+    .rentalDescriptors {
+        margin-top: 20px;
+        height: 282px;
+        overflow-y: auto;
+    }
+
+    .attributes {
+        padding-bottom: 7px;
+    }
+
+    #google-map {
+        height: 200px;
+    }
+</style>
+
+<br />
+<h2 id="title">Редактиране на имот</h2>
+
+
+@using (Html.BeginForm(
+    "EditPropertyInfo", "Properties", FormMethod.Post, new { id = "edit-property-form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(m => m.PropertyId);
+
+        <div class="row basicPropertyInfo">
+            <div class="col-md-6 col-xs-12">
+                <section class="propertyInfo">
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required"> Вид имот</label>
+                        <div class="col-md-8">
+                            @*@Html.DropDownList("PropertyTypeId", null, htmlAttributes: new { @class = "form-control chosen-select", id = "property-type" })*@
+                            <select name="PropertyTypeId" id="property-type" class="form-control chosen-select">
+                                @foreach (var propertyType in ViewBag.PropertyTypeId)
+                                {
+                                    if (Model.PropertyTypeId == int.Parse(propertyType.Value))
+                                    {
+                                        <option value="@propertyType.Value" selected="selected">@propertyType.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@propertyType.Value">@propertyType.Text</option>
+                                    }
+
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(model => model.PropertyTypeId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    @*<div class="form-group">
+                            @Html.Label("Сезон на имота", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-8">
+                                @Html.DropDownList("PropertySeasonId", null, htmlAttributes: new { @class = "form-control chosen-select", id = "property-season" })
+                                @Html.ValidationMessageFor(model => model.PropertySeasonId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>*@
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4"> Площ </label>
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.Area, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Area, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required"> Име на имота</label>
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.PropertyName, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.PropertyName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4"> Продажна цена </label>
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.SellingPrice, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.SellingPrice, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4"> Наемна цена </label>
+                        <div class="col-md-8">
+                            <div class="col-md-6" style="padding: 0px 5px 0px 0px">
+                                @Html.EditorFor(model => model.RentalPrice, new { htmlAttributes = new { @class = "form-control" } })
+
+                            </div>
+                            <div class="col-md-6" style="padding: 0px 0px 0px 5px">
+                                <select name="RentalPeriodId" class="form-control price-period chosen-select">
+                                    @foreach (var item in ViewBag.RentalPeriodId)
+                                    {
+                                        if (Model.RentalPeriodId == (int)item.PeriodId)
+                                        {
+                                            <option value="@item.PeriodId" selected="selected">
+                                                @item.Period
+                                            </option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.PeriodId">
+                                                @item.Period
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            @Html.ValidationMessage("RentalPrice", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </section>
+
+                <section class="addressField">
+                    <div class="form-group">
+                        <label class="control-label col-md-4"> Държава </label>
+                        <div class="col-md-8">
+                            @Html.DropDownList("CountryId", null, htmlAttributes: new { @class = "form-control", id = "CountryId" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required"> Населено място </label>
+                        <div class="col-md-8">
+                            <select name="Address.CityId" class="form-control" id="property-City">
+                                @* Options to be added from ajax call to cities *@
+                            </select>
+                            @Html.ValidationMessageFor(model => model.Address.CityId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required"> Пълен Адрес </label>
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.Address.FullAddress, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Address.FullAddress, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                </section>
+
+                <div class="form-group">
+                    <label class="control-label col-md-4 required"> Собственик </label>
+                    <div class="col-md-8">
+                        <div style="width: 83.33333333%; position: relative; float: left;">
+                            <select class="form-control chosen-select" id="owners" name="OwnerId">
+                                @foreach (var owner in ViewBag.OwnerId)
+                                {
+                                    if (Model.OwnerId == owner.Value)
+                                    {
+                                        <option value="@owner.Value" selected="selected">@owner.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@owner.Value">@owner.Text</option>
+                                    }
+
+                                }
+                            </select>
+                        </div>
+                        <div style="width: 16.66666667%; position: relative; float: left;">
+                            <input type="button" class="btn btn-primary" value="Нов" style="width: 100%" onclick="showModal('modal-owner-create')" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-6 col-xs-offset-6">Местоположение</label>
+                    <div class="col-xs-10 col-xs-offset-2" id="google-map">
+
+                    </div>
+                    <input name="Address.Latitude" id="property-latitude" hidden="hidden" />
+                    <input name="Address.Longitude" id="property-longitude" hidden="hidden" />
+                </div>
+
+            </div>
+            <div class="col-md-6 col-xs-12 additionalInfo">
+                <h3 class="propertyAdditionalInfoLbl">Допълнителна информация</h3>
+                <textarea class="form-control row propertyAdditionalInfoTB min-textarea" id="AdditionalDescription" name="AdditionalDescription" rows="12">@Model.AdditionalDescription</textarea>
+                @Html.ValidationMessageFor(model => model.AdditionalDescription, "", new { @class = "text-danger" })
+
+                <section class="propertyDescriptors">
+                    <label><b>Допълнителни описатели</b></label>
+                    <div class="propertyDescriotorValues">
+
+                        @if (Model.Attributes != null)
+                        {
+                            for (int i = 0; i < Model.Attributes.Count; i++)
+                            {
+                                <div class="attributes">
+                                    <input name="Attributes[@i].Key" class="additionalDescriptors key" value="@Model.Attributes[i].Key" readonly="readonly" />
+                                    <input name="Attributes[@i].Value" class="additionalDescriptors value" value="@Model.Attributes[i].Value" placeholder="Стойност (пример: @Model.Attributes[i].Value)" />
+                                </div>
+                            }
+                            <div class="attributes">
+                                <input name="Attributes[@Model.Attributes.Count].Key" class="additionalDescriptors key" placeholder="Описател (пример: Стройтелство)" />
+                                <input name="Attributes[@Model.Attributes.Count].Value" class="additionalDescriptors value" placeholder="Стойност (пример: тухла)" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="attributes">
+                                <input name="Attributes[0].Key" class="additionalDescriptors key" placeholder="Описател (пример: Стройтелство)" />
+                                <input name="Attributes[0].Value" class="additionalDescriptors value" placeholder="Стойност (пример: тухла)" />
+                            </div>
+                            <div class="attributes">
+                                <input name="Attributes[1].Key" class="additionalDescriptors key" placeholder="Описател (пример: Стройтелство)" />
+                                <input name="Attributes[1].Value" class="additionalDescriptors value" placeholder="Стойност (пример: тухла)" />
+                            </div>
+                            <div class="attributes">
+                                <input name="Attributes[2].Key" class="additionalDescriptors key" placeholder="Описател (пример: Стройтелство)" />
+                                <input name="Attributes[2].Value" class="additionalDescriptors value" placeholder="Стойност (пример: тухла)" />
+                            </div>
+                            <div class="attributes">
+                                <input name="Attributes[3].Key" class="additionalDescriptors key" placeholder="Описател (пример: Стройтелство)" />
+                                <input name="Attributes[3].Value" class="additionalDescriptors value" placeholder="Стойност (пример: тухла)" />
+                            </div>
+                            <div class="attributes">
+                                <input name="Attributes[4].Key" class="additionalDescriptors key" placeholder="Описател (пример: Стройтелство)" />
+                                <input name="Attributes[4].Value" class="additionalDescriptors value" placeholder="Стойност (пример: тухла)" />
+                            </div>
+                            <div class="attributes">
+                                <input name="Attributes[5].Key" class="additionalDescriptors key" placeholder="Описател (пример: Стройтелство)" />
+                                <input name="Attributes[5].Value" class="additionalDescriptors value" placeholder="Стойност (пример: тухла)" />
+                            </div>
+                        }
+                        <input type="button" value="Добави нов атрибут" id="add-property-attribute" class="btn btn-primary" style="float: right; margin-right:32px" />
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="row propertyAdditionalInfo">
+
+            @Html.Partial("PropertyImages_Partial", Model.Images)
+
+
+            @*Property Extras*@
+            <fieldset class="col-xs-12 col-md-12 propertyextras">
+                <legend>Екстри на имота:</legend>
+                @for (var i = 0; i < Model.PropertyExtrasCheckBoxes.Count; i++)
+                {
+                    <div class="col-xs-3">
+                        @Html.HiddenFor(m => m.PropertyExtrasCheckBoxes[i].ExtraId)
+                        @Html.CheckBoxFor(m => m.PropertyExtrasCheckBoxes[i].IsChecked)
+                        <label for="PropertyExtrasCheckBoxes_@(i)__IsChecked">@Model.PropertyExtrasCheckBoxes[i].ExtraName</label>
+                    </div>
+                }
+            </fieldset>
+        </div>
+
+        <div class="form-group">
+            <div class="col-xs-12">
+                <input type="submit" value="Запази" class="btn btn-primary pull-right" id="submit-form-btn" style="margin-right: 20px;" />
+            </div>
+        </div>
+    </div>
+    <br />
+}
+
+<!-- The Modal Regular Images -->
+<div id="modalRegular" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+        <div class="modal-header">
+            Преглед на снимки
+            <span class="close closeRegular" onclick="closeModal('modalRegular')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="owl-regular-slider" class="owl-carousel pgl-pro-slide owl-theme owl-carousel-init" data-plugin-options='{"items": 2, "singleItem": false,"autoPlay": false, "pagination": false}'>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal Slider Images -->
+<div id="modalSlider" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+        <div class="modal-header">
+            Преглед на снимки
+            <span class="close closeSlider" onclick="closeModal('modalSlider');">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="owl-main-slider" class="owl-carousel manual pgl-main-slide owl-theme">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal Slider Images -->
+<div id="modal-owner-create" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content" style="width: 50%;">
+        <div class="modal-header">
+            Създай Собственик
+            <span class="close closeSlider" onclick="closeModal('modal-owner-create');">&times;</span>
+        </div>
+        <div class="modal-body">
+            @Html.Partial("OwnerCreate_Partial", new OwnerCreateViewModel())
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript" src="/Scripts/tinymce/js/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript" src="/Scripts/tinymce/tinyMCE_Setup.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#fileBrowserWrapperSlider').click(function () {
+                document.getElementById('gallery-photo-slider-add').click();
+            });
+            $('#fileBrowserWrapperRegular').click(function () {
+                document.getElementById('gallery-photo-add').click();
+            });
+
+            //Add property Attributes
+            $('body').on('click',
+                '#add-property-attribute',
+                function () {
+                    let prevElemIndexes = $(this).prev().children()[0].name.match(/\d+/g);
+                    let i = parseInt(prevElemIndexes[0]) + 1;
+
+                    var attributeTemplate = '<div class="attributes">' +
+                        '<input name="Attributes[' + i + '].Key" class="additionalDescriptors key" placeholder="Описател (пример: Стройтелство)" />' +
+                        '<input name="Attributes[' + i + '].Value" class="additionalDescriptors value" placeholder="Стойност (пример: тухла)" />' +
+                        '</div>';
+
+                    $(attributeTemplate).insertBefore(this);
+                });
+
+
+            // Countries Cities Master Detail
+            function GetCities(countryId) {
+                let url = "/Cities/GetCitiesInCountry?countryId=" + countryId;
+                $.getJSON(url,
+                    function (data) {
+                        var items = '<option value="">Избери град</option>';
+                        $.each(data,
+                            function (i, city) {
+                                items += '<option value="' + city.CityId + '">' + city.CityName + '</option>';
+                            });
+                        $("#property-City").html(items);
+                        $('#property-City').val(@Model.Address.CityId).trigger('chosen:updated');
+                    });
+            }
+
+            //Select Default Country and make the select as Chosen
+            $('#CountryId').chosen({ no_results_text: "Няма държава с:", placeholder_text_single: "Избери държава" }).val(40).trigger('chosen:updated');
+
+            GetCities($('#CountryId').val());
+            $('#CountryId').change(function () { GetCities(this.value) });
+            $('#property-City').chosen({ no_results_text: "Няма град с:", placeholder_text_single: "Избери град" });
+
+        });
+        //------------------------------------
+
+
+        //-----CREATE OWNER USER------
+
+        $(document).ready(function () {
+            $('#create-owner-btn').on('click',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    var form = $('#create-owner-form');
+                    $.ajax({
+                        type: "POST",
+                        url: '/Account/CreateOwner',
+                        data: form.serialize(),
+                        success: function (data) {
+                            if (data.success) {
+                                showErrorResponse(data, form);
+                            } else {
+                                $('#owners').append('<option selected value="' + data.Id + '">' + data.Info + '</option>');
+                                $('#owners').trigger("chosen:updated");
+                                closeModal('modal-owner-create');
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+                    });
+                });
+        });
+
+
+
+        //Submiting the form
+        $(document).ready(function () {
+            function fixModel(form) {
+
+                form.clearEmptyKeys();
+
+                form.delete('ImageFiles');
+                $('.imagePlaceholder').each(function (index) {
+                    form.append('ImageFiles[' + index + ']', $(this).data('file'));
+                });
+
+                form.delete('ImageFilesForSlider');
+                $('.imagePlaceholderSlider').each(function (index) {
+                    form.append('ImageFilesForSlider[' + index + ']', $(this).data('file'));
+                });
+
+
+
+            }
+
+            $('#submit-form-btn').on('click',
+                function submitForm(event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    var formjQuery = $('#edit-property-form')[0];
+                    var form = new FormData(formjQuery);
+                    fixModel(form);
+
+                    $.ajax({
+                        url: '/Properties/EditPropertyInfo',
+                        type: formjQuery.method,
+                        data: form,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            if (data.success) {
+                                showErrorResponse(data, $('#edit-property-form'));
+                            } else {
+                                alertify.success("Успешно редактиран имот!");
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            alertify.error(shownError);
+                        }
+                    });
+                });
+
+        });
+
+
+        // Extending string prototype
+        // ReSharper disable once NativeTypePrototypeExtending
+        String.prototype.replaceAll = function (search, replacement) {
+            var target = this;
+            return target.replace(new RegExp(search, 'g'), replacement);
+        };
+        //---------------------------
+    </script>
+
+    <!--GoogleMap Setup-->
+    <script>
+
+        var marker, map;
+
+        function initMap() {
+            let latitude = '@Model.Address.Latitude'.replace(",", ".") ;
+            let longitude = '@Model.Address.Longitude'.replace(",", ".");
+
+            var propertyMarker = new google.maps.LatLng(latitude, longitude);
+
+            var mapOptions = {
+                center: propertyMarker,
+                zoom: 10,
+                mapTypeId: 'roadmap'
+            }
+            map = new google.maps.Map(document.getElementById("google-map"), mapOptions);
+
+            addMarker(propertyMarker);
+
+            // This event listener will call addMarker() when the map is clicked.
+            map.addListener('click', function (event) {
+                addMarker(event.latLng);
+            });
+
+        }
+
+        function addMarker(latLng) {
+
+            if (marker != null) {
+                marker.setMap(null);
+            }
+
+            marker = new google.maps.Marker({
+                position: latLng,
+                map: map,
+                visible: true
+            });
+
+
+            var latitude = String(latLng.lat()).replace(".", ",");
+            $('#property-latitude').val(latitude);
+            let longitude = String(latLng.lng()).replace(".", ",");
+            $('#property-longitude').val(longitude);
+        }
+    </script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRNibRrD3DnsD2EoqbagZhLwnf82GxraU&callback=initMap"></script>
+    <!--END GoogleMap Setup-->
+
+    <script>
+        //-----IMAGES FUNCTIONS
+        $(document).ready(function () {
+
+            // owlItemTemplate
+            let owlItemTemplate = function (imgTag, styles) {
+                $(imgTag[0]).attr('style', styles);
+                return '<div class="col-md-12 animation">' +
+                            '<div class="pgl-property featured-item">' +
+                                '<div class="property-thumb-info">' +
+                                    '<div class="property-thumb-info-image">' +
+                                    imgTag[0].outerHTML +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+            }
+
+            // Initialize one Image at a time Slider
+            let slider = $("#owl-main-slider");
+            slider.owlCarousel(owlDefaultOptions);
+            slider.addClass("owl-carousel-init");
+            var carouselSlider = slider.data('owlCarousel');
+
+            // Init regular single image slider modal
+            @foreach (var d in Model.Images.Where(i => i.IsForSlider))
+            {
+                @:carouselSlider.addItem(owlItemTemplate($.parseHTML('<img alt="Снимка" src="' + '@(d.ImagePath.Replace(@"\",@"\\").Replace(" ","%20"))' + '"/>'), 'width:1000px;height:400px;'));
+            }
+
+            //Setting the image count beside choose item button
+            var imagesSliderCount = @Model.Images.Count(i => i.IsForSlider);
+            $('#imageSliderCount').text(imagesSliderCount + ' Снимки');
+
+
+            // Initialize 4 image slider
+            let sliderRegular = $("#owl-regular-slider");
+            sliderRegular.owlCarousel(owlDefaultOptions);
+            sliderRegular.addClass("owl-carousel-init");
+            var carouselRegularSlider = sliderRegular.data('owlCarousel');
+
+
+            // Init regular 4 image slider modal
+            @foreach (var d in Model.Images.Where(i => !i.IsForSlider))
+            {
+                @:carouselRegularSlider.addItem(owlItemTemplate($.parseHTML('<img src="' + '@(d.ImagePath.Replace(@"\",@"\\").Replace(" ", "%20"))' + '"/>'), 'width:522px;height:348px;'));
+            }
+
+            //Setting the image count beside choose item button
+            var imagesRegularCount = @Model.Images.Count(i => !i.IsForSlider);
+            $('#imageRegularCount').text(imagesRegularCount + ' Снимки');
+
+
+
+            let appendImageTo = function (imgTag, isForSlider) {
+                if (isForSlider) {
+                    let imageForOwl = imgTag.clone();
+                    $(imageForOwl).removeClass("imagePlaceholderSlider");
+                    let owlItemToAdd = owlItemTemplate(imageForOwl, 'width:1000px;height:400px;');
+                    carouselSlider.addItem(owlItemToAdd);
+                    let imgTagForGallerySlider = imgTag;
+                    $(imgTagForGallerySlider).appendTo('#gallerySlider');
+                } else {
+                    let imageForOwl = imgTag.clone();
+                    $(imageForOwl).removeClass("imagePlaceholder");
+                    let owlItemToAdd = owlItemTemplate(imageForOwl, 'width:522px;height:348px;');
+                    carouselRegularSlider.addItem(owlItemToAdd);
+                    let imgTagForGallery = imgTag;
+                    $(imgTagForGallery).appendTo('#gallery');
+                }
+
+            }
+            // Multiple images preview in browser
+            // Array of strings which are img tags with pictures embeded
+            /*
+            * This is my function.
+            * @@param images [{ImagePath:string , ImageId:int}]
+            * @@param isForSlider bolean / to be added to owl for slider
+            */
+            let createImageTagsList = function (images, isForSlider) {
+
+                for (let i = 0; i < images.length; i++) {
+
+                    //Create img tag with the image embeded in base64
+                    let imageClass = isForSlider ? 'imagePlaceholderSlider' : 'imagePlaceholder';
+                    let imageTag =
+                        $($.parseHTML('<img alt="Снимка" class="' + imageClass + '"  src="' + images[i].ImagePath.replace(' ','%20') + '"/><span class="topright" data-id="' + images[i].ImageId + '"><b>x</b></span>'));
+
+                    appendImageTo(imageTag, isForSlider);
+                }
+            };
+
+            function AddImageToDb(files, isForSlider) {
+                //Post to database
+                var form = new FormData();
+                form.append('ForeignKey', $('#PropertyId').val());
+                form.append('isForSlider', isForSlider);
+                form.append('__RequestVerificationToken', $('#__AjaxAntiForgeryForm input[name="__RequestVerificationToken"]').val());
+                for (let i = 0; i < files.length; i++) {
+                    form.append('ImageFiles[' + i + ']', files[i]);
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Properties/AddImages/',
+                    data: form,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        if (data) {
+                            createImageTagsList(data, isForSlider);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                        let shownError = titles ? titles[1] : errorThrown;
+                        alertify.error(shownError);
+                    }
+                });
+            }
+
+            $('body').on('change',
+                '#gallery-photo-add',
+                function () {
+                    //Image Count Text setting
+                    imagesRegularCount += this.files.length;
+                    $('#imageRegularCount').text(imagesRegularCount + ' Снимки');
+
+                    AddImageToDb(this.files, false);
+
+                    //input containing the files managing
+                    $(this).clone().appendTo($(this).parent()).hide();
+                    $(this).val('');
+                });
+
+            $('body').on('change',
+                '#gallery-photo-slider-add',
+                function () {
+                    //Image Count Text setting
+                    imagesSliderCount += this.files.length;
+                    $('#imageSliderCount').text(imagesSliderCount + ' Снимки');
+
+                    AddImageToDb(this.files, true);
+
+                    //input containing the files managing
+                    $(this).clone().appendTo($(this).parent()).hide();
+                    $(this).val('');
+                });
+
+
+            $('body').on('click',
+                '.topright',
+                function removeImageFromGaleryAndSetImageCount() {
+                    let clickedSpan = this;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Properties/DeleteImage/',
+                        data: {
+                            id: $(this).data('id'),
+                            __RequestVerificationToken: $('#__AjaxAntiForgeryForm input[name="__RequestVerificationToken"]').val()
+                        },
+                        dataType: 'json',
+                        success: function (data, status) {
+                            if (data === "STATUS_OK") {
+
+                                //Get index of image in the gallery for carousel item deletion
+                                var index = Array.prototype.slice.call(clickedSpan.parentElement.children).indexOf(clickedSpan);
+                                if ($(clickedSpan).prev().attr('class') === 'imagePlaceholder') {
+                                    //Remove the item from the Carousel Preview
+                                    carouselRegularSlider.removeItem((index - 1)/2);
+                                    //Decrement the images count
+                                    imagesRegularCount--;
+                                    //Update the span with the images count
+                                    $('#imageRegularCount').html(imagesRegularCount + ' Снимки');
+                                } else {
+                                    //Remove the item from the Carousel Preview
+                                    carouselSlider.removeItem(index - 1);
+                                    //Decrement the images count
+                                    imagesSliderCount--;
+                                    //Update the span with the images count
+                                    $('#imageSliderCount').html(imagesSliderCount + ' Снимки');
+                                }
+
+                                //Remove the image from gallery
+                                $(clickedSpan).prev().remove();
+                                //Remove the Span with the X from the gallery
+                                $(clickedSpan).remove();
+                            }
+                            else {
+                                location.reload();
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            alertify.error(shownError);
+                        }
+                    });
+                });
+        });
+
+    </script>
+}

@@ -1,29 +1,57 @@
-﻿<div role="main" class="main pgl-bg-grey">
+﻿@using RealEstate.ViewModels.WebMVC
+@{
+    ViewBag.Title = "За нас - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+
+        .img-ratio-square {
+            max-width: 262.5px;
+            max-height: 262.5px;
+            min-width: 262.5px;
+            min-height: 262.5px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /*.team-member-desc {
+            height: 7.2em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: break-word;
+        }*/
+    </style>
+
+    <link type="text/css" rel="stylesheet" href="/Content/reviewStarsManagement.css" />
+}
+
+<div role="main" class="main pgl-bg-grey">
     <section class="pgl-intro">
         <div class="container">
             <h2>Добре дошли</h2>
-            <div class="owl-carousel pgl-pro-slide pgl-img-slide owl-theme owl-carousel-init" data-plugin-options='{"items": 1, "pagination": false, "autoHeight": true}' style="display: block; opacity: 1;">
+            <div class="owl-carousel pgl-pro-slide pgl-img-slide owl-theme owl-carousel-init" data-plugin-options='{"items": 1, "pagination": false, "autoHeight": true}'>
 
                 <div class="owl-item">
                     <div class="item-wrap">
                         <img src="/images/slider1.jpg" alt="Photo" class="img-responsive">
-                        <div class="item-caption"><p>Mauris elementum tempus nisi, vitae ullamcorper sem ultricies vitae.</p></div>
+                        <div class="item-caption"><p>При нас може да намерите имотът, който дълго сте търсили с няколко клика.</p></div>
                     </div>
                 </div><div class="owl-item">
                     <div class="item-wrap">
                         <img src="/images/slider2.jpg" alt="Photo" class="img-responsive">
-                        <div class="item-caption"><p>Mauris elementum tempus nisi, vitae ullamcorper sem ultricies vitae.</p></div>
+                        <div class="item-caption"><p>Търсите квартира за лятото. Море? Планина?</p></div>
                     </div>
                 </div><div class="owl-item">
                     <div class="item-wrap">
                         <img src="/images/slider3.jpg" alt="Photo" class="img-responsive">
-                        <div class="item-caption"><p>Mauris elementum tempus nisi, vitae ullamcorper sem ultricies vitae.</p></div>
+                        <div class="item-caption"><p>Намирането на жилище не е било по-лесно.</p></div>
                     </div>
                 </div>
 
             </div>
             <div class="lead pgl-bg-light text-center">
-                <p>Mauris elementum tempus nisi, vitae ullamcorper sem ultricies vitae. Nullam consectetur lacinia nisi, quis laoreet magna pulvinar in. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In hac habitasse platea dictumst. Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                <p>Ние сме компания предоставяща услуги с имоти. При нас може да намерите квартири, както за дългосрочно наемане така и за краткосрочно. За вашата почивка или за начало на кариера в друг град. Студентски квартири и квартири за работещи. Прелагаме покупко-продажба на всякакъв вид имоти и недвижими имущества.</p>
             </div>
         </div>
     </section>
@@ -38,7 +66,7 @@
                         <div class="offer-item-inner">
                             <p><i class="icons icon-hand"></i></p>
                             <h3>Брокерски услуги</h3>
-                            <p>Perspiciatis unde omnisiste natus error voluptatem remopa accusantium doloremque laudantium, totam rem.</p>
+                            <p>Рекламиране на имоти, правна консултация, посредничество, подготовка и представителство при сключване на сделки с имоти и други.</p>
                         </div>
                     </div>
                 </div>
@@ -47,7 +75,7 @@
                         <div class="offer-item-inner">
                             <p><i class="icons icon-home"></i></p>
                             <h3>Управление на недвижимо имущество</h3>
-                            <p>Sed perspiciatis unde omnisiste natus error voluptatem remopa accusantium doloremque laudantium</p>
+                            <p>Пълен пакет услуги по поддръжка на жилището, заплащане на електричество, вода и телефон, заплащане на данъци и др.</p>
                         </div>
                     </div>
                 </div>
@@ -55,8 +83,8 @@
                     <div class="offer-item pgl-bg-light">
                         <div class="offer-item-inner">
                             <p><i class="icons icon-chart"></i></p>
-                            <h3>Construction &amp; Development</h3>
-                            <p>Unde omnisiste natus error voluptatem remopa accusantium doloremque laudantium, totam rem aperiam.</p>
+                            <h3>Строеж &amp; Разработване</h3>
+                            <p>Връзка с компании от стройтелния бранш за изработване на проекти, планове или строеж на жилище, консултации и други.</p>
                         </div>
                     </div>
                 </div>
@@ -65,28 +93,68 @@
     </section>
     <!-- End About -->
     <!-- Begin testimonial -->
-    <section class="pgl-testimonials pgl-testimonials-full">
-        <div class="container">
-            <h2>Доволни клиенти</h2>
-            <div class="owl-carousel pgl-bg-dark pgl-testimonial owl-theme owl-carousel-init" data-plugin-options="{&quot;items&quot;: 1, &quot;pagination&quot;: false, &quot;autoHeight&quot;: true}" style="display: block; opacity: 1;">
-                @foreach (var client in ViewBag.HappyClient)
-                {
-                    <div class="owl-item">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="testimonial-author">
-                                    <div class="img-thumbnail-small img-circle">
-                                        <img src="@client.ImagePath" style="max-height: 110px;max-width: 110px" class="img-circle" alt="@client.FullName">
+    @if (ViewBag.HappyClient.Count > 0)
+    {
+        <section class="pgl-testimonials pgl-testimonials-full">
+            <div class="container">
+                <h2>Доволни клиенти</h2>
+                <div class="owl-carousel pgl-bg-dark pgl-testimonial owl-theme owl-carousel-init" data-plugin-options='{"items": 1, "pagination": false, "autoHeight": true}'>
+                    @foreach (var client in ViewBag.HappyClient)
+                    {
+                        <div class="owl-item">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="testimonial-author">
+                                        <div class="img-thumbnail-small img-circle">
+                                            <img src="@(client.UserProfileImagePath.Replace(" ","%20") ?? "/Resources/no-image-person.png")" style="height: 110px; max-width: 100%;" class="img-circle" alt="@client.ReviewUserFullname">
+                                        </div>
+                                        <h4>@client.ReviewUserFullname</h4>
+                                        <p><strong>Клиент</strong></p>
                                     </div>
-                                    <h4>@client.FullName</h4>
-                                    <p><strong>Клиент</strong></p>
+                                </div>
+                                <div class="col-sm-8">
+                                    <blockquote class="testimonial" style="padding-top: 0;">
+                                        @Html.Partial("/Views/Shared/ReviewStarsInactive_Partial.cshtml", new ReviewsStarsPartialViewModel { AverageScore = client.ReviewScore, ReviewsCount = 1 })
+                                        <p id="review-text" class="clamp-four">@client.ReviewText</p>
+                                    </blockquote>
                                 </div>
                             </div>
-                            <div class="col-sm-8">
-                                <blockquote class="testimonial">
-                                    <p>@client.AdditionalInformation</p>
-                                </blockquote>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+    <!-- End testimonial -->
+    <!-- Begin testimonial -->
+    <section class="pgl-teams">
+        <div class="container">
+            <h2>Нашият екип</h2>
+            <p>Отзивчиви и в готовност да помогнат професионалисти с основна цел, предоставяне на услуга от високо ниво, със сериозно отношение към всеки проблем на клиентите ни. Може да разчитате на компетентост и учтивост при контакт с всеки един от нашият екип.</p>
+            <div class="row">
+                @foreach (TeamMemberViewModel teamMember in ViewBag.TeamMembers)
+                {
+                    <div class="col-xs-12 col-sm-6 col-md-3">
+                        <div class="pgl-team-item pgl-bg-light">
+
+                            <div class="img-thumbnail-medium">
+                                <a href="@Url.Action("Details", "Agents", new { agentId = teamMember.Id })">
+                                    <img src="@teamMember.ImageSrc" class="img-responsive img-ratio-square" alt="Снимка">
+                                </a>
+                                <ul class="social-links">
+                                    @foreach (var socialAccount in teamMember.SocialMediaAccounts)
+                                    {
+                                        <li><a href="@socialAccount.SocialMediaAccount"><i class="fa fa-@socialAccount.SocialMedia.ToLower()"></i></a></li>
+                                    }
+                                </ul>
                             </div>
+                            <div class="pgl-team-info">
+                                <h4>@teamMember.Name</h4>
+                                <p class="text-muted">@teamMember.Role</p>
+                                <div class="team-member-desc clamp-three">@Html.Raw(teamMember.AdditionalDescription)</div>
+                                <a href="@Url.Action("Details", "Agents", new { agentId = teamMember.Id })">Разгледай профила</a>
+                            </div>
+
                         </div>
                     </div>
                 }
@@ -94,98 +162,14 @@
         </div>
     </section>
     <!-- End testimonial -->
-    <!-- Begin testimonial -->
-    <section class="pgl-teams">
-        <div class="container">
-            <h2>Нашият екип</h2>
-            <p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim<br>veniam, quis nostrudexercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-            <div class="row">
-                <div class="col-xs-6 col-md-3">
-                    <div class="pgl-team-item pgl-bg-light">
-
-                        <div class="img-thumbnail-medium">
-                            <a href="#"><img src="/images/agents/team-1.jpg" class="img-responsive" alt=""></a>
-                            <ul class="social-links">
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fa fa-skype"></i></a></li>
-                            </ul>
-                        </div>
-                        <div class="pgl-team-info">
-                            <h4>Nicholas Mitchell</h4>
-                            <p class="text-muted">Sale Director</p>
-                            <p>Eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrudexercitation</p>
-                            <a href="#">View profile</a>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="col-xs-6 col-md-3">
-                    <div class="pgl-team-item pgl-bg-light">
-
-                        <div class="img-thumbnail-medium">
-                            <a href="#"><img src="images/agents/team-1.jpg" class="img-responsive" alt=""></a>
-                            <ul class="social-links">
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fa fa-skype"></i></a></li>
-                            </ul>
-                        </div>
-                        <div class="pgl-team-info">
-                            <h4>Nicholas Mitchell</h4>
-                            <p class="text-muted">Sale Director</p>
-                            <p>Eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrudexercitation</p>
-                            <a href="#">View profile</a>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="col-xs-6 col-md-3">
-                    <div class="pgl-team-item pgl-bg-light">
-
-                        <div class="img-thumbnail-medium">
-                            <a href="#"><img src="images/agents/team-1.jpg" class="img-responsive" alt=""></a>
-                            <ul class="social-links">
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fa fa-skype"></i></a></li>
-                            </ul>
-                        </div>
-                        <div class="pgl-team-info">
-                            <h4>Nicholas Mitchell</h4>
-                            <p class="text-muted">Sale Director</p>
-                            <p>Eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrudexercitation</p>
-                            <a href="#">View profile</a>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="col-xs-6 col-md-3">
-                    <div class="pgl-team-item pgl-bg-light">
-
-                        <div class="img-thumbnail-medium">
-                            <a href="#"><img src="images/agents/team-1.jpg" class="img-responsive" alt=""></a>
-                            <ul class="social-links">
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fa fa-skype"></i></a></li>
-                            </ul>
-                        </div>
-                        <div class="pgl-team-info">
-                            <h4>Nicholas Mitchell</h4>
-                            <p class="text-muted">Sale Director</p>
-                            <p>Eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrudexercitation</p>
-                            <a href="#">View profile</a>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- End testimonial -->
 
 </div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('review-text').css('max-height', "130px");
+        });
+    </script>
+}

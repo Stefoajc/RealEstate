@@ -1,0 +1,168 @@
+﻿@using RealEstate.Services.Helpers
+@using RealEstate.ViewModels.WebMVC
+@model RealEstate.ViewModels.WebMVC.PropertySearchDetailViewModel
+@{
+    ViewBag.Title = "Детайли на търсене - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+        .tab-detail {
+            margin-top: 25px;
+        }
+    </style>
+}
+
+@section meta{
+    <meta property="og:title" content="@Model.Areas">
+    <meta property="og:description" content="@Model.AdditionalInformation">
+    <meta name="keywords" content="PropertySearch-Details,property,имот,недвижимо имущество,имущество,търсене на имот">
+}
+
+<div>
+    <!-- Begin page top -->
+    <section class="page-top">
+        <div class="container">
+            <div class="page-top-in">
+                @*<h2><span>Property Detail</span></h2>*@
+            </div>
+        </div>
+    </section>
+    <!-- End page top -->
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-9" style="padding-top: 60px;">
+                <div class="pgl-pro-detail pgl-bg-light pgl-detail" style="padding-top: 30px;">
+                    <h1 align="center">Търсене на @string.Join(",", Model.UnitTypes) @(Model.IsRentSearch ? "под наем" : "за купуване")</h1>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <ul class="list-unstyled amenities amenities-detail" style="margin-bottom: 10px;">
+                                <li><strong>Търсене №:</strong> @Model.Id</li>
+                                <li><strong>Цена: </strong> @(Model.PriceFrom != null ? Model.PriceFrom + "-" : "до ")@Model.PriceTo</li>
+                                @if (Model.AreaInSquareMeters != null)
+                                {
+                                    <li><strong>Площ:</strong> @(Model.AreaInSquareMeters)м<sup>2</sup></li>
+                                }
+
+                                <li><address><i class="icons icon-location" title="Местоположение"></i>@Model.CityName@(string.IsNullOrEmpty(Model.Areas) ? "" : "-" + Model.Areas)</address></li>
+                                <li><i class="fa fa-calendar" title="Създадено на"></i> @Model.CreatedOn.ToString("dddd dd.MMMM.yyyy")</li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-12">
+                            @Model.AdditionalInformation
+                        </div>
+                    </div>
+                    <div class="tab-detail">
+                        <h3>Повече информация</h3>
+                        <div class="panel-group" id="accordion">
+                            @if (Model.TeamUser != null)
+                            {
+                                <div class="panel panel-default pgl-panel">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseAgent" class="collapsed">Брокер</a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseAgent" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <div class="pgl-agent-item pgl-bg-light">
+                                                <div class="row pgl-midnarrow-row">
+                                                    <div class="col-xs-4">
+                                                        <div class="img-thumbnail-medium">
+                                                            <a href="@Url.Action("Details", "Agents", new {agentId = Model.TeamUser.AgentId})">
+                                                                <picture>
+                                                                    <source srcset="@(FileHelpers.ChangeFileExtension(Model.TeamUser.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                                                    <source srcset="@Model.TeamUser.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(Model.TeamUser.ImagePath.Replace(" ", "%20"))">
+                                                                    <img alt="Снимка" style="width: 202.08px; height: 202.08px;" class="img-responsive" src="@Model.TeamUser.ImagePath.Replace(" ", "%20")">
+                                                                </picture>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-8">
+                                                        <div class="pgl-agent-info">
+                                                            <h4><a href="@Url.Action("Details", "Agents", new {agentId = Model.TeamUser.AgentId})">@Model.TeamUser.FullName</a></h4>
+                                                            <div class="clamp-three">@Html.Raw(Model.TeamUser.AdditionalDescription)</div>
+                                                            <address>
+                                                                <i class="fa fa-map-marker"></i> Офис : @Model.TeamUser.OfficePhone<br>
+                                                                <i class="fa fa-phone"></i> Мобилен : @Model.TeamUser.PhoneNumber<br>
+                                                                <i class="fa fa-envelope-o"></i> Емейл: <a href="mailto:@Model.TeamUser.Email">@Model.TeamUser.Email</a>
+                                                            </address>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @if (Model.PersonSearcher != null && (User.IsInRole("Agent") || User.IsInRole("Administrator") || User.IsInRole("Maintenance")))
+                            {
+                                <div class="panel panel-default pgl-panel">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseOwner" class="collapsed">Собственик</a> </h4>
+                                    </div>
+                                    <div id="collapseOwner" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <div class="pgl-agent-item pgl-bg-light">
+                                                <div class="row pgl-midnarrow-row">
+                                                    <div class="col-xs-12">
+                                                        <div class="pgl-agent-info">
+                                                            <h4>@Model.PersonSearcher.Name</h4>
+                                                            <address>
+                                                                <i class="fa fa-phone"></i> Mobile : @Model.PersonSearcher.PhoneNumber<br>
+                                                                <i class="fa fa-envelope-o"></i> Mail: <a href="mailto:@Model.PersonSearcher.Email">@Model.PersonSearcher.Email</a>
+                                                            </address>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="panel panel-default pgl-panel">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title"> <a data-toggle="collapse" data-parent="#accordion" href="#collapseContact" class="collapsed">Връзка с нас</a> </h4>
+                                </div>
+                                <div id="collapseContact" class="panel-collapse collapse">
+                                    <div class="panel-body">
+
+                                        <div id="map-company-address-pin" style="position: relative; overflow: hidden; height: 300px;" class="pgl-bg-light col-md-8 col-xs-12"></div>
+                                        <div class="col-md-4 col-xs-12">
+                                            <br />
+                                            <h2>Контакти</h2>
+                                            <address>
+                                                <ul class="list-unstyled">
+                                                    <li style="padding: 0"><i class="fa fa-map-marker"></i> Офис : @System.Configuration.ConfigurationManager.AppSettings["OfficePhone"]<br></li>
+                                                    <li style="padding: 0"><i class="fa fa-phone"></i> Мобилен : @System.Configuration.ConfigurationManager.AppSettings["MobilePhone"]<br></li>
+                                                    <li style="padding: 0"><svg style="width: 20px; height: 20px; margin-left: -2px; vertical-align: middle; margin-bottom: 5px;" aria-hidden="true" data-prefix="fab" data-icon="facebook-messenger" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-facebook-messenger fa-w-14 fa-3x"><path fill="currentColor" d="M224 32C15.9 32-77.5 278 84.6 400.6V480l75.7-42c142.2 39.8 285.4-59.9 285.4-198.7C445.8 124.8 346.5 32 224 32zm23.4 278.1L190 250.5 79.6 311.6l121.1-128.5 57.4 59.6 110.4-61.1-121.1 128.5z" class=""></path></svg> Messenger: <a target="_blank" href="https://fb.me/SmartProperties2018">Пишете ни</a></li>
+                                                    <li style="padding: 0"><i class="fa fa-envelope-o"></i> E-Mail: <a href="mailto:@System.Configuration.ConfigurationManager.AppSettings["OfficeEmail"]">@System.Configuration.ConfigurationManager.AppSettings["OfficeEmail"]</a></li>
+                                                </ul>
+                                            </address>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <aside class="col-md-3 sidebar">
+
+                <aside class="block pgl-agents pgl-bg-light">
+                    <h3>Брокер на връзка</h3>
+                    @Html.Partial("TeamUserListViewVertical", Model.TeamUser)
+                </aside>
+
+                <!-- Begin Advanced Search -->
+                @Html.Partial("/Views/Shared/HappyClients_Partial.cshtml", (List<ListReviewViewModel>)ViewBag.HappyClient)
+                <!-- End Advanced Search -->
+
+            </aside>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,45 @@
+﻿@model RealEstate.ViewModels.WebMVC.Forum.ThemeCreateViewModel
+@{
+    ViewBag.Title = "Създай тема";
+}
+
+@section css{
+    <style>
+        body {
+            text-align: center;
+        }
+
+        input {
+            text-align: center;
+        }
+    </style>
+}
+
+@using (Html.BeginForm("Create", "Themes", FormMethod.Post, new { @class = "container" }))
+{
+
+    <div class="col-xs-12" style="margin: 30px 0 30px 0;">
+        <h1 align="center">Създаване на тема</h1>
+        <div class="form-group col-md-6 col-md-offset-3  col-xs-12">
+            <label>Изберете категория</label>
+            <select name="CategoryId" id="CategoryId" class="chosen-select">
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <option value="@category.ForumCategoryId">@category.Name</option>
+                }
+            </select>
+            @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group col-md-6 col-md-offset-3  col-xs-12">
+            <label>Име на темата</label>
+            @Html.EditorFor(m => m.Name, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+        </div>
+        <div class="form-group col-md-6 col-md-offset-3  col-xs-12">
+            <input class="btn btn-primary pull-right" type="submit" value="Създай" />
+        </div>
+    </div>
+
+
+}

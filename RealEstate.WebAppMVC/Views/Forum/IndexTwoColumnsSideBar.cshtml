@@ -1,0 +1,131 @@
+﻿@using RealEstate.ViewModels.WebMVC.Forum
+@model List<PostForumIndexViewModel>
+
+@{
+    ViewBag.Title = "Блог - Имоти СПРОПЪРТИС";
+}
+
+<!-- Begin Main -->
+<div role="main" class="main pgl-bg-grey">
+    <!-- Begin page top -->
+    <section class="page-top">
+        <div class="container">
+            <div class="page-top-in">
+                <h2><span>Блог</span></h2>
+            </div>
+        </div>
+    </section>
+    <!-- End page top -->
+    <!-- Begin content with sidebar -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 content">
+                <div style="margin-bottom: 20px;" class="listing-header clearfix">
+                    <ul class="list-inline list-icons form-group">
+                        <li>
+                            <a style="padding-top: 2px;" href="@Url.Action("Index", "Forum", new { page = 1, ViewBag.pageSize, ViewBag.categoryId, ViewBag.themeId, ViewBag.tagName, ViewBag.keyword, viewType = "OneColumnWithBar" })">
+                                <svg class="svg-style" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="0 0 640 640" width="640" height="640"><defs><path d="M393.83 0C414.03 -0.06 430.46 16.27 430.53 36.47C430.6 58.42 430.69 87.68 430.76 109.63C430.82 129.83 414.49 146.26 394.29 146.32C315.5 146.57 115.71 147.19 36.92 147.44C16.72 147.5 0.29 131.18 0.23 110.97C0.16 89.03 0.07 59.76 0 37.82C-0.06 17.62 16.26 1.19 36.47 1.12C115.26 0.88 315.04 0.25 393.83 0Z" id="aWAqePkw8"></path><path d="M393.83 191.79C414.03 191.73 430.46 208.06 430.52 228.26C430.59 250.21 430.68 279.47 430.75 301.42C430.82 321.62 414.49 338.05 394.29 338.11C315.5 338.36 115.71 338.98 36.92 339.23C16.72 339.29 0.29 322.97 0.23 302.76C0.16 280.82 0.07 251.55 0 229.61C-0.06 209.4 16.26 192.98 36.46 192.91C115.25 192.67 315.04 192.04 393.83 191.79Z" id="e6LFscn4y"></path><path d="M394.38 383.59C414.58 383.52 431.01 399.85 431.08 420.05C431.15 442 431.24 471.26 431.31 493.21C431.37 513.41 415.04 529.84 394.84 529.9C316.05 530.15 116.26 530.78 37.47 531.02C17.27 531.09 0.84 514.76 0.78 494.56C0.71 472.61 0.62 443.35 0.55 421.4C0.49 401.2 16.81 384.77 37.02 384.71C115.81 384.46 315.59 383.83 394.38 383.59Z" id="asr1nC8Tt"></path><path d="M493.68 36.54C493.71 16.34 510.1 -0.02 530.3 0C552.25 0.02 581.51 0.06 603.46 0.08C623.66 0.1 640.02 16.5 640 36.7C639.89 135.58 639.6 395.64 639.49 494.53C639.46 514.73 623.07 531.09 602.87 531.06C580.92 531.04 551.66 531.01 529.71 530.98C509.51 530.96 493.15 514.56 493.17 494.36C493.28 395.48 493.57 135.42 493.68 36.54Z" id="a1bGb9585I"></path></defs><g><g><g><use xlink:href="#aWAqePkw8" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#e6LFscn4y" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#asr1nC8Tt" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#a1bGb9585I" opacity="1" fill="#333631" fill-opacity="1"></use></g></g></g></svg>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a style="padding-top: 2px;" href="@Url.Action("Index", "Forum", new { page = 1, ViewBag.pageSize, ViewBag.categoryId, ViewBag.themeId, ViewBag.tagName, ViewBag.keyword, viewType = "TwoColumnsWithBar" })">
+                                <svg class="svg-style" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="0 0 640 640" width="640" height="640"><defs><path d="M151.71 0.76C171.92 0.7 188.34 17.03 188.41 37.23C188.48 59.17 188.57 88.44 188.64 110.38C188.7 130.59 172.37 147.01 152.17 147.08C121.81 147.17 67.29 147.34 36.92 147.44C16.72 147.5 0.29 131.18 0.23 110.97C0.16 89.03 0.07 59.76 0 37.82C-0.06 17.62 16.26 1.19 36.47 1.12C66.83 1.03 121.35 0.86 151.71 0.76Z" id="c8LK6gaZ5"></path><path d="M493.68 36.54C493.71 16.34 510.1 -0.02 530.3 0C552.25 0.02 581.51 0.06 603.46 0.08C623.66 0.1 640.02 16.5 640 36.7C639.89 135.58 639.6 395.64 639.49 494.53C639.46 514.73 623.07 531.09 602.87 531.06C580.92 531.04 551.66 531.01 529.71 530.98C509.51 530.96 493.15 514.56 493.17 494.36C493.28 395.48 493.57 135.42 493.68 36.54Z" id="a1bGb9585I"></path><path d="M393.83 0C414.03 -0.06 430.46 16.26 430.52 36.46C430.59 58.41 430.68 87.67 430.75 109.62C430.82 129.82 414.49 146.25 394.29 146.32C363.92 146.41 309.41 146.58 279.04 146.68C258.84 146.74 242.41 130.41 242.35 110.21C242.28 88.26 242.19 59 242.12 37.05C242.06 16.85 258.38 0.42 278.58 0.36C308.95 0.27 363.47 0.1 393.83 0Z" id="fVBOVVjDV"></path><path d="M152.26 192.57C172.47 192.51 188.89 208.84 188.96 229.04C189.03 250.99 189.12 280.25 189.19 302.2C189.25 322.4 172.92 338.83 152.72 338.89C122.36 338.99 67.84 339.16 37.48 339.25C17.27 339.31 0.85 322.99 0.78 302.79C0.71 280.84 0.62 251.58 0.55 229.63C0.49 209.43 16.82 193 37.02 192.94C67.38 192.84 121.9 192.67 152.26 192.57Z" id="aVCiufp4E"></path><path d="M394.38 191.81C414.58 191.75 431.01 208.07 431.08 228.28C431.14 250.22 431.24 279.49 431.3 301.43C431.37 321.64 415.04 338.06 394.84 338.13C364.48 338.22 309.96 338.39 279.59 338.49C259.39 338.55 242.96 322.23 242.9 302.02C242.83 280.08 242.74 250.81 242.67 228.87C242.61 208.66 258.93 192.24 279.13 192.17C309.5 192.08 364.02 191.91 394.38 191.81Z" id="f22uDzsATN"></path><path d="M151.71 384.39C171.92 384.32 188.34 400.65 188.41 420.85C188.48 442.8 188.57 472.06 188.64 494.01C188.7 514.21 172.37 530.64 152.17 530.7C121.81 530.8 67.29 530.97 36.92 531.06C16.72 531.13 0.29 514.8 0.23 494.6C0.16 472.65 0.07 443.39 0 421.44C-0.06 401.24 16.26 384.81 36.47 384.75C66.83 384.65 121.35 384.48 151.71 384.39Z" id="a4oRr4mvn"></path><path d="M393.83 383.62C414.03 383.56 430.46 399.89 430.52 420.09C430.59 442.04 430.68 471.3 430.75 493.25C430.82 513.45 414.49 529.88 394.29 529.94C363.92 530.03 309.41 530.21 279.04 530.3C258.84 530.36 242.41 514.04 242.35 493.84C242.28 471.89 242.19 442.63 242.12 420.68C242.06 400.48 258.38 384.05 278.58 383.99C308.95 383.89 363.47 383.72 393.83 383.62Z" id="ai2hL3FUN"></path></defs><g><g><g><use xlink:href="#c8LK6gaZ5" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#a1bGb9585I" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#fVBOVVjDV" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#aVCiufp4E" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#f22uDzsATN" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#a4oRr4mvn" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#ai2hL3FUN" opacity="1" fill="#333631" fill-opacity="1"></use></g></g></g></svg>
+                            </a>
+                        </li>
+                        <li>
+                            <a style="padding-top: 2px;" href="@Url.Action("Index", "Forum", new { page = 1, ViewBag.pageSize, ViewBag.categoryId, ViewBag.themeId, ViewBag.tagName, ViewBag.keyword, viewType = "TwoColumns" })">
+                                <svg class="svg-style" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="0 0 640 640" width="640" height="640"><defs><path d="M246.51 0.47C266.72 0.4 283.14 16.73 283.21 36.93C283.28 58.88 283.37 88.14 283.44 110.09C283.5 130.29 267.17 146.72 246.97 146.78C197.65 146.94 86.25 147.28 36.92 147.44C16.72 147.5 0.29 131.18 0.23 110.97C0.16 89.03 0.07 59.76 0 37.82C-0.06 17.62 16.26 1.19 36.47 1.12C85.79 0.97 197.19 0.62 246.51 0.47Z" id="blju8qNmx"></path><path d="M603.08 0C623.28 -0.06 639.71 16.26 639.77 36.46C639.84 58.41 639.93 87.67 640 109.62C640.06 129.82 623.74 146.25 603.54 146.32C554.21 146.47 442.81 146.82 393.49 146.97C373.29 147.04 356.86 130.71 356.79 110.51C356.73 88.56 356.63 59.3 356.57 37.35C356.5 17.15 372.83 0.72 393.03 0.66C442.36 0.5 553.75 0.15 603.08 0Z" id="az8ftcEUM"></path><path d="M246.51 199.34C266.72 199.28 283.14 215.6 283.21 235.81C283.28 257.75 283.37 287.02 283.44 308.96C283.5 329.17 267.17 345.59 246.97 345.66C197.65 345.81 86.25 346.16 36.92 346.32C16.72 346.38 0.29 330.05 0.23 309.85C0.16 287.9 0.07 258.64 0 236.69C-0.06 216.49 16.26 200.06 36.47 200C85.79 199.85 197.19 199.5 246.51 199.34Z" id="b1RGptaMa7"></path><path d="M603.08 199.34C623.28 199.28 639.71 215.6 639.77 235.81C639.84 257.75 639.93 287.02 640 308.96C640.06 329.17 623.74 345.59 603.54 345.66C554.21 345.81 442.81 346.16 393.49 346.32C373.29 346.38 356.86 330.05 356.79 309.85C356.73 287.9 356.63 258.64 356.57 236.69C356.5 216.49 372.83 200.06 393.03 200C442.36 199.85 553.75 199.5 603.08 199.34Z" id="b2MFiGBFWA"></path><path d="M246.51 397.31C266.71 397.24 283.14 413.57 283.21 433.77C283.27 455.72 283.37 484.98 283.43 506.93C283.5 527.13 267.17 543.56 246.97 543.62C197.64 543.78 86.25 544.13 36.92 544.28C16.72 544.34 0.29 528.02 0.23 507.82C0.16 485.87 0.07 456.61 0 434.66C-0.06 414.46 16.26 398.03 36.46 397.97C85.79 397.81 197.19 397.46 246.51 397.31Z" id="beFdOkV1v"></path><path d="M603.08 402.11C623.28 402.04 639.71 418.37 639.77 438.57C639.84 460.52 639.93 489.78 640 511.73C640.06 531.93 623.74 548.36 603.54 548.42C554.21 548.58 442.81 548.92 393.49 549.08C373.29 549.14 356.86 532.82 356.79 512.61C356.73 490.67 356.63 461.4 356.57 439.46C356.5 419.26 372.83 402.83 393.03 402.76C442.36 402.61 553.75 402.26 603.08 402.11Z" id="b3ay3ocTss"></path></defs><g><g><g><use xlink:href="#blju8qNmx" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#az8ftcEUM" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#b1RGptaMa7" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#b2MFiGBFWA" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#beFdOkV1v" opacity="1" fill="#333631" fill-opacity="1"></use></g><g><use xlink:href="#b3ay3ocTss" opacity="1" fill="#333631" fill-opacity="1"></use></g></g></g></svg>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="blog-posts">
+                    @for (int i = 0; i < Model.Count;)
+                    {
+                        <div class="row">
+                            @for (; i < Model.Count; i++)
+                            {
+                                <div class="col-sm-6">
+                                    @Html.Partial("PostMain_Partial", Model[i])
+                                </div>
+                                if (i % 2 != 0)
+                                {
+                                    i++;
+                                    break;
+                                }
+                            }
+                        </div>
+                    }
+
+                    <ul class="pagination">
+                        @if (ViewBag.page > 1)
+                        {
+                            <li><a href="@Url.Action("Index", "Forum", new {page = (int) ViewBag.page - 1, ViewBag.pageSize, ViewBag.categoryId, ViewBag.themeId, ViewBag.tagName, ViewBag.keyword, ViewBag.viewType})">@(ViewBag.page - 1)</a></li>
+                        }
+                        <li class="active">
+                            <a href="@Url.Action("Index", "Forum", new {page = (int) ViewBag.page, ViewBag.pageSize, ViewBag.categoryId, ViewBag.themeId, ViewBag.tagName, ViewBag.keyword, ViewBag.viewType})">
+                                @ViewBag.page
+                                <span class="sr-only">(текуща)</span>
+                            </a>
+                        </li>
+                        @if (ViewBag.LastPage > ViewBag.page)
+                        {
+                            <li><a href="@Url.Action("Index", "Forum", new {page = (int) ViewBag.page + 1, ViewBag.pageSize, ViewBag.categoryId, ViewBag.themeId, ViewBag.tagName, ViewBag.keyword, ViewBag.viewType})">@(ViewBag.page + 1)</a></li>
+                            if (ViewBag.LastPage > ViewBag.page + 1)
+                            {
+                                <li><a href="@Url.Action("Index", "Forum", new {page = (int) ViewBag.page + 2, ViewBag.pageSize, ViewBag.categoryId, ViewBag.themeId, ViewBag.tagName, ViewBag.keyword, ViewBag.viewType})">@(ViewBag.page + 2)</a></li>
+                            }
+                            <li><a href="@Url.Action("Index", "Forum", new {page = (int) ViewBag.page + 1, ViewBag.pageSize, ViewBag.categoryId, ViewBag.themeId, ViewBag.tagName, ViewBag.keyword, ViewBag.viewType})">Следващ</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-3 sidebar">
+                
+                <aside style="margin-bottom: 30px; padding-bottom: 30px;">
+                    @using (Html.BeginForm("Create", "Posts", FormMethod.Get))
+                    {
+                        if (ViewBag.ThemeId != null)
+                        {
+                            <input type="hidden" name="ThemeId" value="@ViewBag.ThemeId" />
+                        }
+                        <input type="submit" value="Създай Пост" class="btn btn-primary col-xs-12" />
+                    }
+                </aside>
+
+                <!-- Begin Search by keyword -->
+                @Html.Partial("SearchByKeyword_Partial")
+                <!-- End Search by keyword -->
+                <!-- Begin Posts By Category -->
+                @Html.Partial("ForumCategories_Partial", (List<RealEstate.ViewModels.WebMVC.Forum.ForumCategoriesLinkViewModel>) ViewBag.ForumCategories)
+                <!-- End Posts By Category -->
+
+                @*<aside class="block blk-ads pgl-bg-light">
+                    <img class="img-responsive" src="images/blog/side-ad.png" alt="Blog">
+                </aside>*@
+
+                <!-- Begin Posts By Theme -->
+                @Html.Partial("ForumThemes_Partial", (List<RealEstate.ViewModels.WebMVC.Forum.ThemeLinkViewModel>) ViewBag.Themes)
+                <!-- End Posts By Theme -->
+
+                <aside class="block tabs pgl-bg-light">
+                    <ul class="nav nav-tabs second-tabs">
+                        <li class="active"><a href="#popularPosts" data-toggle="tab"><i class="icon icon-star"></i> Популярни</a></li>
+                        <li><a href="#latestComments" data-toggle="tab">Коментари</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        @Html.Partial("Posts_Partial", (List<PostSideViewModel>) ViewBag.PopularPosts)
+
+                        @Html.Partial("Comments_Partial", (List<CommentSideViewModel>) ViewBag.LatestComments)
+                    </div>
+                </aside>
+                @Html.Partial("Tags_Partial", (List<string>) ViewBag.Tags)
+
+                @*@Html.Partial("PhotosCollection_Partial", (ImageCollectionViewModel) ViewBag.FlickrPhotos)*@
+            </div>
+        </div>
+    </div>
+    <!-- End content with sidebar -->
+
+</div>
+<!-- End Main -->

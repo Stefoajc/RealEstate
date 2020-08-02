@@ -1,0 +1,144 @@
+﻿<aside class="block pgl-advanced-search pgl-bg-light">
+    <h3>Разширено търсене</h3>
+    <form id="adv-search-vert-form" name="adv-search-vert-form">
+        <div class="form-group">
+            <label class="sr-only" for="adv-search-vert-property-status">Статут на имота</label>
+            <select id="adv-search-vert-property-status" name="adv-search-vert-property-status" data-placeholder="Property Status" class="chosen-select">
+                <option value="all">Всички</option>
+                <option value="sale">За продан</option>
+                <option value="rent">Под наем</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="sr-only" for="adv-search-vert-property-types">Типове имоти</label>
+            <select id="adv-search-vert-property-types" name="adv-search-vert-property-types" data-placeholder="Property Types" class="chosen-select">
+                <option selected="selected" value="">Тип имот</option>
+                @foreach (var propertyType in ViewBag.PropertyTypes)
+                {
+                    <option value="@((int)propertyType.PropertyTypeId)">@propertyType.PropertyTypeName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="sr-only" for="adv-search-vert-location">Град</label>
+            <select id="adv-search-vert-location" name="adv-search-vert-location" data-placeholder="Location" class="chosen-select">
+                <option selected="selected" value="">Град</option>
+                @foreach (var city in ViewBag.Cities)
+                {
+                    <option value="@city.CityId">@city.CityName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="sr-only" for="adv-search-vert-distancefromcity">Разстояние от града</label>
+            <select id="adv-search-vert-distancefromcity" name="distanceFromCity" data-placeholder="Разстояние от града" class="chosen-select">
+                <option selected="selected" value="">Разстояние от града</option>
+                <option value="0">0км</option>
+                <option value="5">5км</option>
+                <option value="10">10км</option>
+                <option value="20">20км</option>
+                <option value="30">30км</option>
+                <option value="50">50км</option>
+            </select>
+            @Html.ValidationMessage("distanceFromCity", new { @class = "text-danger" })
+        </div>
+        <div id="adv-search-vert-sell-area-ranges" class="form-group">
+            <div class="row pgl-narrow-row">
+                <div class="col-xs-6">
+                    <label class="sr-only" for="adv-search-vert-area-from">Площ от</label>
+                    <select id="adv-search-vert-area-from" name="adv-search-vert-area-from" data-placeholder="Area From" class="chosen-select">
+                        <option selected="selected" value="">Площ от</option>
+                        <option value="0">от 0м&sup2;</option>
+                        <option value="50">от 50м&sup2;</option>
+                        <option value="100">от 100м&sup2;</option>
+                        <option value="150">от 150м&sup2;</option>
+                        <option value="250">от 250м&sup2;</option>
+                        <option value="350">от 350м&sup2;</option>
+                        <option value="450">от 450м&sup2;</option>
+                    </select>
+                </div>
+                <div class="col-xs-6">
+                    <label class="sr-only" for="adv-search-vert-area-to">Площ до</label>
+                    <select id="adv-search-vert-area-to" name="adv-search-vert-area-to" data-placeholder="Area To" class="chosen-select">
+                        <option selected="selected" value="">Площ до</option>
+                        <option value="50">до 50м&sup2;</option>
+                        <option value="100">до 100м&sup2;</option>
+                        <option value="150">до 150м&sup2;</option>
+                        <option value="250">до 250м&sup2;</option>
+                        <option value="350">до 350м&sup2;</option>
+                        <option value="450">до 450м&sup2;</option>
+                        <option value="450">над 450м&sup2;</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div id="adv-search-vert-sell-price-ranges" class="form-group">
+            <div class="row pgl-narrow-row">
+                <div class="col-xs-6">
+                    <label class="sr-only" for="adv-search-vert-search-sell-minprice">Цена от</label>
+                    <select id="adv-search-vert-search-sell-minprice" name="adv-search-vert-search-sell-minprice" data-placeholder="Price From" class="chosen-select">
+                        <option selected="selected" value="">Цена от</option>
+                        <option value="0">0лв.</option>
+                        <option value="25000">25000лв.</option>
+                        <option value="50000">50000лв.</option>
+                        <option value="75000">75000лв.</option>
+                        <option value="100000">100000лв.</option>
+                        <option value="150000">150000лв.</option>
+                        <option value="200000">200000лв.</option>
+                        <option value="300000">300000лв.</option>
+                        <option value="500000">500000лв.</option>
+                        <option value="750000">750000лв.</option>
+                        <option value="1000000">1000000лв.</option>
+                    </select>
+                </div>
+                <div class="col-xs-6">
+                    <label class="sr-only" for="adv-search-vert-search-sell-maxprice">Цена до</label>
+                    <select id="adv-search-vert-search-sell-maxprice" name="adv-search-vert-search-sell-maxprice" data-placeholder="Price To" class="chosen-select">
+                        <option selected="selected" value="">Цена до</option>
+                        <option value="25000">25000лв.</option>
+                        <option value="50000">50000лв.</option>
+                        <option value="75000">75000лв.</option>
+                        <option value="100000">100000лв.</option>
+                        <option value="150000">150000лв.</option>
+                        <option value="200000">200000лв.</option>
+                        <option value="300000">300000лв.</option>
+                        <option value="500000">500000лв.</option>
+                        <option value="750000">750000лв.</option>
+                        <option value="1000000">1000000лв.</option>
+                        <option value="1000000plus">&gt;1000000лв.</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div id="adv-search-vert-rental-price-ranges" class="form-group">
+            <div class="row pgl-narrow-row">
+                <div class="col-xs-6">
+                    <label class="sr-only" for="adv-search-vert-search-rent-minprice">Цена от</label>
+                    <select id="adv-search-vert-search-rent-minprice" name="adv-search-vert-search-rent-minprice" data-placeholder="Price From" class="chosen-select">
+                        <option selected="selected" value="">Цена от</option>
+                        @for (int i = 0; i <= 1000; i += 100)
+                        {
+                            <option value="@i">@(i)лв.</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-xs-6">
+                    <label class="sr-only" for="adv-search-vert-search-rent-maxprice">Цена до</label>
+                    <select id="adv-search-vert-search-rent-maxprice" name="priceTo" data-placeholder="Price To" class="chosen-select">
+                        <option selected="selected" value="">Цена до</option>
+                        @for (int i = 100; i <= 1000; i += 100)
+                        {
+                            <option value="@i">@(i)лв.</option>
+                        }
+                        <option value="1000plus">&gt;1000лв.</option>
+                    </select>
+                </div>
+                @Html.ValidationMessage("priceTo", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-block btn-primary">Намери своя дом</button>
+        </div>
+
+    </form>
+</aside>

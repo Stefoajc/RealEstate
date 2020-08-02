@@ -1,0 +1,5 @@
+﻿var modalWindows = {
+    showReservationCreateRegistered: function() {
+        
+    }
+}

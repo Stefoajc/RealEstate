@@ -1,0 +1,331 @@
+﻿@using System.Globalization
+@model RealEstate.ViewModels.WebMVC.Reports.ReportTemplateViewModel
+@{
+    Layout = null;
+}
+
+
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+
+<body>
+    <div style="width:22cm; height:27.9cm;">
+        <h1 align="center" style="margin-top:0; margin-bottom:20px;">Доклад за извършени дейности „СПРОПЪРТИС“</h1>
+        <table style="border-collapse:collapse; width: 100%;">
+            <tbody>
+                <tr>
+                    <td colspan="4" style="border: black 2px solid;">
+                        <p align="center" style="font-size: 18pt; margin: 5px 0;text-align: center;">
+                            <b>Извършена реклама</b>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="border: black 2px solid;">
+                        <p align="center" style="font-size: 14pt; margin:5px 0; text-align: center;">
+                            <b>Начини на реклама</b>
+                        </p>
+                    </td>
+                    <td colspan="2" style="border: black 2px solid;">
+                        <p align="center" style="font-size: 14pt; margin:5px 0; text-align: center;">
+                            <b>Използвани платформи</b>
+                        </p>
+                    </td>
+                    <td rowspan="2" style="border: black 2px solid;">
+                        <p align="center" style="font-size: 14pt; margin:5px 0; text-align: center;">
+                            <b> Споделен с колеги</b>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;border: black 2px solid;"><b>Платформа</b></td>
+                    <td style="text-align: center;border: black 2px solid;"><b>Прегл.</b></td>
+                </tr>
+                <tr>
+                    <td rowspan="10" style="border: black 2px solid;">
+                        @foreach (var platform in Model.PromotionMediae)
+                        {
+                            <div style="margin: 0; padding: 3px; position: relative;">
+                                @if (platform.IsChecked)
+                                {
+                                    <span style="display: inline-block;text-align: center;color: white;-webkit-appearance: initial;background: gray;width: 16px;height: 16px;border: none;position: relative;padding: 0;margin: 0;line-height: 16px;">X</span>
+                                }
+                                else
+                                {
+                                    <span style="display: inline-block;text-align: center;color: white;-webkit-appearance: initial;background: gray;width: 16px;height: 16px;border: none;position: relative;padding: 0;margin: 0;line-height: 16px;"></span>
+                                }
+                                <span style="font-size: 16px; position: absolute; left: 23px; top: 2px;">@platform.MediaType</span>
+                            </div>
+                        }
+                        @for (int i = 0; i < 2; i++)
+                        {
+                            <div style="margin: 0; padding: 3px; position: relative;">
+                                @if (Model.CustomPromotionMediae.Count > i)
+                                {
+                                    <span style="display: inline-block;text-align: center;color: white;-webkit-appearance: initial;background: gray;width: 16px;height: 16px;border: none;position: relative;padding: 0;margin: 0;line-height: 16px;">X</span>
+                                }
+                                else
+                                {
+                                    <span style="display: inline-block;text-align: center;color: white;-webkit-appearance: initial;background: gray;width: 16px;height: 16px;border: none;position: relative;padding: 0;margin: 0;line-height: 16px;"></span>
+                                }
+                                <span style="font-size: 16px; position: absolute; left: 23px; top: 2px;">@(Model.CustomPromotionMediae.Count > i ? Model.CustomPromotionMediae[i] : "")</span>
+                            </div>
+                        }
+                    </td>
+                    <td style="width: 33.5%;height: 21.5px;border: black 2px solid; text-align: center;">
+                        <span style="width: 99.8%; font-size: 16px; margin: 0; border: 0;">
+                            @(Model.WebPlatformViews.Any()
+                                            ? Model.WebPlatformViews[0] != null
+                                                ? Model.WebPlatformViews[0].PlatformName
+                                                : ""
+                                            : ""))
+                        </span>
+                    </td>
+                    <td style="width: 5%;height: 21.5px;border: black 2px solid; text-align: center;">
+                        <span style="width: 99.8%; font-size: 16px; margin: 0; border: 0;">
+                            @(Model.WebPlatformViews.Any()
+                                            ? Model.WebPlatformViews[0] != null
+                                                ? (Model.WebPlatformViews[0].Views != 0
+                                                    ? Model.WebPlatformViews[0].Views.ToString()
+                                                    : "")
+                                                : ""
+                                            : "")
+                        </span>
+                    </td>
+                    <td style="height: 21.5px;border: black 2px solid; text-align: center;">
+                        <span style="width: 99.8%; font-size: 16px; margin: 0; border: 0;">
+                            @(Model.PartnersSharedWith.Any()
+                                            ? Model.PartnersSharedWith[0]
+                                            : "")
+                        </span>
+                    </td>
+                </tr>
+                @for (int i = 1; i < 10; i++)
+                {
+                    <tr>
+                        <td style="width: 33.5%; height: 21.5px;border: black 2px solid; text-align: center;">
+                            <span style="width: 99.8%; font-size: 16px; margin: 0; border: 0;">
+                                @(Model.WebPlatformViews.Count > i
+                                            ? Model.WebPlatformViews[i] != null
+                                                ? Model.WebPlatformViews[i].PlatformName
+                                                : ""
+                                            : "")
+                            </span>
+                        </td>
+                        <td style="width: 5%; height: 21.5px;border: black 2px solid; text-align: center;">
+                            <span style="width: 99.8%; font-size: 16px; margin: 0; border: 0;">
+                                @(Model.WebPlatformViews.Count > i
+                                            ? Model.WebPlatformViews[i] != null
+                                                ? (Model.WebPlatformViews[i].Views != 0
+                                                    ? Model.WebPlatformViews[i].Views.ToString()
+                                                    : "")
+                                                : ""
+                                            : "")
+                            </span>
+                        </td>
+                        <td style="height: 21.5px;border: black 2px solid; text-align: center;">
+                            <span style="width: 99.8%; font-size: 16px; margin: 0; border: 0;">
+                                @(Model.PartnersSharedWith.Count > i
+                                            ? Model.PartnersSharedWith[i] ?? "" : "")
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <br>
+        <table style="border-collapse:collapse;  width: 100%;">
+            <tbody>
+                <tr>
+                    <td colspan="4" style="border: black 2px solid;">
+                        <p align="center" style="font-size: 18pt; margin: 5px 0; text-align: center;">
+                            <b>Резултати от извършените дейности</b>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border: black 2px solid;">
+                        <p align="center" style="font-size: 18pt; margin: 0; text-align: center;">
+                            <b>Общо прегледи</b>
+                        </p>
+                    </td>
+                    <td style="border: black 2px solid;">
+                        <p align="center" style="font-size: 18pt; margin: 0; text-align: center;">
+                            <b>Общо обаждания</b>
+                        </p>
+                    </td>
+                    <td style="border: black 2px solid;">
+                        <p align="center" style="font-size: 18pt; margin: 0; text-align: center;">
+                            <b>Общо огледи</b>
+                        </p>
+                    </td>
+                    <td style="border: black 2px solid;">
+                        <p align="center" style="font-size: 18pt; margin: 0; text-align: center;">
+                            <b>Общо оферти</b>
+                        </p>
+                    </td>
+                </tr>
+                <tr height="50px;">
+                    <td width="26%" style="text-align: center; border: black 2px solid;">
+                        <span style="width: 98%; font-size: 36px; border: 0;">@Model.TotalViews</span>
+                    </td>
+                    <td style="text-align: center; border: black 2px solid;">
+                        <span style="width: 98%; font-size: 36px;  border: 0;">@Model.TotalCalls</span>
+                    </td>
+                    <td style="text-align: center;border: black 2px solid;">
+                        <span style="width: 98%; font-size: 36px;  border: 0;">@Model.TotalInspections</span>
+                    </td>
+                    <td style="text-align: center;border: black 2px solid;">
+                        <span style="width: 98%; font-size: 36px;  border: 0;">@Model.TotalOffers</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border: black 2px solid;">
+                        @for (int i = 0; i < 3; i++)
+                        {
+                            <div style="width: 33%; display: inline-block;">
+                                <span>Цена на оферта:</span>
+                                <span style="width: 40%;">@(Model.Offers.Count > i ? Model.Offers[i] != 0 ? Model.Offers[i].ToString(CultureInfo.InvariantCulture) : "" : "")</span>
+                                <span>лв.</span>
+                            </div>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border: black 2px solid;">
+                        @for (int i = 3; i < 6; i++)
+                        {
+                            <div style="width: 33%; display: inline-block;">
+                                <span>Цена на оферта:</span>
+                                <span style="width: 40%;">@(Model.Offers.Count > i ? Model.Offers[i] != 0 ? Model.Offers[i].ToString(CultureInfo.InvariantCulture) : "" : "")</span>
+                                <span>лв.</span>
+                            </div>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="border: black 2px solid;">
+                        @for (int i = 6; i < 9; i++)
+                        {
+                            <div style="width: 33%; display: inline-block;">
+                                <span>Цена на оферта:</span>
+                                <span style="width: 40%;">@(Model.Offers.Count > i ? Model.Offers[i] != 0 ? Model.Offers[i].ToString(CultureInfo.InvariantCulture) : "" : "")</span>
+                                <span>лв.</span>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <table style="border-collapse:collapse; width: 100%;">
+            <tbody>
+                <tr>
+                    <td style="border: black 2px solid;">
+                        <p align="center" style="font-size: 18pt; margin: 5px 0;text-align: center;">
+                            <b>Изводи от извършените дейности</b>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0;border: black 2px solid;">
+                        <div style="width:99.8%; margin:0; padding:0; border: 0;">@Model.ActionsConclusion</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <table style="border-collapse:collapse;  width: 100%;">
+            <tbody>
+                <tr>
+                    <td colspan="2" style="border: black 2px solid;">
+                        <p align="center" style="font-size: 18pt; margin: 5px 0;text-align: center;">
+                            <b>Препоръки за последваща работа</b>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border: black 2px solid;">
+                        <div style="margin: 0; padding: 3px;">
+                            @if (Model.IsMarketingChangeIssued)
+                            {
+                                <span style="display: inline-block;text-align: center;color: white;-webkit-appearance: initial;background: gray;width: 16px;height: 16px;border: none;position: relative;padding: 0;margin: 0;line-height: 16px;">X</span>
+                            }
+                            else
+                            {
+                                <span style="display: inline-block;text-align: center;color: white;-webkit-appearance: initial;background: gray;width: 16px;height: 16px;border: none;position: relative;padding: 0;margin: 0;line-height: 16px;"></span>
+                            }
+                            <strong style="font-size: 16px; position: relative;">Промяна на маркетинг</strong>
+                        </div>
+                    </td>
+                    <td style="border: black 2px solid;">
+                        <div style="text-align:center;">
+                            <strong style="font-size:22px;">Аргументи</strong>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="30%" style="border: black 2px solid;">
+                        <div style="margin: 0; padding: 3px;">
+                            @if (Model.IsPriceChangeIssued)
+                            {
+                                <span style="display: inline-block;text-align: center;color: white;-webkit-appearance: initial;background: gray;width: 16px;height: 16px;border: none;position: relative;padding: 0;margin: 0;line-height: 16px;">X</span>
+                            }
+                            else
+                            {
+                                <span style="display: inline-block;text-align: center;color: white;-webkit-appearance: initial;background: gray;width: 16px;height: 16px;border: none;position: relative;padding: 0;margin: 0;line-height: 16px;"></span>
+                            }
+                            <strong style="font-size: 16px; position: relative;">Корекция на цената</strong>
+                        </div>
+                    </td>
+                    <td rowspan="4" style="border: black 2px solid;">
+                        <div style="border: 0; width: 595px; ">@Model.ChangeArguments</div>
+                    </td>
+                </tr>
+                @for (int i = 0; i < 3; i++)
+                {
+                    <tr>
+                        <td style="border: black 2px solid;">
+                            <div style="margin: 0; padding: 3px;">
+                                @if (Model.CustomRecommendedActions.Count > i)
+                                {
+                                    if (!string.IsNullOrEmpty(Model.CustomRecommendedActions[i]))
+                                    {
+                                        <span style="display: inline-block;text-align: center;color: white;-webkit-appearance: initial;background: gray;width: 16px;height: 16px;border: none;position: relative;padding: 0;margin: 0;line-height: 16px;">X</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="display: inline-block;text-align: center;color: white;-webkit-appearance: initial;background: gray;width: 16px;height: 16px;border: none;position: relative;padding: 0;margin: 0;line-height: 16px;"></span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span style="display: inline-block;text-align: center;color: white;-webkit-appearance: initial;background: gray;width: 16px;height: 16px;border: none;position: relative;padding: 0;margin: 0;line-height: 16px;"></span>
+                                }
+                                <span style="font-size: 16px;">@(Model.CustomRecommendedActions.Count > i ? Model.CustomRecommendedActions[i] : "")</span>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <br />
+        <div style="text-align: center;">
+            <span style="float: left;">Изготвен на:</span>
+            <span id="createdOn" style="float: left;">@Model.CreatedOn.ToString("dd.MM.yyyy")</span>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Имот:<a target="_blank" href="@Model.LinkToProperty">@Model.LinkToProperty</a></span>
+
+            <span id="agentName" style="float: right;">@Model.AgentCreator</span>
+            <span style="float: right;">От:</span>
+        </div>
+    </div>
+    <br />
+    <br />
+</body>
+</html>
+
+

@@ -5,6 +5,7 @@ namespace RealEstate.Repositories.Interfaces
 {
     public interface IRentalsRepository:IGenericRepository<RentalsInfo>
     {
-        IQueryable<UnitTypes> GetRentalTypes();
+        IQueryable<PropertyTypes> GetRentalTypes();
+        IQueryable<RentalHirePeriodsTypes> GetRentalPeriodTypes();
     }
 }

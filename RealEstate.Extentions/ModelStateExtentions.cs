@@ -10,7 +10,7 @@ namespace RealEstate.Extentions
     public static class ModelStateExtentions
     {
 
-        public static Dictionary<string, string[]> ToJson(this ModelStateDictionary modelState)
+        public static Dictionary<string, string[]> ToDictionary(this ModelStateDictionary modelState)
         {
             var errorList = modelState.ToDictionary(
                 kvp => kvp.Key,

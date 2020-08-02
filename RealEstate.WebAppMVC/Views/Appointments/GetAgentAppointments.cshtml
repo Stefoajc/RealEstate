@@ -1,0 +1,217 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.AgentOwnAppointmentsViewModel>
+
+@{
+    ViewBag.Title = "Мои срещи - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+
+        .pgl-property {
+            margin: 0px !important;
+        } 
+        
+        @@media screen and (min-width:992px) {
+            .col-md-3-5 {
+                width: 29.16667% !important;
+            }
+            .col-md-8-5 {
+                width: 70.83333% !important;
+            }
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    <br/>
+    <h1 align="center">Всички заявки за срещи/огледи</h1>
+    <!-- Begin FAQs -->
+    <div class="panel-group pgl-group-faqs" id="accordion">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+
+            <div class="panel panel-default pgl-panel">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        @{ var appointmentStatus = Model[i].IsApprovedByAgent ? "Потвърдена" : "Непотвърдена"; }
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@i" class="collapsed appointment-heading">Среща в @Model[i].AppointmentDate.ToString("dd.MM.yyyy HH:mm") - @Model[i].ClientName / тел:@Model[i].ClientPhoneNumber (@appointmentStatus)</a>
+                    </h4>
+                </div>
+                <div id="collapse-@i" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="pgl-property animation">
+                            <div class="row">
+                                <div class="col-md-3 col-md-3-5 col-xs-12">
+                                    <div class="property-thumb-info-image">
+                                        <img alt="Снимка" class="img-responsive" src="@Model[i].Property.ImagePath.Replace(" ","%20")">
+                                        <span class="property-thumb-info-label">
+                                            <span class="label price">@Model[i].Property.Price</span>
+                                            <span class="label">@Model[i].Property.Status</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-9 col-md-8-5 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12">
+                                            <div class="property-thumb-info">
+                                                <div class="property-thumb-info-content" style="height: 197.8px;">
+                                                    <h3 class="h3-one-line">
+                                                        <a class="clamp" href="@Url.Action("Details", "Properties", new {id = Model[i].Property.PropertyId})">@Model[i].Property.PropertyName</a>
+                                                    </h3>
+                                                    <address>@Model[i].Property.FullAddress</address>
+                                                    <p class="clamp-four">@Model[i].Property.Info</p>
+                                                </div>
+                                                <div class="amenities clearfix">
+                                                    <ul class="pull-left">
+                                                        <li><strong>Площ:</strong> @Model[i].Property.AreaInSquareMeters<sup>m2</sup></li>
+                                                    </ul>
+                                                    <ul class="pull-right">
+                                                        <li title="Преглеждания"><i class="fa fa-eye"></i> @Model[i].Property.Views</li>
+                                                        @Html.Raw(Model[i].Property.BottomRight)
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            <div class="property-thumb-info">
+                                                <div class="property-thumb-info-content" style="height: 197.8px;">
+                                                    <h3 style="margin-bottom: 8px;">Заявена среща от:</h3>
+                                                    <div class="appointer-info">
+                                                        <span>Име: </span><label>@Model[i].ClientName</label><br/>
+                                                        <span>Телефон: </span><label>@Model[i].ClientPhoneNumber</label><br/>
+                                                        @if (!string.IsNullOrEmpty(Model[i].ClientEmail))
+                                                        {
+                                                            <span>Име: </span><label>@Model[i].ClientEmail</label><br/>
+                                                        }
+                                                        <div id="current-date" class="form-group toggle-date">
+                                                            <div class="input-group date" id="event-start">
+                                                                <input id="old-date" class="form-control" value="Дата: @Model[i].AppointmentDate.ToString("dd.MM.yyyy HH:mm")" type="text" disabled="disabled"/>
+                                                                <span class="input-group-addon" style="">
+                                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                                </span>
+                                                                <button id="change-date-btn" class="pull-right btn btn-primary change-date-btn">Смени</button>
+                                                            </div>
+                                                        </div>
+                                                        <div id="date-changer" class="form-group toggle-date">
+                                                            <div class="input-group date" id="event-start">
+                                                                <input id="appointment-@i" class="appointmentId" value="@Model[i].Id" type="hidden"/>
+                                                                <input class="form-control date-to" id="new-date" name="new-date" value="@Model[i].AppointmentDate.ToString("dd.MM.yyyy HH:mm")" type="text"/>
+                                                                <span class="input-group-addon" style="">
+                                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                                </span>
+                                                                <button id="save-date-btn" class="pull-right btn btn-primary save-date-btn">Запази</button>
+                                                            </div>
+
+                                                            @Html.ValidationMessage("new-date", new {@class = "text-danger"})
+                                                        </div>
+
+                                                        <div class="form-group">
+
+                                                            @if (Model[i].IsApprovedByAgent)
+                                                            {
+                                                                <button id="approve-appointment" class="btn btn-success col-xs-12 approve-appointment">Потвърдена среща</button>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input id="appointment-@i" class="appointmentId" value="@Model[i].Id" type="hidden"/>
+                                                                <button id="approve-appointment" class="btn btn-primary col-xs-12 approve-appointment">Потвърди срещата</button>
+                                                            }
+                                                            <div class="clearfix"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
+    <!-- End FAQs -->
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function() {
+            //DatetimePicker init
+            jQuery.datetimepicker.setLocale('bg');
+            $('.date-to').datetimepicker({
+                format: 'd.m.Y H:i',
+                locale: 'bg',                
+                minDate: new Date()  
+            });
+
+            //Change appointment date
+            (function() {
+                $('.change-date-btn').click(function() {
+                    $(this).closest('.toggle-date').toggle().siblings('.toggle-date').toggle();
+                });
+
+                $('.save-date-btn').click(function() {
+                    var thisElem = $(this);
+                    var date = moment(thisElem.siblings('#new-date').val(), "DD.MM.YYYY HH:mm");
+                    var appointmentId = thisElem.siblings('.appointmentId').val();
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/Appointments/ChangeDate',
+                        data: {
+                            appointmentId: appointmentId,
+                            newDate: date.toISOString(),
+                            __RequestVerificationToken: $('#__AjaxAntiForgeryForm input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(data) {
+                            if (data.success) {
+                                showErrorResponse(data, $('#date-changer'));
+                            } else {
+                                thisElem.closest('.appointer-info').find('#old-date')
+                                    .val("Дата: " + thisElem.siblings('#new-date').val());
+                                thisElem.closest('.toggle-date').toggle().siblings('.toggle-date').toggle();
+                            }
+                        },
+                        error: function() {
+                            thisElem.closest('.toggle-date').toggle().siblings('.toggle-date').toggle();
+                        }
+                    });
+                });
+            })();
+
+            //Change Approve appointment
+            (function() {
+                $('.approve-appointment').click(function() {
+                    var thisBtn = $(this);
+                    var appointmentId = $(this).siblings('.appointmentId').val();
+                    $.ajax({
+                        type: "POST",
+                        url: '/Appointments/ApproveAppointment',
+                        data: {
+                            appointmentId: appointmentId,
+                            __RequestVerificationToken: $('#__AjaxAntiForgeryForm input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(data) {
+                            if (data === "STATUS_OK") {
+                                //Change the heading text from Непотвърдена -> Потвърдена
+                                var panelHeading = thisBtn.closest('.panel').find('.appointment-heading');
+                                panelHeading.text(panelHeading.text().replace('Непотвърдена', 'Потвърдена'));
+                                //clicked button color and text change
+                                thisBtn.text('Потвърдена среща').removeClass('btn-primary').addClass('btn-success');
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            alertify.error(shownError);
+                        }
+                    });
+                });
+            })();
+
+        });
+    </script>
+}

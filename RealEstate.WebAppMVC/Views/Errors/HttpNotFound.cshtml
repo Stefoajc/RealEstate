@@ -1,0 +1,71 @@
+﻿@model RealEstate.WebAppMVC.Controllers.ErrorsController.ErrorMessageViewModel
+
+@{
+    ViewBag.Title = "Страницата не е намерена - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+        .help-links {
+            list-style-type: none;
+            position: relative;
+            padding-left: 15px;
+        }
+    </style>
+}
+
+<div class="container" style="padding: 50px 0; text-align: center;">
+    <div class="row">
+        <div class="col-xs-12">
+            <h1 style="font-size: 80px; margin: 0;">404</h1>
+            <h1 style="margin-bottom: 20px;">@ViewBag.Title</h1>
+            <h3>
+                Страницата, която търсите не е намерена, <br /> сменено и е името или е временно недостъпна
+            </h3>
+        </div>
+        <div class="col-xs-12" style="margin-bottom: 20px;">
+            <h3 style="margin-bottom: 10px;">
+                <strong>Може да потърсите каквото ви интересува</strong>
+            </h3>
+            <div class="col-md-6 col-md-offset-3">
+                <input class="form-control" placeholder="Напишете ключова дума" /><button class="btn btn-primary" style="position: absolute; top: 0; right: 0;">Търси</button>
+            </div>
+        </div>
+
+        <div class="col-xs-12">
+            <h1 style="font-size: 32px; margin-bottom: 10px;">Или</h1>
+            <h3>няколко линка, които могат да ви помогнат.</h3>
+            <div class="row">
+                <ul class="col-xs-12 col-md-6 col-md-offset-3 help-links">
+                    <li class="col-xs-6 col-md-4" style="float: left;">
+                        <strong>&#x25ba; <a href="@Url.Action("Index","Home")">Начало</a></strong>
+                    </li>
+                    <li class="col-xs-6 col-md-4" style="float: left;">
+                        <strong>&#x25ba; <a href="@Url.Action("Search","Properties")">Търсене</a></strong>
+                    </li>
+                    <li class="col-xs-6 col-md-4" style="float: left;">
+                        <strong>&#x25ba; <a href="@Url.Action("Contact","Home")">Контакти</a></strong>
+                    </li>
+                    <li class="col-xs-6 col-md-4" style="float: left;">
+                        <strong>&#x25ba; <a href="@Url.Action("Index","Properties")">Имоти</a></strong>
+                    </li>
+                    <li class="col-xs-6 col-md-4" style="float: left;">
+                        <strong>&#x25ba; <a href="@Url.Action("Index","Forum")">Форум</a></strong>
+                    </li>
+                    <li class="col-xs-6 col-md-4" style="float: left;">
+                        <strong>&#x25ba; <a href="@Url.Action("About","Home")">За нас</a></strong>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+<script>
+        var stackTrace = '@Html.Raw(Model.ErrorStackTrace)';
+        console.log(stackTrace);
+</script>
+}
+

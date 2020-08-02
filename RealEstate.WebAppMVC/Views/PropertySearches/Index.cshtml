@@ -1,0 +1,104 @@
+﻿@using RealEstate.ViewModels.WebMVC
+@using RealEstate.WebAppMVC.Helpers
+@model List<PropertySearchListViewModel>
+@{
+    ViewBag.Title = "Имотни търсения - Имоти СПРОПЪРТИС";
+}
+
+<div class="container pgl-properties">
+    <h2>Търсени имоти</h2>
+    <div id="filtering-selects" class="listing-header clearfix">
+        <ul class="list-inline list-icons pull-left">
+            <li class="active"><a href="@Url.Action("Index", "PropertySearches")"><i class="fa fa-th"></i></a></li>
+        </ul>
+        <ul class="list-inline list-sort pull-right">
+            <li>
+                <select id="filter-searchType" class="chosen-select" onchange="location = this.value + '#filtering-selects'">
+                    <option value="@Url.Action("Index", "PropertySearches", new {pageNumber = 0, ViewBag.pageSize, ViewBag.CityId, ViewBag.propertyTypeId})" @(ViewBag.onlyRentalSearches == null ? "selected" : "")>Тип търсене на имот</option>
+                    <option value="@Url.Action("Index", "PropertySearches", new {pageNumber = 0, ViewBag.pageSize, ViewBag.CityId, ViewBag.propertyTypeId, onlyRentalSearches = true})" @(ViewBag.onlyRentalSearches == true ? "selected" : "")>Търсене наем</option>
+                    <option value="@Url.Action("Index", "PropertySearches", new {pageNumber = 0, ViewBag.pageSize, ViewBag.CityId, ViewBag.propertyTypeId, onlyRentalSearches = false})" @(ViewBag.onlyRentalSearches == false ? "selected" : "")>Търсене покупка</option>
+                </select>
+            </li>
+            <li>
+                <label for="filter-city">Град</label>
+            </li>
+            <li class="min-width">
+                <select id="filter-city" name="filter-status" class="chosen-select filter-status" onchange="location = this.value + '#filtering-selects'">
+                    <option value="@Url.Action("Index", "PropertySearches", new {pageNumber = 0, pageSize = 6, ViewBag.propertyTypeId, ViewBag.onlyRentalSearches})" @(ViewBag.cityId == null ? "selected" : "")>Градове</option>
+                    @foreach (var city in ViewBag.Cities)
+                    {
+                        <option value="@Url.Action("Index", "PropertySearches", new {pageNumber = 0, ViewBag.pageSize, cityId = city.CityId, ViewBag.propertyTypeId, ViewBag.onlyRentalSearches})" @(ViewBag.cityId == city.CityId ? "selected" : "")>@city.CityName</option>
+                    }
+                </select>
+            </li>
+            <li>
+                <label for="filter-propertyType">Тип имот</label>
+            </li>
+            <li class="min-width">
+                <select id="filter-propertyType" name="filter-status" class="chosen-select filter-status" onchange="location = this.value + '#filtering-selects'">
+                    <option value="@Url.Action("Index", "PropertySearches", new {pageNumber = 0, pageSize = 6, ViewBag.cityId, ViewBag.onlyRentalSearches})" @(ViewBag.propertyTypeId == null ? "selected" : "")>Типове имоти</option>
+                    @foreach (var propertyType in ViewBag.PropertyTypes)
+                    {
+                        <option value="@Url.Action("Index", "PropertySearches", new {pageNumber = 0, ViewBag.pageSize, ViewBag.cityId, propertyTypeId = propertyType.PropertyTypeId, ViewBag.onlyRentalSearches})" @(ViewBag.propertyTypeId == propertyType.PropertyTypeId ? "selected" : "")>@propertyType.PropertyTypeName</option>
+                    }
+                </select>
+            </li>
+        </ul>
+    </div>
+
+    <div class="row" id="property-searches">
+        @foreach (PropertySearchListViewModel propertySearch in Model)
+        {
+            <div class="col-xs-12 col-sm-6 col-md-4 animation">
+                <div class="pgl-property">
+                    <div class="property-thumb-info">
+                        <div class="property-thumb-info-content">
+                            <h3>
+                                <a class="clamp-two" title="@string.Join(",", propertySearch.UnitTypes)" href="@Url.Action("Details", "PropertySearches", new {id = propertySearch.Id})">@string.Join(",", propertySearch.UnitTypes)</a>
+                            </h3>
+                            @{
+                                var area = propertySearch.CityName + (propertySearch.Areas != null ? " - " + propertySearch.Areas : "");
+                            }
+                            <address title="@area" class="clamp-one"><i class="fa fa-map-marker"></i> @area</address>
+                            <p class="clamp-four">
+                                @propertySearch.AdditionalInformation
+                            </p>
+                        </div>
+                        <div class="amenities clearfix">
+                            <ul class="pull-left">
+                                <li><strong>Цена:</strong> @(propertySearch.PriceFrom != null ? propertySearch.PriceFrom + "-" : "до ")@(propertySearch.PriceTo)лв.</li>
+                            </ul>
+                            <ul class="pull-right">
+                                <li title="Преглеждания"><i class="fa fa-eye"></i> @propertySearch.Views</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <ul class="pagination">
+            @if (ViewBag.PageNumber > 1)
+            {
+                <li><a href="@Url.Action("Index", "PropertySearches")">@(ViewBag.PageNumber)</a></li>
+            }
+            <li class="active">
+                <a href="@Url.Action("Index","PropertySearches")">
+                    @(ViewBag.PageNumber+1)
+                    <span class="sr-only">(текуща)</span>
+                </a>
+            </li>
+            @if (ViewBag.PagesCount > ViewBag.PageNumber)
+            {
+                <li><a href="@Url.Action("Index","PropertySearches")">@(ViewBag.PageNumber + 2)</a></li>
+                if (ViewBag.PagesCount > ViewBag.PageNumber + 1)
+                {
+                    <li><a href="@Url.Action("Index","PropertySearches")">@(ViewBag.PageNumber + 3)</a></li>
+                }
+                <li>
+                    <a href="@Url.Action("Index", "PropertySearches")">Следващ</a>
+                </li>
+            }
+        </ul>
+</div>

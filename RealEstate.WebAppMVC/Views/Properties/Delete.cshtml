@@ -1,7 +1,7 @@
 ﻿@model RealEstate.Model.Properties
 
 @{
-    ViewBag.Title = "Delete";
+    ViewBag.Title = "Изтрии имот";
 }
 
 <h2>Delete</h2>
@@ -28,11 +28,11 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.PropertyType.PropertyTypeName)
+            @Html.DisplayNameFor(model => model.UnitType.PropertyTypeName)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.PropertyType.PropertyTypeName)
+            @Html.DisplayFor(model => model.UnitType.PropertyTypeName)
         </dd>
 
         <dt>
@@ -82,7 +82,7 @@
 
         <div class="form-actions no-color">
             <input type="submit" value="Delete" class="btn btn-default" /> |
-            @Html.ActionLink("Back to List", "Index")
+            @Html.ActionLink("Обратно към списъка", "Index")
         </div>
     }
 </div>

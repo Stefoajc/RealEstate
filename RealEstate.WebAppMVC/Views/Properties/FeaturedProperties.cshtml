@@ -1,4 +1,5 @@
-﻿@model List<RealEstate.ViewModels.WebMVC.PropertyBriefInfoViewModel>
+﻿@using RealEstate.Services.Helpers
+@model List<RealEstate.ViewModels.WebMVC.PropertyBriefInfoViewModel>
 
 <section class="pgl-featured">
     <div class="container">
@@ -11,12 +12,18 @@
                         <div class="col-md-12 animation">
                             <div class="pgl-property featured-item">
                                 <div class="property-thumb-info">
-                                    <div class="property-thumb-info-image">
-                                        <img alt="" class="img-responsive" src="@property.ImagePath">
-                                    </div>
+                                    <a style="display: block;" href="@Url.Action("Details", "Properties", new {id = property.PropertyId})" class="property-thumb-info-image">
+                                        <picture >
+                                            <source srcset="@(FileHelpers.ChangeFileExtension(property.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                            <source srcset="@property.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(property.ImagePath.Replace(" ", "%20"))">
+                                            <img alt="Снимка" class="img-responsive" style="height: 192.867px; width: 100%;" src="@property.ImagePath.Replace(" ", "%20")">
+                                        </picture>
+                                    </a>
                                     <div class="property-thumb-info-content">
-                                        <h3><a href="@Url.Action("Details" , new {id = property.PropertyId})">@property.FullAddress</a></h3>
-                                        <p>@property.PropertyName</p>
+                                        <h3>
+                                            <a href="@Url.Action("Details", "Properties", new {id = property.PropertyId})">@property.FullAddress</a>
+                                        </h3>
+                                        <p class="clamp-one">@property.PropertyName</p>
                                     </div>
                                 </div>
                             </div>

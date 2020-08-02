@@ -1,0 +1,237 @@
+﻿@model RealEstate.ViewModels.WebMVC.PropertySearchCreateViewModel
+@{
+    ViewBag.Title = "Създаване на Имотно търсене";
+}
+
+@section css{
+    <style>
+        .input-units {
+            position: absolute;
+            top: 9px;
+            right: 25px;
+            color: gray;
+        }
+
+        #title, .propertyAdditionalInfoLbl {
+            text-align: center;
+            display: block;
+        }
+
+            #title {
+                margin-bottom: 12px;
+            }
+
+            fieldset {
+                display: block;
+                padding-top: 0.35em;
+                padding-bottom: 0.625em;
+                border: 2px groove;
+            }
+
+        legend {
+            border-bottom: 0px;
+            width: auto;
+            margin-bottom: 0px;
+            margin-left: 20px;
+        }
+    </style>
+}
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+            $(document).on('click',
+                '#property-types>option',
+                function () {
+                    var $clickedOption = $(this);
+                    var $selectedPropertyTypes = $('#selected-property-types');
+                    $selectedPropertyTypes.append($clickedOption.prop('outerHTML'));
+                    $clickedOption.remove();
+                });
+
+            $(document).on('click',
+                '#selected-property-types>option',
+                function () {
+                    var $clickedSelectedOption = $(this);
+                    var $propertyTypes = $('#property-types');
+                    $propertyTypes.append($clickedSelectedOption.prop('outerHTML'));
+                    $clickedSelectedOption.remove();
+                });
+
+            $(document).on('submit',
+                '#create-propertySearch-form',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    var form = new FormData($('#create-propertySearch-form')[0]);
+                    $("#selected-property-types > option").each(function (i, item) {
+                        form.append('UnitTypeIds[' + i + ']', $(item).val());
+                    });
+
+                    form.printAll();
+
+                    $.ajax({
+                        url: '/PropertySearches/Create',
+                        processData: false,
+                        contentType: false,
+                        data: form,
+                        type: 'POST',
+                        success: function (data) {
+                            if (data.success) {
+                                window.alertify.error("Има проблеми в информацията за Имотното търсенето");
+                                showErrorResponse(data, $('#create-propertySearch-form'));
+                            } else {
+                                window.location = "/propertySearches/details/" + data.Id;
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+                    });
+                });
+
+        });
+    </script>
+}
+
+<br />
+<h2 id="title">@ViewBag.Title</h2>
+
+<div class="container">
+    @using (Html.BeginForm(
+        "Create", "PropertySearches", FormMethod.Post, new { id = "create-propertySearch-form" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            <hr />
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <section class="propertyInfo">
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-xs-12" for="AreaInSquareMeters"> Площ </label>
+                            <div class="col-md-9 col-xs-12">
+                                @Html.EditorFor(model => model.AreaInSquareMeters, new { htmlAttributes = new { @class = "form-control" } })
+                                <span title="Квадратни метра" class="unselectable input-units">кв.м.</span>
+                                @Html.ValidationMessageFor(model => model.AreaInSquareMeters, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-xs-12" for="PriceFrom">Цена от:</label>
+                            <div class="col-md-9 col-xs-12">
+                                @Html.EditorFor(model => model.PriceFrom, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.PriceFrom, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-xs-12 titled required" for="PriceTo" title="Ако не се въведете това поле, както и полето наемна цена, имотът няма да се показва в списъците."> Цена до: </label>
+                            <div class="col-md-7 col-xs-12">
+                                @Html.EditorFor(model => model.PriceTo, new { htmlAttributes = new { @class = "form-control" } })
+                                <span title="Цена" class="unselectable input-units">лв.</span>
+                                @Html.ValidationMessageFor(model => model.PriceTo, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="control-label col-md-2 col-xs-12">
+                                <label for="IsRentSearch">Наем:</label>
+                                @Html.CheckBoxFor(c => c.IsRentSearch, new { htmlAttributes = new { @class = "form-control" } })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3  col-xs-12 required"> Населено място</label>
+                            <div class="col-md-9  col-xs-12">
+                                <select id="cityId" name="cityId" class="chosen-select">
+                                    <option selected="selected" value="">Град</option>
+                                    @foreach (var city in ViewBag.Cities)
+                                    {
+                                        <option value="@city.CityId">@city.CityName</option>
+                                    }
+                                </select>
+                                @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3  col-xs-12"> Квартали:</label>
+                            <div class="col-md-9 col-xs-12">
+                                @Html.EditorFor(model => model.Areas, new { htmlAttributes = new { @class = "form-control", placeholder = "Кючук Париж, Мараша, Христо Смирненски" } })
+                                @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                    </section>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <h3 class="propertyAdditionalInfoLbl" align="center">Допълнителна информация</h3>
+                    <textarea class="form-control propertyAdditionalInfoTB min-textarea" id="AdditionalInformation" name="AdditionalInformation" rows="9"></textarea>
+                    @Html.ValidationMessageFor(model => model.AdditionalInformation, "", new { @class = "text-danger" })
+                </div>
+                <div class="col-xs-12">
+                    <fieldset>
+                        <legend class="required">Типове търсен имот:</legend>
+
+                        <div class="col-xs-6">
+                            <select id="property-types" class="col-xs-12" multiple="multiple" style="height: 8em;">
+                                @foreach (var propertyType in ViewBag.PropertyTypes)
+                                {
+                                    <option value="@propertyType.PropertyTypeId">@propertyType.PropertyTypeName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-xs-6">
+                            <select id="selected-property-types" class="col-xs-12" name="propertyType" multiple="multiple" style="height: 8em;"></select>
+                        </div>
+
+                        @Html.ValidationMessageFor(model => model.UnitTypeIds, "", new { @class = "text-danger" })
+                    </fieldset>
+                </div>
+                <div class="col-xs-12">
+                    <fieldset>
+                        <legend>Данни за търсещия:</legend>
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-xs-12 titled required" for="PersonSearcher_Name"> Име: </label>
+                                <div class="col-md-9 col-xs-12">
+                                    @Html.EditorFor(model => model.PersonSearcher.Name, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.PersonSearcher.Name, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-xs-12 titled required" for="PersonSearcher_PhoneNumber"> Телефон: </label>
+                                <div class="col-md-9 col-xs-12">
+                                    @Html.EditorFor(model => model.PersonSearcher.PhoneNumber, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.PersonSearcher.PhoneNumber, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-xs-12 titled" for="PersonSearcher_Email"> Емейл: </label>
+                                <div class="col-md-9 col-xs-12">
+                                    @Html.EditorFor(model => model.PersonSearcher.Email, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.PersonSearcher.Email, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label col-xs-12 titled" style="text-align: center;" for="PersonSearcher_AdditionalInformation"> Допълнителна информация: </label>
+                                <div class="col-xs-12">
+                                    @Html.TextAreaFor(model => model.PersonSearcher.AdditionalInformation, new { @class = "form-control col-xs-12", rows = 5 })
+                                    @Html.ValidationMessageFor(model => model.PersonSearcher.AdditionalInformation, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <input type="submit" value="Създай търсене" class="btn btn-primary pull-right" id="submit-form-btn" style="margin-top: 15px;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

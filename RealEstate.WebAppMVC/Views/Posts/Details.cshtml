@@ -1,0 +1,562 @@
+﻿@using System.Text.RegularExpressions
+@using Microsoft.AspNet.Identity
+@using RealEstate.Services.Helpers
+@using RealEstate.ViewModels.WebMVC.Forum
+@model PostDetailViewModel
+@{
+    ViewBag.Title = "Детайли за пост - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style type="text/css">
+
+        .avatar {
+            width: 55px;
+            height: 55px;
+        }
+
+        .comment-operation {
+            margin-right: 3px;
+            float: right;
+            cursor: pointer;
+        }
+
+        .img-center {
+            display: block;
+            height: 380px;
+            width: 848px;
+        }
+
+        .checked {
+            color: orange;
+        }
+
+        /*Scoring*/
+        fieldset, label {
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            font-size: 1.5em;
+            margin: 10px;
+        }
+
+        .post-content {
+            padding-left: 110px;
+        }
+
+        @@media only screen and (max-width: 462px) {
+            .post-content {
+                padding-top: 100px;
+                padding-left: 0;
+            }
+        }
+    </style>
+
+    <link type="text/css" rel="stylesheet" href="/Content/reviewStarsManagement.css" />
+}
+
+@section meta{
+    <meta property="og:title" content="@Model.Title">
+    <meta property="og:description" content="@Regex.Replace(Model.Body, "<[^>]*>", string.Empty)">
+}
+
+<!-- Begin Main -->
+<div role="main" class="main pgl-bg-grey">
+    <!-- Begin page top -->
+    <section class="page-top">
+        <div class="container">
+            <div class="page-top-in">
+                <h2>
+                    <span>Детайли за пост</span>
+                </h2>
+            </div>
+        </div>
+    </section>
+    <!-- End page top -->
+    <!-- Begin content with sidebar -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 content">
+                <div class="blog-posts">
+                    <article class="post post-large post-single">
+                        <div class="post-image">
+                            <div class="owl-carousel pgl-pro-slide pgl-img-slide" data-plugin-options='{"items": 1, "pagination": false, "autoHeight": true}'>
+                                @foreach (var image in Model.ImageUrls)
+                                {
+                                    <div class="item">
+                                        <picture>
+                                            <source srcset="@(FileHelpers.ChangeFileExtension(image.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                            <source srcset="@image.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(image.Replace(" ", "%20"))">
+                                            <img class="img-responsive img-center" src="@image.Replace(" ", "%20")" alt="Blog">
+                                        </picture>
+                                        <div class="item-caption">
+                                            @*<p><small>Caption here eaque ipsa</small>
+                                                </p>*@
+
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                        <div class="post-body">
+                            <div class="post-date">
+                                <span class="day">@Model.CreatedOn.Day</span>
+                                <span class="month-year">@Model.CreatedOn.ToString("MMM") @Model.CreatedOn.Year</span>
+                            </div>
+                            <div style="float: right;margin-right: 2%; text-align: center;">
+                                <label style="display: block;">Рейтинг:</label>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    using (Html.BeginForm("Create", "Reviews", new { reviewedItemType = "Post" }, FormMethod.Post, new { id = "create-review" }))
+                                    {
+                                        <input type="hidden" name="ReviewedItemId" id="ReviewedItemId" value="@Model.PostId" />
+                                        @Html.Partial("/Views/Shared/ReviewStars_Partial.cshtml", Model.ReviewsInfo, new ViewDataDictionary())
+                                    }
+                                }
+                                else
+                                {
+                                    @Html.Partial("/Views/Shared/ReviewStarsInactive_Partial.cshtml", Model.ReviewsInfo, new ViewDataDictionary())
+                                }
+                            </div>
+
+                            <div class="post-content">
+                                <h3>
+                                    <a href="@Url.Action("Details", "Posts", new { id = Model.PostId })">@Model.Title</a>
+                                </h3>
+                                <div class="post-meta">
+                                    <span>От <a href="@Url.Action("Details", "Agents", new { agentId = Model.AuthorId })">@Model.AuthorName</a> в тема <a href="@Url.Action("Index","Forum", new { themeId = Model.ThemeId })">@Model.ThemeName</a></span>
+                                    <span><i class="fa fa-comment-o"></i> <a href="#comments">@Model.CommentsCount Коментара</a></span>
+                                </div>
+
+                                <hr />
+                                <div>
+                                    @Html.Raw(Model.Body)
+                                </div>
+
+                                <div class="post-tags">
+                                    <strong>Тагове:</strong>
+                                    @foreach (var tag in Model.Tags)
+                                    {
+                                        <a href="@Url.Action("Index","Forum", new {tagName = tag.Name})">@tag.Name</a>
+                                    }
+                                </div>
+                                @if (ViewBag.RelatedPosts.Count >= 2)
+                                {
+                                    <ul class="post-action">
+                                        <li class="btn-pre">
+                                            <a class="clamp-two" href="@Url.Action("Details", "Posts", new {id = ViewBag.RelatedPosts[0].PostId})" title="от @ViewBag.RelatedPosts[0].AuthorName">@(ViewBag.RelatedPosts[0].Title)</a>
+                                            <div style="margin-top: 5px;">
+                                                <span>
+                                                    От
+                                                    <a href="@Url.Action("Index","Forum",new { AuthorName = ViewBag.RelatedPosts[0].AuthorName})">@ViewBag.RelatedPosts[0].AuthorName</a>
+                                                    в тема
+                                                    <a href="@Url.Action("Index","Forum",new { ThemeName = ViewBag.RelatedPosts[0].ThemeName})">@ViewBag.RelatedPosts[0].ThemeName</a>
+                                                </span>
+                                            </div>
+                                        </li>
+                                        <li class="btn-next">
+                                            <a class="clamp-two" href="@Url.Action("Details", "Posts", new {id = ViewBag.RelatedPosts[1].PostId})" title="от @ViewBag.RelatedPosts[1].AuthorName">@(ViewBag.RelatedPosts[1].Title)</a>
+                                            <div style="margin-top: 5px;">
+                                                <span>
+                                                    От
+                                                    <a href="@Url.Action("Index","Forum",new { AuthorName = ViewBag.RelatedPosts[1].AuthorName})">@ViewBag.RelatedPosts[1].AuthorName</a>
+                                                    в тема
+                                                    <a href="@Url.Action("Index","Forum",new { ThemeName = ViewBag.RelatedPosts[1].ThemeName})">@ViewBag.RelatedPosts[1].ThemeName</a>
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                }
+                                <div class="related-posts">
+                                    <h3>Може би също ще харесате</h3>
+                                    <div class="row">
+                                        @foreach (PostDetailViewModel post in ViewBag.HeighestScoredPosts)
+                                        {
+                                            <div class="col-sm-4">
+                                                <article class="post">
+                                                    <div class="post-image">
+                                                        <a href="@Url.Action("Details", "Posts", new {id = post.PostId})">
+                                                            @if (post.ImageUrls.FirstOrDefault() != null)
+                                                            {
+                                                                <picture>
+                                                                    <source srcset="@(FileHelpers.ChangeFileExtension(post.ImageUrls.FirstOrDefault().Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                                                    <source srcset="@post.ImageUrls.FirstOrDefault().Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(post.ImageUrls.FirstOrDefault().Replace(" ", "%20"))">
+                                                                    <img class="img-responsive" style="width: 100%; height: 134.817px" src="@(post.ImageUrls.FirstOrDefault().Replace(" ", "%20"))" alt="Blog">
+                                                                </picture>
+                                                            }
+                                                            else
+                                                            {
+                                                                <img class="img-responsive" style="width: 100%; height: 134.817px" src="\Resources\noimage.png" alt="Blog">
+                                                            }
+
+                                                        </a>
+                                                    </div>
+                                                    <h4>
+                                                        <a class="clamp-two" href="@Url.Action("Details", "Posts", new {id = post.PostId})">@post.Title</a>
+                                                    </h4>
+                                                </article>
+                                            </div>
+                                        }
+
+                                    </div>
+                                </div>
+                                <div class="post-block post-comments clearfix">
+                                    <h3>@Model.CommentsCount Коментара</h3>
+                                    @if (Model.Comments.Count == 0)
+                                    {
+                                        <p id="uncommented">Вие имате възможността да бъдете първият коментирал то Пост!</p>
+                                    }
+                                    else
+                                    {
+                                        <ul id="comments" class="comments">
+                                            @foreach (var comment in Model.Comments.OrderBy(c => c.CreationDate))
+                                            {
+                                                <li>
+                                                    <div class="comment">
+                                                        <div class="img-circle">
+                                                            <picture>
+                                                                <source srcset="@(FileHelpers.ChangeFileExtension(comment.UserImageUrl.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                                                <source srcset="@comment.UserImageUrl.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(comment.UserImageUrl.Replace(" ", "%20"))">
+                                                                <img class="avatar" width="50" alt="Снимка" src="@comment.UserImageUrl.Replace(" ", "%20")">
+                                                            </picture>
+                                                        </div>
+                                                        <div class="comment-block">
+                                                            @if (User.Identity.Name == comment.Author)
+                                                            {
+                                                                using (Html.BeginForm("Delete", "Comments", FormMethod.Post, new { @class = "remove-comment" }))
+                                                                {
+                                                                    <input id="id" name="id" type="hidden" value="@comment.CommentId" />
+                                                                    <span class="remove-comment comment-operation glyphicon glyphicon-remove"></span>
+                                                                }
+
+                                                                <span class="edit-comment comment-operation glyphicon glyphicon-edit"></span>
+                                                            }
+
+                                                            <span class="comment-by"> <strong>@comment.Author</strong></span>
+                                                            <span class="date"><small><i class="fa fa-clock-o"></i> @comment.CreationDate.ToString("MMMM dd, yyyy")</small></span>
+
+
+                                                            <p class="comment-body">@Html.Raw(comment.Body)</p>
+
+                                                            @using (Html.BeginForm("Edit", "Comments", FormMethod.Post, new { style = "display: none;", @class = "submit-edit" }))
+                                                            {
+                                                                <input id="CommentId" name="CommentId" type="hidden" value="@comment.CommentId" />
+                                                                <div class="form-group">
+                                                                    <div class="row">
+                                                                        <div class="col-md-12">
+                                                                            <textarea maxlength="5000" rows="10" class="form-control" name="Body" id="Body">@comment.Body</textarea>
+                                                                            <span class="field-validation-valid text-danger" data-valmsg-for="Body" data-valmsg-replace="true"></span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-12">
+                                                                        <input type="submit" value="Редактирай коментар" class="btn btn-default btn-sm" data-loading-text="Loading...">
+                                                                    </div>
+                                                                </div>
+                                                            }
+
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            }
+
+
+                                        </ul>
+                                    }
+                                </div>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <div class="post-block post-leave-comment">
+                                        <h3>Напишете коментар</h3>
+                                        <p>Въведете всички полета отбелязани със знакът (*). Коментарът е само текст.</p>
+                                        <div class="row">
+                                            @using (Html.BeginForm("Create", "Comments", FormMethod.Post, new { @class = "col-xs-12", id = "create-comment" }))
+                                            {
+                                                @Html.HiddenFor(m => m.PostId)
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <label class="required">Коментар</label>
+                                                            <textarea maxlength="5000" rows="10" class="form-control min-textarea" name="Body" id="Body"></textarea>
+                                                            <span class="field-validation-valid text-danger" data-valmsg-for="Body" data-valmsg-replace="true"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <input type="submit" value="Създай коментар" class="btn btn-default btn-sm" data-loading-text="Loading...">
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    </article>
+
+                </div>
+            </div>
+            <div class="col-md-3 sidebar">
+                <aside>
+                    @if (User.Identity.GetUserId() == Model.AuthorId)
+                    {
+                        using (Html.BeginForm("Edit", "Posts", FormMethod.Get))
+                        {
+                            <input name="id" type="hidden" value="@Model.PostId" />
+                            <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">Редактирай</button>
+                        }
+                    }
+                </aside>
+                <aside class="block pgl-bg-light blk-search">
+                    <form class="form-inline form-search" role="form">
+                        <div class="form-group">
+                            <label class="sr-only" for="textsearch2">Търсите нещо?</label>
+                            <input type="text" class="form-control" id="textsearch2" placeholder="Търсите нещо?">
+                        </div>
+                        <button type="submit" class="btn"><i class="fa fa-search"></i></button>
+                    </form>
+                </aside>
+                <!-- Begin Posts By Category -->
+                @Html.Partial("~/Views/Forum/ForumCategories_Partial.cshtml", (List<ForumCategoriesLinkViewModel>)ViewBag.ForumCategories)
+                <!-- End Posts By Category -->
+                @*<aside class="block blk-ads pgl-bg-light">
+                        <img class="img-responsive" src="images/blog/side-ad.png" alt="Blog">
+                    </aside>*@
+
+                <!-- Begin Posts By Theme -->
+                @Html.Partial("~/Views/Forum/ForumThemes_Partial.cshtml", (List<ThemeLinkViewModel>)ViewBag.Themes)
+                <!-- End Posts By Theme -->
+
+                <aside class="block tabs pgl-bg-light">
+                    <ul class="nav nav-tabs second-tabs">
+                        <li class="active">
+                            <a href="#popularPosts" data-toggle="tab"><i class="icon icon-star"></i> Популярни</a>
+                        </li>
+                        <li>
+                            <a href="#latestComments" data-toggle="tab">Коментари</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        @Html.Partial("~/Views/Forum/Posts_Partial.cshtml", (List<PostSideViewModel>)ViewBag.PopularPosts)
+
+                        @Html.Partial("~/Views/Forum/Comments_Partial.cshtml", (List<CommentSideViewModel>)ViewBag.LatestComments)
+                    </div>
+                </aside>
+
+                @Html.Partial("~/Views/Forum/Tags_Partial.cshtml", (List<string>)ViewBag.Tags)
+
+                @*@Html.Partial("~/Views/Forum/PhotosCollection_Partial.cshtml", (ImageCollectionViewModel)ViewBag.FlickrPhotos)*@
+            </div>
+        </div>
+    </div>
+    <!-- End content with sidebar -->
+
+</div>
+<!-- End Main -->
+
+@section scripts{
+    <script type="text/javascript" src="/Scripts/tinymce/js/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript" src="/Scripts/tinymce/tinyMCE_Setup.js"></script>
+
+    @if (Model.PostId == 2)
+    {
+        <!-- Facebook Pixel Code -->
+        <script>
+            !function (f, b, e, v, n, t, s) {
+                if (f.fbq) return; n = f.fbq = function () {
+                    n.callMethod ?
+                        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+                };
+                if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+                n.queue = []; t = b.createElement(e); t.async = !0;
+                t.src = v; s = b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t, s)
+            }(window, document, 'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '420208795413542');
+            fbq('track', 'PageView');
+        </script>
+        <noscript>
+            <img height="1" width="1" style="display: none"
+                 src="https://www.facebook.com/tr?id=420208795413542&ev=PageView&noscript=1" />
+        </noscript>
+        <!-- End Facebook Pixel Code -->
+    }
+
+    <script>
+        $(document).ready(function () {
+
+            //Create comment and add it to the DOM
+            $(document).on('submit',
+                '#create-comment',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    var form = $(this);
+
+                    $.ajax({
+                        url: this.action,
+                        type: this.method,
+                        data: form.serialize(),
+                        success: function (data, status) {
+                            if (data.success) {
+                                showErrorResponse(data, $('#create-post'));
+                            } else {
+                                var createdComment = '<li> \
+                                                        <div class="comment"> \
+                                                            <div class="img-circle"> \
+                                                                <img class="avatar" width="50" alt="Снимка" src="' + data.UserImageUrl.replace(' ','%20')+ '"> \
+                                                            </div> \
+                                                            <div class="comment-block"> \
+                                                                <form action="/Comments/Delete" class="remove-comment" method="post"> \
+                                                                        <input id="id" name="id" value="' + data.CommentId + '" type="hidden"> \
+                                                                        <span class="remove-comment comment-operation glyphicon glyphicon-remove"></span> \
+                                                                </form> \
+                                                                <span class="edit-comment comment-operation glyphicon glyphicon-edit"></span> \
+                                                                <span class="comment-by"> <strong>' + data.Author + '</strong></span> \
+                                                                <span class="date"><small><i class="fa fa-clock-o"></i> ' + data.CreationDate + '</small></span> \
+                                                                <p class="comment-body">' + data.Body + '</p> \
+                                                                <form action="/Comments/Edit" class="submit-edit" method="post" style="display: none;"> \
+                                                                    <input id="CommentId" name="CommentId" value="' + data.CommentId + '" type="hidden"> \
+                                                                    <div class="form-group"> \
+                                                                        <div class="row"> \
+                                                                            <div class="col-md-12"> \
+                                                                                <textarea maxlength="5000" rows="10" class="form-control" name="Body" id="Body">' + data.Body + '</textarea> \
+                                                                            </div> \
+                                                                        </div> \
+                                                                    </div> \
+                                                                    <div class="row"> \
+                                                                        <div class="col-md-12"> \
+                                                                            <input value="Редактирай коментар" class="btn btn-default btn-sm" data-loading-text="Loading..." type="submit"> \
+                                                                        </div> \
+                                                                    </div> \
+                                                                </form> \
+                                                            </div> \
+                                                        </div> \
+                                                    </li>';
+
+                                $('.comments').append(createdComment);
+
+                                form.find('#Body').val('');
+
+                                $('#uncommented').remove();
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+                    });
+                });
+
+
+            $(document).on('click',
+                '.remove-comment',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    var form = $(this);
+
+                    $.ajax({
+                        url: this.action,
+                        type: this.method,
+                        data: form.serialize(),
+                        success: function (data, status) {
+                            if (data.success) {
+                                showErrorResponse(data, $('#create-post'));
+                            } else {
+                                form.closest('li').empty().remove();
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+                    });
+                });
+
+            //Show Edit form hide body paragrapth
+            $(document).on('click',
+                '.edit-comment',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    let commentBody = $(this).siblings('.comment-body');
+                    commentBody.toggle();
+
+                    let commentEditForm = $(this).siblings('.submit-edit');
+                    commentEditForm.toggle();
+                });
+
+            //Post edit to Db and switch the form with the body
+            $(document).on('submit',
+                '.submit-edit',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    var form = $(this);
+
+                    $.ajax({
+                        url: this.action,
+                        type: this.method,
+                        data: form.serialize(),
+                        success: function (data, status) {
+                            if (data.success) {
+                                showErrorResponse(data, $('#create-post'));
+                            } else {
+                                let commentBody = form.siblings('.comment-body');
+                                commentBody.text(data);
+                                form.hide();
+                                commentBody.show();
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+                    });
+                });
+
+
+            //Scroll smooth when click on anchor with id of element
+            $('#scrollToTop').click(function () {
+                $('html, body').animate({
+                    scrollTop: $($(this).attr('href')).offset().top
+                }, 500);
+                return false;
+            });
+
+            //Set the review score
+            @*let avgReviewScore = @Model.AvgReviewScore;
+            $('.rating > input[value="' + avgReviewScore + '"] , ' +
+              '.rating-inactive > input[value="' + avgReviewScore + '"] ')
+                .attr('checked', 'true');*@
+
+
+        });
+
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $(document).on('click',
+                '.rating-inactive',
+                function () {
+                    if (!window.g_isUserAuthenticated) {
+                        window.alertify.error('Влезте в акаунта си за да дадете оценка.');
+                    }
+                });
+        });
+    </script>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <script type="text/javascript" src="/Scripts/reviewStarsManagement.js"></script>
+    }
+}

@@ -1,0 +1,1137 @@
+﻿@model RealEstate.ViewModels.WebMVC.AgentMaterials.AgentMaterialsIndexViewModel
+
+@{
+    ViewBag.Title = "Материали - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+        .hiddenRow {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 2% !important;
+            border-left: 2px black solid;
+            border-right: 2px black solid;
+            border-bottom: 2px black solid;
+        }
+
+        td, th {
+            border-top: none !important;
+            vertical-align: middle !important;
+        }
+
+        th {
+            border: none !important;
+            /* make text in th not selectable */
+            -webkit-user-select: none; /* Chrome all / Safari all */
+            -moz-user-select: none; /* Firefox all */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Likely future */
+        }
+
+        .table-headers {
+            border: 2px black solid;
+        }
+
+        .accordion-toggle {
+            border-left: 2px black solid;
+            border-right: 2px black solid;
+        }
+
+            .accordion-toggle:hover {
+                background: darkgrey;
+                cursor: pointer;
+            }
+
+        .extended-information {
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        .arrow-up {
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 7px solid black;
+        }
+
+        .arrow-down {
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 7px solid black;
+        }
+
+        .ordering-text {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .ordering:hover, .ordering-ascending:hover, .ordering-descending:hover {
+            color: black;
+        }
+
+        .ordering-ascending, .ordering-descending {
+            cursor: pointer
+        }
+
+            .ordering-ascending:before {
+                content: "▼";
+            }
+
+            .ordering-descending:before {
+                content: "▲";
+            }
+
+        .operation {
+            font-size: 24px;
+        }
+
+            .operation:hover {
+                cursor: pointer;
+                transform: scale(1.2);
+            }
+
+
+        .operations {
+            width: 84px;
+        }
+
+
+        @@media only screen and (min-width: 800px) {
+        }
+
+        @@media only screen and (max-width: 800px) {
+            .hidden-on-mobile {
+                display: none;
+            }
+        }
+
+        .creation-date, .agent-name {
+            width: 150px;
+        }
+
+        .item-type {
+            width: 22px;
+        }
+
+        tbody > tr:hover {
+            background-color: #aaaaaa;
+            cursor: pointer;
+        }
+    </style>
+    <style>
+        .filedrag {
+            border: 2px dashed #AAA;
+            border-radius: 7px;
+            cursor: default;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+            .filedrag .drag-label {
+                font-weight: bold;
+                text-align: center;
+                display: block;
+                color: #AAA;
+                margin-top: 10px;
+                margin-bottom: -10px;
+            }
+
+            .filedrag.hover {
+                border-color: #F00;
+                border-style: solid;
+                box-shadow: inset 0 3px 4px #888;
+            }
+
+                .filedrag.hover .drag-label {
+                    color: #F00;
+                }
+
+        .custom-file-input-wrapper {
+            position: relative;
+        }
+
+            .custom-file-input-wrapper .custom-file-input-button {
+                position: relative;
+                overflow: hidden;
+            }
+
+                .custom-file-input-wrapper .custom-file-input-button * {
+                    cursor: pointer;
+                }
+
+                .custom-file-input-wrapper .custom-file-input-button input[type="file"] {
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    bottom: 0;
+                    cursor: pointer;
+                    opacity: 0;
+                }
+
+        .top-solid-border {
+            border-top: 2px black solid;
+        }
+
+        .side-solid-borders {
+            border-left: 2px black solid;
+            border-right: 2px black solid;
+        }
+    </style>
+}
+
+<div class="container-fluid" style="padding-top: 50px;">
+    <h1 align="center">Материали</h1>
+    <div class="row">
+        @*<div class="col-xs-12 col-sm-4 col-md-2">
+                <div class="form-group">
+
+                </div>
+            </div>*@
+        <div class="col-xs-12 col-sm-4 col-md-2">
+            <div class="form-group">
+                <label class="sr-only" for="agents">Всички Брокери</label>
+                <select data-bind="value: agentId" id="agentId" name="agentId" data-placeholder="Всички Брокер" class="chosen-select">
+                    <option selected="selected" value="">Всички Брокери</option>
+                    @foreach (var agent in ViewBag.Agents)
+                    {
+                        <option value="@agent.Id">@agent.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-4 col-md-2">
+            <div class="form-group">
+                <input class="form-control" id="filterName" name="filterName" placeholder="Филтрирай по име" data-bind="value: name, valueUpdate: 'input'" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-6 col-md-2">
+            <div class="form-group">
+                <input data-bind="click: showAddFolderModal" class="btn btn-primary btn-block" id="createFolder" name="createFolder" type="button" value="Добави папка" />
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-2">
+            <div class="form-group">
+                <input data-bind="click: showAddFileModal" class="btn btn-primary btn-block" id="createFile" name="createFile" type="button" value="Добави файл" />
+            </div>
+        </div>
+    </div>
+
+    <!-- ko if:currentFolderSpace() !== null -->
+    <div class="col-xs-12 top-solid-border side-solid-borders">
+        <div class="pull-left">
+            <i data-bind="event: { click: returnFromFolder }" style="width: 20px; cursor: pointer; color: green;" class="fa fa-arrow-circle-left operation"></i>
+            <b class="hidden-on-mobile" style="font-size: 22px;">Назад</b>
+        </div>
+        <div>
+            <h3 style="margin-bottom: 0px; font-size: 32px; text-align: center;" title="Текуща папка">
+                <i class="fa fa-folder-open" style="color: #e6df5d;"></i> <b data-bind="text: currentFolderSpace().Name"></b>
+            </h3>
+        </div>
+    </div>
+    <!-- /ko -->
+
+    <table class="table table-condensed top-solid-border">
+        <thead>
+            <tr>
+                <th class="item-type"></th>
+                <th class="name">
+                    <span name="Name">Име</span>
+                </th>
+                <th class="hidden-on-mobile agent-name"><div class="ordering"><span class="ordering-text" name="AgentName">Брокер</span><span class="ordering-ascending"></span></div></th>
+                <th class="hidden-on-mobile creation-date"><div class="ordering"><span class="ordering-text" name="CreatedOn">Създадено</span><span class="ordering-ascending"></span></div></th>
+                <th class="operations">
+                    Операции
+                </th>
+            </tr>
+        </thead>
+        <tbody class="folderPath" data-bind="event: { dblclick: returnFromFolder }">
+            <tr>
+                <td>
+                    <img alt="Назад" class="unselectable" src="/Images/uplevel.gif" height="25" />
+                </td>
+                <td class="unselectable" colspan="4" data-bind=" text: '[/' + NamesStack().join('/') + ']' "></td>
+            </tr>
+        </tbody>
+        <tbody class="folders-container" data-bind='foreach:filteredFolders()'>
+
+            <tr data-bind="event: { dblclick: $root.openFolder }">
+                <td>
+                    <i style="color: #e6df5d; font-size: 18px;" class="fa fa-folder"></i>
+                </td>
+                <td class="unselectable" data-bind='text: Name'></td>
+                <td class="hidden-on-mobile unselectable" data-bind='text: AgentName'></td>
+                <td class="hidden-on-mobile unselectable" data-bind='text: moment(CreatedOn()).format("DD.MM.YYYY HH:mm") + "ч."'></td>
+                <td class="operations unselectable">
+                    <!-- ko if: IsAllowedToEdit() -->
+                    <a><i class="fa fa-edit operation" data-bind="click: $root.showEditFolderModal"></i></a>
+                    <!-- /ko -->
+                    <!-- ko if: IsAllowedToDelete() -->
+                    <a><i class="fa fa-remove operation" data-bind="click: $root.showDeleteFolderModal"></i></a>
+                    <!-- /ko -->
+                </td>
+            </tr>
+        </tbody>
+        <tbody class="files-container" data-bind='foreach:filteredFiles()'>
+            <tr data-bind="event: { dblclick: $root.downloadFile } , attr: {'data-id': Id}">
+                <td>
+                    <i style="color: #bcbcbc; font-size: 18px;" class="fa fa-file"></i>
+                </td>
+                <td class="unselectable" data-bind='text: Name'></td>
+                <td class="hidden-on-mobile unselectable" data-bind='text: AgentName'></td>
+                <td class="hidden-on-mobile unselectable" data-bind='text: moment(CreatedOn()).format("DD.MM.YYYY HH:mm") + "ч."'></td>
+                <td class="operations unselectable">
+                    <a data-bind="attr: { href: '/AgentMaterials/DownloadFile/' + Id(), target: '_blank'}" download>
+                        <i class="fa fa-download operation"></i>
+                    </a>
+                    <!-- ko if: IsAllowedToEdit() -->
+                    <a><i class="fa fa-edit operation" data-bind="click: $root.showEditFileModal"></i></a>
+                    <!-- /ko -->
+                    <!-- ko if: IsAllowedToDelete() -->
+                    <a><i class="fa fa-remove operation" data-bind="click: $root.showDeleteFileModal"></i></a>
+                    <!-- /ko -->
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@section bottomBody{
+
+    @*Create folder modal*@
+    <div class="modal fade" id="modalAddFolderForm" role="dialog" aria-labelledby="Добави папка" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Създаване на папка</h4>
+                </div>
+                <!-- ko if: currentFolderSpace() !== null -->
+                <div class="col-xs-12" data-bind="with:currentFolderSpace">
+                    <label>Папка в която ще се създаде папката:</label>
+                    <p data-bind="text: Name"></p>
+                </div>
+                <!-- /ko -->
+                <div class="modal-body mx-3" data-bind="with: folderToCreate">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label class="required" for="folderName">Име на папка</label>
+                            <input id="folderName" name="folderName" class="form-control" data-bind="value:Name" />
+                            <span class="field-validation-valid text-danger" data-valmsg-for="Name" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: addFolder">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @*Edit folder modal*@
+    <div class="modal fade" id="modalEditFolderForm" role="dialog" aria-labelledby="Редактирай папка" aria-hidden="true" >
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Редактиране на папка</h4>
+                </div>
+                <div class="modal-body mx-3">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label class="required" for="folderToEdit">Папка</label>
+                            <input id="folderToEdit" name="folderToEdit" class="form-control" data-bind="value:folderNameToEdit" />
+                            <span class="field-validation-valid text-danger" data-valmsg-for="Name" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.saveFolderChanges">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Delete folder modal *@
+    <div class="modal fade" id="modalDeleteFolderForm" role="dialog" aria-labelledby="Изтрии папка" aria-hidden="true" >
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Найстина ли искате да изтриете тази Папка ?</h4>
+                </div>
+                <div class="modal-body mx-3" data-bind="with: selectedFolderForDelete">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label>Папка</label>
+                            <p data-bind="text: Name"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.removeFolder">Изтрии</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* Delete folder modal *@
+
+    @*Create file modal*@
+    <div class="modal fade" id="modalCreateFileForm" role="dialog" aria-labelledby="Качи файл" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Качване на файл</h4>
+                </div>
+                <div class="modal-body mx-3">
+                    <div class="row">
+
+                        <!-- ko if: currentFolderSpace() !== null -->
+                        <div class="col-xs-12" data-bind="with:currentFolderSpace">
+                            <label>Папка в която ще се създаде файлът:</label>
+                            <p data-bind="text: Name"></p>
+                        </div>
+                        <!-- /ko -->
+                        <div class="col-xs-12" data-bind="with: fileToCreate">
+                            <!-- ko if: Name().length > 0 -->
+                            <div class="form-group">
+                                <label for="fileToCreate">Име на файл</label>
+                                <input id="fileToCreate" name="fileToCreate" class="form-control" data-bind="value:Name" />
+                                <span class="field-validation-valid text-danger" data-valmsg-for="Name" data-valmsg-replace="true"></span>
+                            </div>
+                            <!-- /ko -->
+                            <div class="well filedrag" data-bind="fileDrag: fileData, event: { drop: onFileDropedEvent}">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group" data-bind="ifnot: fileData().dataURL">
+                                            <label class="drag-label">Пусни файлът тук</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <input class="form-control" type="file" data-bind="fileInput: fileData, customFileInput: {
+                                          buttonClass: 'btn btn-success',
+                                          fileNameClass: 'disabled form-control',
+                                          onClear: onClear,
+                                        }, event: {change: onFileSelectedEvent}" accept="application/pdf">
+                                    </div>
+                                </div>
+                            </div>
+
+                            @*<div class="well" data-bind="fileDrag: multiFileData">
+                                    <div class="form-group row">
+                                        <div class="col-md-6">
+                                            <div data-bind="ifnot: fileData().dataURL">
+                                                <label class="drag-label">Пуснете файловете тук</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="file" multiple data-bind="fileInput: multiFileData, customFileInput: {
+                                              buttonClass: 'btn btn-success',
+                                              fileNameClass: 'disabled form-control',
+                                              onClear: onClear,
+                                            }" accept="application/pdf">
+                                        </div>
+                                    </div>
+                                </div>*@
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.addFile">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Edit file modal*@
+    <div class="modal fade" id="modalEditFileForm" role="dialog" aria-labelledby="Редактирай файл" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Редактиране на Файл</h4>
+                </div>
+                <div class="modal-body mx-3">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label for="fileNameToEdit">Ново име на файла</label>
+                            <input id="fileNameToEdit" name="fileNameToEdit" class="form-control" data-bind="value: fileNameToEdit" />
+                            <span class="field-validation-valid text-danger" data-valmsg-for="Name" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.editFile">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Delete file modal *@
+    <div class="modal fade" id="modalDeleteFileForm" role="dialog" aria-labelledby="Изтрии файл" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Найстина ли искате да изтриете файлът ?</h4>
+                </div>
+                <div class="modal-body mx-3" data-bind="with: selectedFileToDelete">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label>Име на файлът</label>
+                            <p data-bind="text: Name"></p>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.deleteFile">Изтрии</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section scripts{
+
+    <script type='text/javascript' src='~/Scripts/knockoutJS/knockout-3.5.0.js'></script>
+    <script type='text/javascript' src='~/Scripts/knockoutJS/knockout-extentions.js'></script>
+    <script type='text/javascript' src='~/Scripts/knockoutJS/knockout-file-bindings.js'></script>
+    <script>
+        var files = @Html.Raw(Json.Encode(Model.Files));
+        var folders = @Html.Raw(Json.Encode(Model.Folders));
+
+        var rootFiles = files.filter(function(file) { return file.FolderId === null });
+        var rootFolders = folders.filter(function(folder) { return folder.ParentId === null });
+
+
+        var FolderModel = function(folder) {
+            this.Id = ko.observable(folder.Id);
+            this.CreatedOn = ko.observable(folder.CreatedOn);
+            this.Name = ko.observable(folder.Name);
+            this.AgentId = ko.observable(folder.AgentId);
+            this.AgentName = ko.observable(folder.AgentName);
+            this.ParentId = ko.observable(folder.ParentId);
+            this.IsAllowedToEdit = ko.observable(folder.IsAllowedToEdit);
+            this.IsAllowedToDelete = ko.observable(folder.IsAllowedToDelete);
+        }
+
+        var CreateFolderModel = function() {
+            this.Name = ko.observable('');
+            this.ParentId = ko.observable(null);
+        }
+
+
+        var FileModel = function(file) {
+            this.Id = ko.observable(file.Id);
+            this.CreatedOn = ko.observable(file.CreatedOn);
+            this.Name = ko.observable(file.Name);
+            this.Type = ko.observable(file.Type);
+            this.Path = ko.observable(file.Path);
+            this.Size = ko.observable(file.Size);
+            this.AgentId = ko.observable(file.AgentId);
+            this.AgentName = ko.observable(file.AgentName);
+            this.FolderId = ko.observable(file.FolderId);
+            this.IsAllowedToEdit = ko.observable(file.IsAllowedToEdit);
+            this.IsAllowedToDelete = ko.observable(file.IsAllowedToDelete);
+            this.IsAllowedToCopy = ko.observable(file.IsAllowedToCopy);
+            this.IsAllowedToCut = ko.observable(file.IsAllowedToCut);
+        }
+
+        var CreateFileModel = function () {
+
+            var self = this;
+            self.Name = ko.observable('');
+            self.File = ko.observable();
+
+            self.fileData = ko.observable({
+                dataURL: ko.observable()
+            });
+
+
+            self.multiFileData = ko.observable({
+                dataURLArray: ko.observableArray(),
+            });
+
+            self.onClear = function(fileData) {
+                fileData.clear && fileData.clear();
+            };
+
+            self.onFileSelectedEvent = function(vm, event) {
+                vm.Name(event.target.files.length !== 0 ? event.target.files[0].name : '');
+            };
+
+            self.onFileDropedEvent = function (data, event) {
+                self.Name(self.fileData().file().name);
+            };
+        }
+
+
+        var PageViewModel = function(folders, files) {
+
+            var self = this;
+
+            var observableFolders = [];
+            for (var i = 0; i < folders.length; i++) {
+                observableFolders.push(new FolderModel(folders[i]));
+            }
+            self.folders = ko.observableArray(observableFolders);
+
+            var observableFiles = [];
+            for (var i = 0; i < files.length; i++) {
+                observableFiles.push(new FileModel(files[i]));
+            }
+            self.files = ko.observableArray(observableFiles);
+
+            //Filters
+            self.agentId = ko.observable('');
+            self.name = ko.observable('');
+            //this is the folder in which we are into (ex. In folder Category)
+            self.currentFolderSpace = ko.observable(null);
+
+            //Ordering
+            self.isSortAsc = ko.observable(true);
+            self.sortBy = ko.observable('CreatedOn');
+
+            self.filteredFolders = ko.computed(function() {
+                return ko.utils
+                    .arrayFilter(self.folders(),
+                        function(folder) {
+                            return (self.name().length === 0 ||
+                                    folder.Name().toLowerCase().indexOf(self.name().toLowerCase()) !== -1) &&
+                                (self.agentId().length === 0 || folder.AgentId() === self.agentId()) &&
+                                ((!folder.ParentId() ? null : folder.ParentId()) ===
+                                    (!self.currentFolderSpace() ? null : self.currentFolderSpace().Id()));
+                        })
+                    .sort(function(a, b) {
+                        var dateA;
+                        var dateB;
+                        if (self.isSortAsc() === true)
+                            switch (self.sortBy()) {
+                            case 'CreatedOn':
+                                dateA = moment(a["CreatedOn"]()).toDate();
+                                dateB = moment(b["CreatedOn"]()).toDate();
+                                return dateB.getTime() - dateA.getTime();
+                            case 'AgentName':
+                                return a.AskingAgentName() > b.AskingAgentName();
+                            default:
+                            }
+                        else if (self.isSortAsc() === false) {
+                            switch (self.sortBy()) {
+                            case 'CreatedOn':
+                                dateA = moment(a["CreatedOn"]()).toDate();
+                                dateB = moment(b["CreatedOn"]()).toDate();
+                                return dateA.getTime() - dateB.getTime();
+                            case 'AgentName':
+                                return a.AgentName() < b.AgentName();
+                            default:
+                            }
+                        }
+
+                        return a.Id > b.Id;
+                    });
+            });
+            self.filteredFiles = ko.computed(function() {
+                return ko.utils
+                    .arrayFilter(self.files(),
+                        function(file) {
+                            return (self.name().length === 0 ||
+                                file.Name().toLowerCase().indexOf(self.name().toLowerCase()) !== -1) &&
+                                (self.agentId().length === 0 || file.AgentId() === self.agentId()) &&
+                                ((!file.FolderId() ? null : file.FolderId()) ===
+                                    (!self.currentFolderSpace() ? null : self.currentFolderSpace().Id()));
+                        })
+                    .sort(function(a, b) {
+                        var dateA;
+                        var dateB;
+                        if (self.isSortAsc() === true)
+                            switch (self.sortBy()) {
+                            case 'CreatedOn':
+                                dateA = moment(a["CreatedOn"]()).toDate();
+                                dateB = moment(b["CreatedOn"]()).toDate();
+                                return dateB.getTime() - dateA.getTime();
+                            case 'AgentName':
+                                return a.AgentName() > b.AgentName();
+                            default:
+                            }
+                        else if (self.isSortAsc() === false) {
+                            switch (self.sortBy()) {
+                            case 'CreatedOn':
+                                dateA = moment(a["CreatedOn"]()).toDate();
+                                dateB = moment(b["CreatedOn"]()).toDate();
+                                return dateA.getTime() - dateB.getTime();
+                            case 'AgentName':
+                                return a.AgentName() < b.AgentName();
+                            default:
+                            }
+                        }
+
+                        return a.Id > b.Id;
+                    });
+            });
+
+            //!!Create folder funcs!!
+            self.folderToCreate = ko.observable(new CreateFolderModel());
+            self.showAddFolderModal = function() {
+                $('#modalAddFolderForm').modal('show');
+            }
+
+            self.addFolder = function() {
+                var folderViewModel = ko.toJS(self.folderToCreate);
+
+                if (self.currentFolderSpace() !== null) {
+                    folderViewModel.ParentId = self.currentFolderSpace().Id();
+                }
+
+                $.post('/AgentMaterials/CreateFolder',
+                        folderViewModel,
+                        function(data) {
+
+                            var thisForm = $('#modalAddFolderForm');
+
+                            //Executed here because:
+                            //we need to clear old errors to show the new one on failure
+                            //we need to clear errors for the next creation when successfull
+                            clearFormValidationErrors(thisForm);
+
+                            if (data.success) {
+                                showErrorResponse(data, thisForm);
+                            } else {
+                                self.folders.push(new FolderModel(data));
+                                thisForm.modal('hide');
+                                self.folderToCreate().Name('');
+
+                                window.alertify.success("Успешно добавена папка!");
+                            }
+                        })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        $('#modalAddFolderForm').modal('hide');
+
+                        var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                        let shownError = titles ? titles[1] : errorThrown;
+                        window.alertify.error(shownError);
+                    });
+            }
+            //!!Create folder funcs!!
+
+            //!!Edit folder funcs!!
+            self.selectedFolderForEdit = ko.observable();
+            self.folderToEditId = ko.observable('');
+            self.folderNameToEdit = ko.observable('');
+            self.showEditFolderModal = function(folder) {
+
+                //Load selected item from table to variable
+                self.selectedFolderForEdit(folder);
+                //Show modal window with the binded data
+                $('#modalEditFolderForm').modal('show');
+
+                if (self.folderNameToEdit().length === 0 ||
+                    self.folderToEditId() !== self.selectedFolderForEdit().Id()) {
+
+                    self.folderNameToEdit(self.selectedFolderForEdit().Name());
+                    self.folderToEditId(self.selectedFolderForEdit().Id());
+                }
+            }
+
+            self.saveFolderChanges = function() {
+                var editViewModel = {
+                    Id: self.folderToEditId(),
+                    Name: self.folderNameToEdit()
+                };
+
+                $.post('/AgentMaterials/EditFolder',
+                        editViewModel,
+                        function(data) {
+
+                            var thisForm = $('#modalEditFolderForm');
+
+                            //Executed here because:
+                            //we need to clear old errors to show the new one on failure
+                            //we need to clear errors for the next creation when successfull
+                            clearFormValidationErrors(thisForm);
+
+                            if (data.success) {
+                                showErrorResponse(data, thisForm);
+                            } else {
+                                self.selectedFolderForEdit().Name(data.Name);
+
+                                self.selectedFolderForEdit(null);
+                                thisForm.modal('hide');
+
+                                window.alertify.success("Успешно редактирана папка!");
+                            }
+                        })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        $('#modalEditFolderForm').modal('hide');
+
+                        var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                        let shownError = titles ? titles[1] : errorThrown;
+                        window.alertify.error(shownError);
+                    });
+            }
+            //!!Edit folder funcs!!
+
+            //!!Delete folder funcs!!
+            self.selectedFolderForDelete = ko.observable();
+            self.showDeleteFolderModal = function(folder) {
+                self.selectedFolderForDelete(folder);
+                $('#modalDeleteFolderForm').modal('show');
+            }
+
+            self.removeFolder = function() {
+                $.post('/AgentMaterials/DeleteFolder',
+                    { id: self.selectedFolderForDelete().Id() },
+                    function(data) {
+                        if (data === 'STATUS_OK') {
+                            self.folders.remove(self.selectedFolderForDelete());
+                            self.selectedFolderForDelete(null);
+
+                            $('#modalDeleteFolderForm').modal('hide');
+                            window.alertify.success("Успешно изтрита папка!");
+                        } else {
+                            window.alertify.error('Проблем при изтриване на папката. Моля опитайте по-късно!');
+                        }
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        $('#modalDeleteFolderForm').modal('hide');
+                        var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                        let shownError = titles ? titles[1] : errorThrown;
+                        window.alertify.error(shownError);
+                });
+            };
+            //!!Delete folder funcs!!
+
+
+            //!!Upload file funcs!!
+            self.fileToCreate = ko.observable(new CreateFileModel());
+            self.showAddFileModal = function() {
+                $('#modalCreateFileForm').modal('show');
+            }
+
+            self.addFile = function() {
+                var addFileViewModel = new FormData();
+                if (self.currentFolderSpace() !== null) {
+                    addFileViewModel.append("FolderId", self.currentFolderSpace().Id());
+                }
+                addFileViewModel.append("Name", self.fileToCreate().Name());
+                addFileViewModel.append("File", self.fileToCreate().fileData().file());
+
+                $.ajax({
+                    url: '/AgentMaterials/UploadFile',
+                    data: addFileViewModel,
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+
+                        var thisForm = $('#modalCreateFileForm');
+                        //Executed here because:
+                        //we need to clear old errors to show the new one on failure
+                        //we need to clear errors for the next creation when successfull
+                        clearFormValidationErrors(thisForm);
+
+                        if (data.success) {
+                            showErrorResponse(data, thisForm);
+                        } else {
+
+                            self.files.push(new FileModel(data));
+                            thisForm.modal('hide');
+
+                            self.fileToCreate().Name('');
+                            self.fileToCreate().fileData().clear && self.fileToCreate().fileData().clear();;
+                            window.alertify.success("Успешно добавен файл! Ако искате да промените файлът имате " + '@System.Configuration.ConfigurationManager.AppSettings["TimeWindowForChangesInMinutes"]' + " минути да го направите!");
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('#modalCreateFileForm').modal('hide');
+                        var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                        let shownError = titles ? titles[1] : errorThrown;
+                        window.alertify.error(shownError);
+                    }
+                });
+        }
+        //!!Upload file funcs!!
+
+        //!!Edit file funcs!!
+
+        self.selectedFileToEdit = ko.observable();
+        // fileToEditId covers the problem of incidental closing of the modal
+        // which would cause flush of the entered data
+        self.fileToEditId = ko.observable('');
+        self.fileNameToEdit = ko.observable('');
+        self.showEditFileModal = function(file) {
+            $('#modalEditFileForm').modal('show');
+            self.selectedFileToEdit(file);
+            if (self.fileNameToEdit().length === 0 ||
+                self.fileToEditId() !== self.selectedFileToEdit().Id()) {
+
+                self.fileNameToEdit(self.selectedFileToEdit().Name());
+                self.fileToEditId(self.selectedFileToEdit().Id());
+            }
+        }
+
+        self.editFile = function() {
+
+            var editFileViewModel = {
+                FileId: self.fileToEditId(),
+                FileName: self.fileNameToEdit()
+            };
+
+            $.post('/AgentMaterials/EditFile',
+                editFileViewModel,
+                function(data) {
+
+                    var thisForm = $('#modalEditFileForm');
+                    //Executed here because:
+                    //we need to clear old errors to show the new one on failure
+                    //we need to clear errors for the next creation when successfull
+                    clearFormValidationErrors(thisForm);
+
+                    if (data.success) {
+                        showErrorResponse(data, thisForm);
+                    } else {
+
+                        self.selectedFileToEdit().Name(data.Name);
+
+                        self.selectedFileToEdit(null);
+                        thisForm.modal('hide');
+
+                        window.alertify.success("Успешно редактиран файл!");
+                    }
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    $('#modalEditFileForm').modal('hide');
+
+                    var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                    let shownError = titles ? titles[1] : errorThrown;
+                    window.alertify.error(shownError);
+            });
+        }
+        //!!Edit file funcs!!
+
+
+        //!! Delete file funcs !!
+        self.selectedFileToDelete = ko.observable();
+        self.showDeleteFileModal = function(file) {
+            $('#modalDeleteFileForm').modal('show');
+            self.selectedFileToDelete(file);
+        }
+
+        self.deleteFile = function() {
+
+            var fileId = self.selectedFileToDelete().Id();
+
+            $.post('/AgentMaterials/DeleteFile',
+                { id: fileId },
+                function(data) {
+                    if (data === "STATUS_OK") {
+                        self.files.remove(self.selectedFileToDelete());
+                        self.selectedFileToDelete(null);
+
+                        $('#modalDeleteFileForm').modal('hide');
+                        window.alertify.success("Успешно изтрит файл!");
+                    } else {
+                        window.alertify.error("Проблем при изтриване на файл! Опитайте по-късно!");
+                    }
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    $('#modalDeleteFileForm').modal('hide');
+
+                    var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                    let shownError = titles ? titles[1] : errorThrown;
+                    window.alertify.error(shownError);
+            });
+        };
+
+        self.downloadFile = function(file) {
+            window.location = '@Url.Action("DownloadFile")' + '?id=' + file.Id() + '&forceDownload=false';
+        };
+        //!! Delete file funcs !!
+
+
+        //Navigation function
+
+        // NAVIGATION IN AND OUT OF FOLDERS
+
+
+        //Stack of all directories we navigated into
+        self.previousFolderSpaceStack = ko.observableArray();
+
+        //----------------------------------
+
+        //The Model of the current Folder we are looking into
+            var NavigationFolderModel = function(folderId, folderName) {
+                this.Id = ko.observable(folderId);
+                this.Name = ko.observable(folderName);
+            };
+
+        self.NamesStack = ko.observableArray();
+
+            self.openFolder = function(folder) {
+                self.previousFolderSpaceStack.push(self.currentFolderSpace());
+                self.currentFolderSpace(new NavigationFolderModel(folder.Id(), folder.Name()));
+
+                self.NamesStack.push(folder.Name());
+            };
+
+            self.returnFromFolder = function() {
+
+                if (self.previousFolderSpaceStack().length === 0) {
+                    return;
+                }
+
+                var prevFolder = self.previousFolderSpaceStack.pop();
+                if (prevFolder) {
+                    self.currentFolderSpace(new NavigationFolderModel(prevFolder.Id(), prevFolder.Name()));
+                } else {
+                    self.currentFolderSpace(null);
+                }
+
+                self.NamesStack.pop();
+            };
+
+            self.navigateToFolder = function() {
+                var urlString = window.location.href;
+                var url = new URL(urlString);
+                var folderId = Number(url.searchParams.get("folderId"));
+
+                if (folderId) {
+                    var foldersToSelectedStack = [];
+                    var folderToPush = self.folders().filter(function(folder) { return folder.Id() === folderId; })[0];
+
+                    var folderToOpen = folderToPush;
+                    if (folderToOpen) {
+                        self.currentFolderSpace(new NavigationFolderModel(folderToOpen.Id(), folderToOpen.Name()));
+                    }
+
+                    while (folderToPush) {
+                        foldersToSelectedStack.push(new NavigationFolderModel(folderToPush.Id(), folderToPush.Name()));
+                        if (folderToPush.ParentId()) {
+                            folderToPush = self.folders().filter(function(folder) {
+                                return folder.Id() === folderToPush.ParentId();
+                            })[0];
+                        } else {
+                            foldersToSelectedStack.push(null);
+                            break;
+                        }
+                    }
+
+                    if (foldersToSelectedStack.length > 0) {
+                        var foldersSelectedStackLength = foldersToSelectedStack.length;
+                        for (var i = 0; i < foldersSelectedStackLength; i++) {
+
+                            var folderToSelectStack = foldersToSelectedStack.pop();
+
+                            //skip the last folder cuz it is the current folder
+                            //and shouldn't be added as previous
+                            if (i + 1 !== foldersSelectedStackLength)
+                                self.previousFolderSpaceStack.push(folderToSelectStack);
+
+                            //skip the top level 'null' entry
+                            if (folderToSelectStack) {
+                                self.NamesStack.push(folderToSelectStack.Name());
+                            }
+                        }
+                    }
+
+                }
+            };
+
+            self.highlightFile = function () {
+
+                var urlString = window.location.href;
+                var url = new URL(urlString);
+                var fileId = url.searchParams.get("fileId");
+
+                if (fileId) {
+                    // Using jQuery's animate() method to add smooth page scroll
+                    // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
+                    var $elementToScrollTo = $('tr[data-id="' + fileId + '"]');
+
+                    console.log($elementToScrollTo);
+
+                    if ($elementToScrollTo[0]) {
+
+                        const viewportHeight = window.innerHeight || 0;
+
+                        $('html, body').animate({
+                                scrollTop: $elementToScrollTo.offset().top - viewportHeight / 2
+                            },
+                            800,
+                            function() {
+                                $elementToScrollTo.css('background-color', '#fff9d7');
+                            });
+                    }
+                }
+            };
+
+        }
+
+
+        var vm = new PageViewModel(folders, files);
+        ko.applyBindings(vm);
+
+        vm.navigateToFolder();
+        vm.highlightFile();
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $(document).on('click',
+                '.ordering',
+                function (e) {
+                    var textSpan = $(this).find('.ordering-text');
+                    var property = textSpan.attr('name');
+
+                    var arrowSpan = textSpan.next();
+                    arrowSpan.toggleClass('ordering-ascending ordering-descending');
+
+                    var isOrderAsc = arrowSpan.hasClass('ordering-ascending');
+
+                    vm.isSortAsc(isOrderAsc);
+                    vm.sortBy(property);
+                });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            function toggleChevron(e) {
+                $(e.target)
+                    .closest('tr')
+                    .prev()
+                    .find("i.indicator")
+                    .toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+            }
+
+            $('.table-condensed').on('hidden.bs.collapse', toggleChevron);
+            $('.table-condensed').on('shown.bs.collapse', toggleChevron);
+
+            $(document).on('click',
+                '.table-condensed .operation',
+                (function (e) {
+                    e.stopPropagation();
+                }));
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+}

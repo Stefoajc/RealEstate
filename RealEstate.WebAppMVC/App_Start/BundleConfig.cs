@@ -8,29 +8,48 @@ namespace RealEstate.WebAppMVC
         // For more information on bundling, visit https://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
+            bundles.UseCdn = true;
+            bundles.Add(new ScriptBundle("~/bundles/shared")
+                .Include(
+                "~/Scripts/jquery-3.3.1.min.js",
+                "~/Scripts/jquery.gmap.js",
+                "~/Scripts/jquery.flexslider-min.js",
+                "~/Scripts/modernizr-*",
+                "~/Scripts/bootstrap.min.js",
+                "~/Scripts/respond.min.js",
+                "~/Scripts/alertify/alertify.min.js",
+                "~/Scripts/theme/owlDefaultOptions.js",
+                "~/Scripts/owl/old/owl.carousel.js",
+                "~/Scripts/moment-with-locales.min.js",
+                "~/Scripts/dateTimePicker/jquery.datetimepicker.full.min.js",
+                "~/Scripts/modelstate-error-handling.js",
+                "~/Scripts/UnselectableTags.js",
+                "~/Scripts/extentions/extentions.js",
+                "~/Scripts/paymentMethods.js",
+                "~/Scripts/cookies/cookies-managing.js",
+                "~/Scripts/unpkg/weakmap-polyfill.min.js",
+                "~/Scripts/unpkg/formdata.min.js"));
+
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
-                        "~/js/jquery/jquery.min.js",
-                        "~/js/jquery/jquery.gmap.js",
-                        "~/js/jquery/jquery.flexslider-min.js"));
+                        "~/Scripts/jquery-3.3.1.min.js",
+                        "~/Scripts/jquery.gmap.js",
+                        "~/Scripts/jquery.flexslider-min.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
-                        "~/js/jquery.validate*"));
-
-            bundles.Add(new ScriptBundle("~/bundles/modelstate-errors-handling").Include(
-                        "~/js/modelstate-error-handling.js"));
+                        "~/Scripts/jquery.validate*"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at https://modernizr.com to pick only the tests you need.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
-                        "~/js/modernizr-*"));
+                        "~/Scripts/modernizr-*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/js/bootstrap/bootstrap.min.js",
-                      "~/js/respond.js"));
+                      "~/Scripts/bootstrap.min.js",
+                      "~/Scripts/respond.min.js"));
 
-            bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/css/bootstrap/bootstrap.css",
-                      "~/css/css.css"));
+            bundles.Add(new StyleBundle("~/Content/alertify").Include(
+                "~/Content/alertify/alertify.min.css",
+                "~/Content/alertify/themes/semantic.min.css"));
 
             //bundles.Add(new ScriptBundle("~/bundles/owl")
             //    .Include("~/js/owl/owl.carousel.js"));
@@ -40,19 +59,24 @@ namespace RealEstate.WebAppMVC
             //        "~/css/owl/ow.theme.default.css",
             //        "~/css/owl/ow.theme.green.css"));
 
-            bundles.Add(new ScriptBundle("~/bundles/owl")
-                .Include("~/js/owl/old/owl.carousel.js"));
-
             bundles.Add(new StyleBundle("~/Content/owl")
-                .Include("~/css/owl/old/owl.carousel.css",
-                    "~/css/owl/old/owl.theme.css"));
+                .Include("~/Content/owl/old/owl.carousel.css",
+                    "~/Content/owl/old/owl.theme.css"));
 
-            bundles.Add(new ScriptBundle("~/bundles/bootstrapDatePicker")
-                .Include("~/js/bootstrap-datepicker.min.js"));
 
-            bundles.Add(new StyleBundle("~/Content/bootstrapDatePicker")
-                .Include("~/css/bootstrapDateTimePicker/bootstrap-datepicker.min.css",
-                "~/css/bootstrapDateTimePicker/bootstrap-datepicker3.min.css"));
+            bundles.Add(new StyleBundle("~/Content/shared")
+                .Include("~/Content/bootstrap.min.css",
+                    "~/Content/owl/old/owl.carousel.css",
+                    "~/Content/owl/old/owl.theme.css",
+                    "~/Content/alertify/alertify.min.css",
+                    "~/Content/alertify/themes/semantic.min.css",
+                    "~/Content/shared-compressed.css",
+                    "~/Content/dateTimePicker/jquery.datetimepicker.min.css")
+                .Include("~/Content/css/font-awesome.min.css", new CssRewriteUrlTransform())
+                .Include("~/Content/chosen/chosen.css", new CssRewriteUrlTransform())
+                .Include(
+                    "~/Content/theme/theme-all-compressed.css",
+                    "~/Content/smartMenus/jquery.smartmenus.bootstrap.css"));
         }
     }
 }

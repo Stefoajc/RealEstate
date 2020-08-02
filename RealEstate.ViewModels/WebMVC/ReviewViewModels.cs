@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace RealEstate.ViewModels.WebMVC
 {
@@ -7,12 +8,27 @@ namespace RealEstate.ViewModels.WebMVC
         
     }
 
-    public class CreateReviewViewModel
+    public class ReviewStarsPartialViewModel
     {
-        public int? ReviewScore { get; set; }
-        public string ReviewText { get; set; }
+        public ReviewStarsPartialViewModel(string reviewedItemType, object reviewForeignKey)
+        {
+            ReviewForeignKey = reviewForeignKey;
+            ReviewedItemType = reviewedItemType;
+        }
 
         [Required]
+        public string ReviewedItemType { get; set; }
+        [Required(ErrorMessage = "Задължително е да се въведе относно какво е ревюто!")]
+        public object ReviewForeignKey { get; set; }
+    }
+
+    public class CreateReviewViewModel
+    {
+        [Required(ErrorMessage = "Задължително е да се въведе рейтинг точки!")]
+        public int ReviewScore { get; set; }
+        public string ReviewText { get; set; }
+
+        [Required(ErrorMessage = "Задължително е да се въведе относно какво е ревюто!")]
         public object ReviewForeignKey { get; set; }
     }
 
@@ -42,12 +58,40 @@ namespace RealEstate.ViewModels.WebMVC
 
     }
 
+    public class PropertyReviewCreateViewModel
+    {
+        [Required(ErrorMessage = "Изберете имот за даване на Ревю!")]
+        public int PropertyId { get; set; }
+        public string ReviewText { get; set; }
+        [Required(ErrorMessage = "Въведете резултат на ревюто!")]
+        public int Score { get; set; }
+    }
+
+
+    public class ReviewsStarsPartialViewModel
+    {
+        public ReviewsStarsPartialViewModel() {}
+
+        public double? AverageScore { get; set; }
+        public int ReviewsCount { get; set; }
+    }
+
+
+    public class ReviewListViewModel
+    {
+        public int? ReviewScore { get; set; }
+        public string ReviewText { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public ClientReviewListViewModel ClientReviewer { get; set; }
+    }
+
 
     public enum ReviewTypes
     {
         Property,
         Sight,
         City,
-        Owner
+        Owner,
+        Agent
     }
 }

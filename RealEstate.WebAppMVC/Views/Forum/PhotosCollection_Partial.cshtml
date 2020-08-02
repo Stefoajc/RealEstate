@@ -1,0 +1,11 @@
+﻿@model RealEstate.ViewModels.WebMVC.Forum.ImageCollectionViewModel
+
+<aside class="block pgl-bg-light">
+    <h3>@Model.CollectionName</h3>
+    <ul class="list-thumb-gallery">
+        @foreach (var imageUrl in Model.ImageUrls)
+        {
+            <li><a href="@imageUrl"><img class="img-responsive" src="@imageUrl" width="70" alt="Снимка"></a></li>
+        }
+    </ul>
+</aside>

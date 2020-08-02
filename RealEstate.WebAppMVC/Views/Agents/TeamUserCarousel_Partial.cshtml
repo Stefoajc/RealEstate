@@ -1,0 +1,35 @@
+﻿@using RealEstate.Services.Helpers
+@model List<RealEstate.ViewModels.WebMVC.TeamUserListViewModel>
+
+@if (Model.Any())
+{
+    <aside class="block pgl-agents pgl-bg-light">
+        <h3>Нашите брокери</h3>
+        <div class="owl-carousel pgl-pro-slide owl-theme owl-carousel-init" data-plugin-options="{&quot;items&quot;: 1, &quot;pagination&quot;: false, &quot;autoHeight&quot;: true}" style="display: block; opacity: 1;">
+            @foreach (var agent in Model)
+            {
+                <div class="pgl-agent-item">
+                    <div class="img-thumbnail-medium">
+                        <a href="@Url.Action("Details", "Agents", new {agentId = agent.AgentId})">
+                            <picture>
+                                <source srcset="@(FileHelpers.ChangeFileExtension(agent.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                <source srcset="@agent.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(agent.ImagePath.Replace(" ", "%20"))">
+                                <img alt="Снимка"  class="img-responsive" style="width: 100%; height: 220.5px;" src="@agent.ImagePath.Replace(" ", "%20")">
+                            </picture>
+                        </a>
+                    </div>
+                    <div class="pgl-agent-info" style="max-height: 144.4px;">
+                        <small></small>
+                        <h4><a href="@Url.Action("Details","Agents",new {agentId = agent.AgentId})">@agent.FullName</a></h4>
+                        <div class="clamp-two">@(Html.Raw(agent.AdditionalDescription ?? "Брокер"))</div>
+                        <address>
+                            <i class="fa fa-map-marker"></i> Офис : @agent.OfficePhone<br>
+                            <i class="fa fa-phone"></i> Мобилен : @agent.PhoneNumber<br>
+                            <i class="fa fa-envelope-o"></i> Емейл: <a href="mailto:@(agent.Email)">@agent.Email</a>
+                        </address>
+                    </div>
+                </div>
+            }
+        </div>
+    </aside>
+}

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RealEstate.Model
 {
@@ -16,7 +12,10 @@ namespace RealEstate.Model
         [Required, MaxLength(50)]
         public string PropertyTypeName { get; set; }
 
-        public virtual ISet<Properties> Properties { get; set; } = new HashSet<Properties>();
+        public bool IsPropertyOnly { get; set; }
+
+        public virtual ISet<PropertiesBase> Properties { get; set; } = new HashSet<PropertiesBase>();
+        public virtual ISet<PropertySearches.PropertySearches> PropertySearches { get; set; } = new HashSet<PropertySearches.PropertySearches>();
     }
 
 

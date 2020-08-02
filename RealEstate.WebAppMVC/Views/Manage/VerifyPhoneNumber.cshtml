@@ -1,27 +1,27 @@
 ﻿@model RealEstate.ViewModels.WebMVC.VerifyPhoneNumberViewModel
 @{
-    ViewBag.Title = "Verify Phone Number";
+    ViewBag.Title = "Потвърдете телефонният номер";
 }
-
-<h2>@ViewBag.Title.</h2>
 
 @using (Html.BeginForm("VerifyPhoneNumber", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
     @Html.AntiForgeryToken()
-    @Html.Hidden("phoneNumber", @Model.PhoneNumber)
-    <h4>Enter verification code</h4>
-    <h5>@ViewBag.Status</h5>
-    <hr />
-    @Html.ValidationSummary("", new { @class = "text-danger" })
-    <div class="form-group">
-        @Html.LabelFor(m => m.Code, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.Code, new { @class = "form-control" })
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" class="btn btn-default" value="Submit" />
+    @Html.Hidden("phoneNumber", Model.PhoneNumber)
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <h2 align="center">Въведи полученият код</h2>
+            <h5 class="text-success" align="center">Ако не сте получили код се обадете в офиса за да ви потвърдят телефонния номер</h5>
+            <hr class="" />
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+            <div class="form-group">
+                <h5 align="center" class="col-md-12" style="margin-bottom: 5px;">Код</h5>
+                <div class="col-md-12">
+                    @Html.TextBoxFor(m => m.Code, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group" style="padding: 0 15px;">
+                <input type="submit" class="btn btn-primary col-xs-12" value="Потвърди" />
+            </div>
         </div>
     </div>
 }

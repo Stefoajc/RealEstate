@@ -1,0 +1,39 @@
+﻿.payment-field .pay-icon::before {
+    content: "";
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    background-image: url(/Resources/Payments/payment-types.png);
+    background-repeat: no-repeat;
+    display: inline-block;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+.payment-field .pay-icon.card::before {
+    background-position: center -112px;
+}
+
+.payment-field .pay-icon.easy::before {
+    background-position: center -67px;
+    background-color: transparent;
+}
+
+.payment-field .pay-icon.epay::before {
+    background-position: center -27px;
+    background-color: #15597C;
+}
+
+.payment-field input[type="radio"] {
+    vertical-align: middle;
+}
+
+.payment-field .pay-icon {
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+}

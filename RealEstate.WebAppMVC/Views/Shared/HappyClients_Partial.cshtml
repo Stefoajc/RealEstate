@@ -1,0 +1,34 @@
+﻿@using RealEstate.Services.Helpers
+@using RealEstate.ViewModels.WebMVC
+@model List<ListReviewViewModel>
+
+@if (Model.Any())
+{
+    <aside class="block pgl-bg-dark pgl-testimonials">
+        <div class="owl-carousel pgl-testimonial owl-theme owl-carousel-init" data-plugin-options="{&quot;items&quot;: 1, &quot;pagination&quot;: false, &quot;autoHeight&quot;: true}" style="max-height: 400px;">
+            @foreach (var client in Model)
+            {
+                <div class="owl-item">
+                    <div class="col-md-12">
+                        <div class="testimonial-author">
+                            <div class="img-thumbnail-small img-circle">
+                                <picture >
+                                    <source srcset="@(FileHelpers.ChangeFileExtension(client.UserProfileImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                    <source srcset="@client.UserProfileImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(client.UserProfileImagePath.Replace(" ", "%20"))">
+                                    <img class="img-responsive img-circle" style="max-width: 110px; max-height: 110px" src="@client.UserProfileImagePath.Replace(" ", "%20")" alt="@client.ReviewUserFullname">
+                                </picture>
+                            </div>
+                            <h4>@client.ReviewUserFullname</h4>
+                            <p><strong>Клиент</strong></p>
+                        </div>
+                        <div class="divider-quote-sign"><span>“</span></div>
+                        <blockquote class="testimonial">
+                            @Html.Partial("/Views/Shared/ReviewStarsInactive_Partial.cshtml", new ReviewsStarsPartialViewModel{ AverageScore = client.ReviewScore, ReviewsCount = 1})
+                            <p class="clamp-two">@client.ReviewText</p>
+                        </blockquote>
+                    </div>
+                </div>
+            }
+        </div>
+    </aside>
+}

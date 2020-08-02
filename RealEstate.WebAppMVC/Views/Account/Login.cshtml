@@ -4,62 +4,63 @@
     ViewBag.Title = "Вход";
 }
 
-<style>
-    #Google {
-        background-image: url(/ExternalLoginIcons/googleLoginIcon.png);
-        background-size: 30px,30px;
-        background-repeat: no-repeat;
-        width: 33px;
-        height: 33px;
-        border-style: none;
-    }
+@section css{
+    <style>
+        #Google, #Facebook, #Twitter, #Instagram, #LinkedIn {
+            background-repeat: no-repeat;
+            width: 32px;
+            height: 33px;
+            border-style: none;
+            background-position: center;
+        }
 
-    #Facebook {
-        background-image: url(/ExternalLoginIcons/facebookIcon.png);
-        background-size: 50px,50px;
-        background-repeat: no-repeat;
-        width: 33px;
-        height: 33px;
-        background-position: center;
-        border-style: none;
-    }
+        #Google {
+            background-image: url(/ExternalLoginIcons/googleLoginIcon.png);
+            background-size: 32px 33px;
+        }
 
-    #Twitter {
-        background-image: url(/ExternalLoginIcons/twitterIcon.png);
-        background-size: 35px,35px;
-        background-repeat: no-repeat;
-        width: 33px;
-        height: 33px;
-        background-position: center;
-        border-style: none;
-    }
+        #Facebook {
+            background-image: url(/ExternalLoginIcons/facebookIcon.png);
+            background-size: 50px 50px;
+        }
 
-    #Instagram {
-        background-image: url(/ExternalLoginIcons/instagramIcon.jpg);
-        background-size: 33px,33px;
-        background-repeat: no-repeat;
-        width: 33px;
-        height: 33px;
-        border-style: none;
-    }
+        #Twitter {
+            background-image: url(/ExternalLoginIcons/twitterIcon.png);
+            background-size: 35px 36.3px;
+        }
 
-    #LinkedIn {
-        background-image: url(/ExternalLoginIcons/linkedinIcon.png);
-        background-size: 33px,33px;
-        background-repeat: no-repeat;
-        width: 33px;
-        height: 33px;
-        border-style: none;
-    }
+        #Instagram {
+            background-image: url(/ExternalLoginIcons/instagramIcon.jpg);
+            background-size: 31.7px 33px;
+        }
 
-    .loginForm {
-        margin-top: 10px;
-    }
+        #LinkedIn {
+            background-image: url(/ExternalLoginIcons/linkedinIcon.png);
+            background-size: 32px 33px;
+        }
 
-    .registerLink {
-        text-decoration: underline;
-    }
-</style>
+        .loginForm {
+            margin-top: 10px;
+        }
+
+        .registerLink {
+            text-decoration: underline;
+        }
+
+        .g-recaptcha {
+            transform: scale(1.15,1);
+            margin-left: 24px;
+        }
+
+        @@media only screen and (max-width: 462px) {
+            .g-recaptcha {
+                transform: scale(0.99,1);
+                margin-left: -2px;
+            }            
+        }
+    </style>
+}
+
 
 <div role="main" class="main pgl-bg-grey">
     <!-- Begin page top -->
@@ -87,10 +88,15 @@
                         @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
                         @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                     </div>
-                    <div class="form-group">
-                        @Html.CheckBoxFor(m => m.RememberMe)
-                        <label>Запомни ме?</label>
+
+                    <div class="g-recaptcha not-ready"></div>
+                    @Html.ValidationMessageFor(m => m.reCaptcha, "", new { @class = "text-danger" })
+
+                    <div style="margin: 5px 5px 0 5px;">
+                        @Html.CheckBoxFor(m => m.RememberMe, new { id = "rememberMe" })
+                        <label for="rememberMe">Запомни ме?</label>
                     </div>
+
                     <div class="form-group">
                         <button type="submit" class="btn btn-block btn-primary">Вход</button>
                     </div>
@@ -112,6 +118,35 @@
         </div>
     </section>
 </div>
+
+@Html.Partial("RequestStatusDropModal")
+
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+
+            var confirmationType = getParam('confirm');
+            if (confirmationType === 'email') {
+                createAndShowModal({
+                    title: "Потвърждаване на акаунт",
+                    body:
+                        "Вашият акаунт беше създаден успешно, но е нужно да бъде потвърден. </br> " +
+                        "Потвърдете го като влезете на е-мейл адресът си. </br>  " +
+                        "Там е изпратен е-мейл от който ще потвърдите потребителят си."
+                });
+            } else if (confirmationType === 'sms') {
+                createAndShowModal({
+                    title: "Потвърждаване на акаунт",
+                    body:
+                        "Вашият акаунт беше създаден успешно, но е нужно да бъде потвърден. </br> " +
+                        "На телефонът, който сте въвели ще получите код за потвърждение."
+                });
+            }
+
+            function getParam(param) {
+                return new URLSearchParams(window.location.search).get(param);
+            }
+        });
+    </script>
 }

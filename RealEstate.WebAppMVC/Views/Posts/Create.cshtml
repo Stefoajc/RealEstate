@@ -1,0 +1,316 @@
+﻿@model RealEstate.ViewModels.WebMVC.Forum.PostCreateViewModel
+@{
+    ViewBag.Title = "Създай пост - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+        body {
+            text-align: center;
+        }
+
+        input {
+            text-align: center;
+        }
+
+        textarea {
+            display: block;
+            width: 100%;
+        }
+
+        #image-main {
+            max-height: 456px;
+            width: 100%;
+            height: 100%;
+            border: black 2px solid;
+        }
+
+        .postImage {
+            width: 45%;
+            height: 18%;
+            padding-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .topright {
+            position: relative;
+            top: -27px;
+            right: 12px;
+            font-size: 18px;
+            color: red;
+            cursor: pointer;
+        }
+
+        .remove-tag {
+            color: red;
+            cursor: pointer;
+            margin-left: 3px;
+        }
+
+        #gallery {
+            height: 416px;
+            border-style: solid;
+            border-bottom-width: 0;
+            padding-top: 10px;
+            text-align: left;
+        }
+
+        .tagclouds > li > a {
+            margin: 0 5px 0 0;
+            background-color: lightcyan;
+        }
+
+        #tag-container {
+            height: 140px;
+            overflow-y: scroll;
+            border-style: solid;
+            border-width: 1px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            text-align: left;
+        }
+    </style>
+}
+
+@using (Html.BeginForm("Create", "Posts", FormMethod.Post, new { @class = "container", id = "create-post" }))
+{
+
+    <div class="col-xs-12" style="margin: 30px 0 30px 0;">
+
+        <h1 align="center">Създаване на пост</h1>
+        <div class="row" style="margin-bottom: 30px;">
+            <div class="col-md-9 col-xs-12">
+                <img id="image-main" class="img-responsive" src="/Resources/Blog/no-image-post.png" alt="Снимка" />
+            </div>
+            <div class="col-md-3 col-xs-12">
+                <div id="gallery" class="col-xs-12">
+
+                </div>
+
+                <input type="file" style="display: none" name="" multiple id="gallery-photo-add">
+                <input type="button" class="btn btn-primary col-xs-12" value="Избери снимка" onclick="$('#gallery-photo-add').trigger('click')" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-xs-12">
+                <div class="form-group">
+                    <label class="required">Изберете тема</label>
+                    <select name="ThemeId" id="ThemeId" class="chosen-select">
+                        @foreach (var theme in ViewBag.Themes)
+                        {
+                            if (ViewBag.SelectedThemeId == theme.ThemeId)
+                            {
+                                <option selected="selected" value="@theme.ThemeId">@theme.Name от категория @theme.CategoryName</option>
+                            }
+                            else
+                            {
+                                <option value="@theme.ThemeId">@theme.Name от категория @theme.CategoryName</option>
+                            }
+                        }
+                    </select>
+                    @Html.ValidationMessageFor(model => model.ThemeId, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Заглавие</label>
+                    @Html.EditorFor(m => m.Title, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xs-12">
+                <div class="col-xs-12 form-group">
+                    <label>Тагове</label>
+                    <div id="tag-container" class="col-xs-12">
+                        <ul class="list-inline tagclouds"></ul>
+                    </div>
+                    <div class="col-xs-12" style="padding-right: 0px;">
+                        <div class="pull-right" style="padding-top: 3px;">
+                            <input id="tag" list="tags" type="text" placeholder="Въведете таг" style="height: 40px" />
+                            <datalist id="tags">
+                                @foreach (var tag in ViewBag.Tags)
+                                {
+                                    <option value="@tag" />
+                                }
+                            </datalist>
+                            <input id="add-tag" type="button" class="btn btn-primary" value="Добави таг" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group col-md-12  col-xs-12">
+                <label class="required">Съдържание на поста</label>
+                <textarea id="Body" name="Body" class="form-control full-textarea"></textarea>
+                @Html.ValidationMessageFor(model => model.Body, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group col-xs-12">
+                <input class="btn btn-primary pull-right" type="submit" value="Създай" />
+            </div>
+        </div>
+    </div>
+
+
+}
+
+
+@section scripts{
+    <script type="text/javascript" src="/Scripts/tinymce/js/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript" src="/Scripts/tinymce/tinyMCE_Setup.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            //Add tag to the tags field
+            $('#add-tag').click(function () {
+                let tagName = $('#tag').val();
+                if (tagName !== '' && tagName !== null) {
+
+                    let isDublicate = false;
+
+                    //Tags already added for the post
+                    var addedTags = getAllTags();
+                    // Iterating tru all tags applied already and check if there is tag with that name
+                    $.each(addedTags,
+                        function (index, item) {
+
+                            if (item === tagName) {
+                                isDublicate = true;
+                            }
+                        });
+
+                    //Add the new tag if its not dublicate
+                    if (!isDublicate) {
+                        //Adding tag with bolded X for deleting the tag
+                        $('.tagclouds').append('<li><a>' + tagName + '<b class="remove-tag">X</b></a></li>');
+                        //clear input text
+                        $('#tag').val('');
+                    }
+                }
+            });
+
+            //Get all tags as array of strings
+            function getAllTags() {
+                //Tags already added for the post
+                var addedTags = $('.tagclouds > li > a').toArray();
+                return Array.from(addedTags,
+                    function (x) {
+                        return $(x)
+                            .clone() //clone the element
+                            .children() //select all the children
+                            .remove() //remove all the children
+                            .end() //again go back to selected element
+                            .text();
+                    });
+            }
+
+            //Remove the tag containing the item
+            $('body').on('click',
+                ".remove-tag",
+                function () {
+                    $(this).closest('li').remove();
+                });
+
+            // Multiple images preview in browser
+            // Array of strings which are img tags with pictures embeded
+            let createImageTagsList = function (input) {
+                if (input.files) {
+                    let filesAmount = input.files.length;
+
+                    for (let i = 0; i < filesAmount; i++) {
+                        let reader = new FileReader();
+
+                        //Create img tag with the image embeded in base64
+                        let imageTag =
+                            $($.parseHTML('<img alt="Снимка" class="postImage"/><span class="topright"><b>x</b></span>'))
+                                .data('file', input.files[i]);
+
+                        reader.onload = function (event) {
+                            imageTag.attr('src', event.target.result);
+                        }
+                        reader.readAsDataURL(input.files[i]);
+
+                        if ($('#gallery img').length < 10) {
+                            $(imageTag).appendTo('#gallery');
+                        }
+                    }
+                }
+            };
+
+            //Add Image to the gallery
+            $('body').on('change',
+                '#gallery-photo-add',
+                function () {
+                    createImageTagsList(this);
+
+                    $(this).clone().appendTo($(this).parent()).hide();
+                    $(this).val('');
+                });
+
+            //Remove image from gallery
+            $('body').on('click',
+                '.topright',
+                function removeImageFromGaleryAndSetImageCount() {
+                    var imgToDelete = $(this).siblings('img')[0];
+                    if ($(imgToDelete).data('selected') === true) {
+                        $('#image-main').attr('src', '/Resources/Blog/no-image-post.png');
+                    }
+                    //Remove the image from gallery
+                    $(this).prev().remove();
+                    //Remove the Span with the X from the gallery
+                    $(this).remove();
+                });
+
+            //Change main image
+            $('body').on('click',
+                '.postImage',
+                function () {
+                    $(this).data('selected', true);
+                    $('#image-main').attr('src', this.src);
+                });
+
+
+            $('#create-post').on('submit',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    let form = new FormData(this);
+
+                    let tagsArray = getAllTags();
+                    //add tags to the form
+                    $.each(tagsArray, function (i, tagName) {
+                        form.append('Tags', tagName);
+                    });
+
+                    $('.postImage').each(function (index) {
+                        form.append('ImageFiles[' + index + ']', $(this).data('file'));
+                    });
+
+                    //Save tinymce editor content to the textarea
+                    form.set('Body', window.tinyMCE.get('Body').getContent());
+
+                    window.alertify.success("Постът се създава, моля изчакайте!", 5);
+                    $.ajax({
+                        url: this.action,
+                        type: this.method,
+                        processData: false,
+                        contentType: false,
+                        data: form,
+                        success: function (data, status) {
+                            if (data.success) {
+                                window.alertify.error("Има грешка в попълнените полета!", 5);
+                                showErrorResponse(data, $('#create-post'));
+                            } else {
+                                window.location = "/Posts/Details/" + data.PostId;
+                            };
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+                    });
+                });
+        });
+    </script>
+}

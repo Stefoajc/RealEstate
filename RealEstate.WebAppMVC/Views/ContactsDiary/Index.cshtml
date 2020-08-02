@@ -1,0 +1,900 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.RecordListViewModel>
+
+@{
+    ViewBag.Title = "Контактен списък - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+        .hiddenRow {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 2% !important;
+            border-left: 2px black solid;
+            border-right: 2px black solid;
+            border-bottom: 2px black solid;
+        }
+
+        td {
+            border-top: none !important;
+            vertical-align: middle !important;
+        }
+
+        th {
+            border: none !important;
+            /* make text in th not selectable */
+            -webkit-user-select: none; /* Chrome all / Safari all */
+            -moz-user-select: none; /* Firefox all */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Likely future */
+        }
+
+        .table-headers {
+            border: 2px black solid;
+        }
+
+        .accordion-toggle {
+            border-left: 2px black solid;
+            border-right: 2px black solid;
+        }
+
+        .accordion-toggle:hover {
+            background: darkgrey;
+            cursor: pointer;
+        }
+
+        .extended-information {
+            margin-top: 5px;
+            margin-bottom: 20px;
+        }
+
+        .arrow-up {
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 7px solid black;
+        }
+
+        .arrow-down {
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 7px solid black;
+        }
+
+        .ordering-text {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .ordering:hover, .ordering-ascending:hover, .ordering-descending:hover {
+            color: black;
+        }
+
+        .ordering-ascending, .ordering-descending {
+            cursor: pointer
+        }
+
+            .ordering-ascending:before {
+                content: "▼";
+            }
+
+            .ordering-descending:before {
+                content: "▲";
+            }
+
+
+        @@media only screen and (max-width: 800px) {
+            .hidden-on-mobile {
+                display: none;
+            }
+        }
+    </style>
+}
+
+<div class="container-fluid" style="padding-top: 50px;">
+    <h1 align="center">Контактна листа на "СПРОПЪРТИС"</h1>
+    <div class="row">
+        <div class="col-xs-6 col-sm-2">
+            <div class="form-group">
+                <label class="sr-only" for="property-types">Тип имот</label>
+                <select data-bind="value: propertyTypeId" id="property-types" name="propertyType" data-placeholder="Типове имоти" class="chosen-select">
+                    <option selected="selected" value="">Типове имоти</option>
+                    @foreach (var propertyType in ViewBag.PropertyTypes)
+                    {
+                        <option value="@propertyType.PropertyTypeId">@propertyType.PropertyTypeName</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-2">
+            <div class="form-group">
+                <label class="sr-only" for="cityId">Град</label>
+                <select data-bind="value: cityId" id="cityId" name="cityId" data-placeholder="Град" class="chosen-select">
+                    <option selected="selected" value="">Град</option>
+                    @foreach (var city in ViewBag.Cities)
+                    {
+                        <option value="@city.CityId">@city.CityName</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-2">
+            <div class="form-group">
+                <label class="sr-only" for="city-District">Квартал</label>
+                <select data-bind="value: cityDistrict" id="city-District" name="cityDistrict" data-placeholder="Квартал" class="chosen-select">
+                    <option selected="selected" value="">Квартал</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-2">
+            <div class="form-group">
+                <label class="sr-only" for="agentId">Брокер</label>
+                <select data-bind="value: agentId" id="agentId" name="agentId" data-placeholder="Брокер" class="chosen-select">
+                    <option selected="selected" value="">Брокер</option>
+                    @foreach (var agent in ViewBag.Agents)
+                    {
+                        <option value="@agent.Id">@agent.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6 col-sm-2">
+            <div class="form-group">
+                <label class="sr-only" for="deal-types">Вид сделка</label>
+                <select data-bind="value: dealTypeId" id="deal-types" name="dealType" data-placeholder="Вид сделка" class="chosen-select">
+                    <option selected="selected" value="">Вид сделка</option>
+                    @foreach (var dealType in ViewBag.DealTypes)
+                    {
+                        <option value="@dealType.DealTypeId">@dealType.DealType</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-2">
+            <div class="form-group">
+                <label class="sr-only" for="deal-stages">Етап сделка</label>
+                <select data-bind="value: negotiationStageId" id="deal-stages" name="dealStage" data-placeholder="Етап сделка" class="chosen-select">
+                    <option selected="selected" value="">Етап сделка</option>
+                    @foreach (var negotiationStage in ViewBag.NegotiationStages)
+                    {
+                        <option value="@negotiationStage.NegotiationStageId">@negotiationStage.NegotiationStage</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-2">
+            <div class="form-group">
+                <label class="sr-only" for="person-type">Етап сделка</label>
+                <select data-bind="value: personTypeId" id="person-type" name="personType" data-placeholder="Вид клиент" class="chosen-select">
+                    <option selected="selected" value="">Вид клиент</option>
+                    @foreach (var personType in ViewBag.PersonTypes)
+                    {
+                        <option value="@personType.PersonTypeId">@personType.PersonType</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-2">
+            <div class="form-group">
+                <input class="form-control" id="phonenumber" name="phonenumber" placeholder="Телефонен номер" data-bind="value: phoneNumber, valueUpdate: 'input'" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-2">
+            <div class="form-group">
+                <button class="btn btn-primary btn-block" data-bind="click: showAddRecordModal">Добави контакт</button>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-condensed" style="border-collapse:collapse;">
+        <thead>
+            <tr class="table-headers">
+                <th class="hidden-on-mobile"></th>
+                <th>Телефон</th>
+                <th class="hidden-on-mobile">
+                    <div class="ordering">
+                        <span class="ordering-text" name="Name">Клиент</span>
+                        <span class="ordering-ascending"></span>
+                    </div>
+                </th>
+                <th class="hidden-on-mobile"><div class="ordering"><span class="ordering-text" name="PropertyType">Тип имот</span><span class="ordering-ascending"></span></div></th>
+                <th><div class="ordering"><span class="ordering-text" name="CityName">Град</span><span class="ordering-ascending"></span></div></th>
+                <th class="hidden-on-mobile"><div class="ordering"><span class="ordering-text" name="CityDistrict">Квартал</span><span class="ordering-ascending"></span></div></th>
+                <th><div class="ordering"><span class="ordering-text" name="DealType">Вид сделка</span><span class="ordering-ascending"></span></div></th>
+                <th><div class="ordering"><span class="ordering-text" name="NegotiationState">Етап</span><span class="ordering-ascending"></span></div></th>
+                <th class="hidden-on-mobile"><div class="ordering"><span class="ordering-text" name="CreatedOn">Създадено</span><span class="ordering-ascending"></span></div></th>
+                <th class="hidden-on-mobile"><div class="ordering"><span class="ordering-text" name="AgentName">Брокер</span><span class="ordering-ascending"></span></div></th>
+                <th class="hidden-on-mobile">
+                    Операции
+                </th>
+            </tr>
+        </thead>
+        <tbody data-bind='foreach:filteredRecords()'>
+
+            <tr data-toggle="collapse" data-bind="attr: {'data-target': '#accordeon' + $index(), 'data-id': Id}, style: { 'background-color': RecordColor }" class="accordion-toggle">
+                <td class="indicator-container hidden-on-mobile" >
+                    <i class="indicator glyphicon glyphicon-chevron-down  pull-left"></i>
+                </td>
+                <td data-bind='text: PhoneNumber'></td>
+                <td class="hidden-on-mobile" data-bind='text: Name'></td>
+                <td class="hidden-on-mobile" data-bind='text: PropertyType() !== null ? PropertyType() : ""'></td>
+                <td data-bind='text: CityName'></td>
+                <td class="hidden-on-mobile" data-bind='text: CityDistrict'></td>
+                <td data-bind='text: DealType'></td>
+                <td data-bind='text: NegotiationState'></td>
+                <td class="hidden-on-mobile" data-bind='text: moment(CreatedOn()).format("DD.MM.YYYY HH:mm") + "ч."'></td>
+                <td class="hidden-on-mobile" data-bind='text: AgentName'></td>
+                <td class="hidden-on-mobile">
+                    <i class="fa fa-edit operation" style="font-size: 24px;" data-bind="click: $root.editRecord"></i>
+                    <i class="fa fa-remove operation" style="font-size: 24px;" data-bind="click: $root.showRemoveContactForm"></i>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="11" class="hiddenRow">
+                    <div class="accordion-body collapse" data-bind="attr: {'id': 'accordeon' + $index()}">
+                        <div class="extended-information row">
+                            <div class="col-md-4">
+                                <div>
+                                    <div>
+                                        <b>Име на контакта:</b>
+                                        <span data-bind="text:Name"></span>
+                                    </div>
+                                    <div>
+                                        <b>Тип на контакта:</b>
+                                        <span data-bind="text:ContactedPersonType"></span>
+                                    </div>
+                                    <div>
+                                        <b>Етап на преговори:</b>
+                                        <span data-bind="text:NegotiationState"></span>
+                                    </div>
+                                    <div>
+                                        <b>Вид сделка:</b>
+                                        <span data-bind="text:DealType"></span>
+                                    </div>
+                                    <div>
+                                        <b>Местоположение:</b>
+                                        <span data-bind="text: 'гр.' + CityName() + ', ' + 'кв.' + CityDistrict() + ', ' + Address()"></span>
+                                    </div>
+                                    <div>
+                                        <b>Брокер:</b>
+                                        <a target="_blank" data-bind="text: AgentName, attr: {'href': '/Agents/Details?id=' + AgentId}"> </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="additionalInformation col-md-8">
+                                <div>
+                                    <b>Допълнителна инфромация</b>
+                                </div>
+                                <div data-bind="text: AdditionalDescription">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+
+@section bottomBody{
+
+    @*Create record modal*@
+    <div class="modal fade" id="modalAddRecordForm" role="dialog" aria-labelledby="Добави контакт" aria-hidden="true" >
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Добавяне на запис</h4>
+                </div>
+                <div class="modal-body mx-3" data-bind="with: recordToCreate">
+                    <div class="row">
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label  class="required" for="add-contact-phonenumber">Телефон</label>
+                                    <input type="text" id="add-contact-phonenumber" class="form-control" placeholder="08765433219" data-bind="value:PhoneNumber">
+                                    @Html.ValidationMessage("PhoneNumber", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-contact-name">Име</label>
+                                    <input type="text" id="add-contact-name" class="form-control" placeholder="Иван Иванов" data-bind="value:Name">
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-contact-type">Източник на контакта</label>
+                                    <input type="text" id="add-contact-source" class="form-control" placeholder="Facebook, Olx..." data-bind="value:PropertySource">
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-deal-type">Tип на сделката</label>
+                                    <select id="add-deal-type" name="dealType" data-placeholder="Вид сделка" class="chosen-manual" data-bind="value:DealTypeId">
+                                        <option selected="selected" value="">Вид сделка</option>
+                                        @foreach (var dealType in ViewBag.DealTypes)
+                                        {
+                                            <option value="@dealType.DealTypeId">@dealType.DealType</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-property-type">Tип на имота</label>
+                                    <select id="add-property-type" name="propertyType" data-placeholder="Типове имоти" class="chosen-manual" data-bind="value: PropertyTypeId">
+                                        <option selected="selected" value="">Типове имоти</option>
+                                        @foreach (var propertyType in ViewBag.PropertyTypes)
+                                        {
+                                            <option value="@propertyType.PropertyTypeId">@propertyType.PropertyTypeName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label  class="required" for="add-contact-city">Град</label>
+                                    <select id="add-contact-city" name="cityId" data-placeholder="Град" class="chosen-manual" data-bind="value: CityId">
+                                        <option selected="selected" value="">Град</option>
+                                        @foreach (var city in ViewBag.Cities)
+                                        {
+                                            <option value="@city.CityId">@city.CityName</option>
+                                        }
+                                    </select>
+                                    @Html.ValidationMessage("CityId", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-contact-cityDistrict">Квартал</label>
+                                    <input type="text" id="add-contact-cityDistrict" class="form-control" placeholder="Кючук Париж" data-bind="value:CityDistrict">
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-contact-address">Адрес</label>
+                                    <input type="text" id="add-contact-address" class="form-control" placeholder="ул.Иван Братоев 8" data-bind="value:Address">
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-contact-type">Tип на контакта</label>
+                                    <select id="add-contact-type" name="personType" data-placeholder="Вид клиент" class="chosen-manual" data-bind="value:ContactedPersonTypeId">
+                                        <option selected="selected" value="">Вид клиент</option>
+                                        @foreach (var personType in ViewBag.PersonTypes)
+                                        {
+                                            <option value="@personType.PersonTypeId">@personType.PersonType</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-deal-stage">Етап на сделката</label>
+                                    <select id="add-deal-stage" name="dealStage" data-placeholder="Етап сделка" class="chosen-manual" data-bind="value:NegotiationStateId">
+                                        <option selected="selected" value="">Етап сделка</option>
+                                        @foreach (var negotiationStage in ViewBag.NegotiationStages)
+                                        {
+                                            <option value="@negotiationStage.NegotiationStageId">@negotiationStage.NegotiationStage</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <label>Допълнителна информация</label>
+                        </div>
+                        <div class="col-xs-12">
+                            <textarea class="form-control" rows="3" data-bind="value:AdditionalDescription"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: addRecord">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @*Edit record modal*@
+    <div class="modal fade" id="modalEditRecordForm" role="dialog" aria-labelledby="Редактирай запис" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Редактиране на запис</h4>
+                </div>
+                <div class="modal-body mx-3" data-bind="with: selectedRecordForEdit">
+                    <input type="hidden" data-bind="value: Id" />
+                    <div class="row">
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label  class="required" for="edit-contact-phonenumber">Телефон</label>
+                                    <input type="text" id="edit-contact-phonenumber" class="form-control" placeholder="08765433219" data-bind="value: PhoneNumber">
+                                    @Html.ValidationMessage("PhoneNumber", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="edit-contact-name">Име</label>
+                                    <input type="text" id="edit-contact-name" class="form-control" placeholder="Иван Иванов" data-bind="value: Name">
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="edit-contact-source">Източник на контакта</label>
+                                    <input type="text" id="edit-contact-source" class="form-control" placeholder="Facebook, Olx..." data-bind="value: PropertySource">
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="edit-deal-type">Tип на сделката</label>
+                                    <select id="edit-deal-type" name="dealType" data-placeholder="Вид сделка" class="chosen-manual" data-bind="value: DealTypeId">
+                                        <option selected="selected" value="">Вид сделка</option>
+                                        @foreach (var dealType in ViewBag.DealTypes)
+                                        {
+                                            <option value="@dealType.DealTypeId">@dealType.DealType</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="edit-property-type">Tип на имота</label>
+                                    <select id="edit-property-type" name="propertyType" data-placeholder="Типове имоти" class="chosen-manual" data-bind="value: PropertyTypeId">
+                                        <option selected="selected" value="">Типове имоти</option>
+                                        @foreach (var propertyType in ViewBag.PropertyTypes)
+                                        {
+                                            <option value="@propertyType.PropertyTypeId">@propertyType.PropertyTypeName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label  class="required" for="edit-contact-city">Град</label>
+                                    <select id="edit-contact-city" name="cityId" data-placeholder="Град" class="chosen-manual" data-bind="value: CityId">
+                                        <option selected="selected" value="">Град</option>
+                                        @foreach (var city in ViewBag.Cities)
+                                        {
+                                            <option value="@city.CityId">@city.CityName</option>
+                                        }
+                                    </select>
+                                    @Html.ValidationMessage("CityId", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="edit-contact-cityDistrict">Квартал</label>
+                                    <input type="text" id="edit-contact-cityDistrict" class="form-control" placeholder="Кючук Париж" data-bind="value: CityDistrict">
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="edit-contact-address">Адрес</label>
+                                    <input type="text" id="edit-contact-address" class="form-control" placeholder="ул.Иван Братоев 8" data-bind="value: Address">
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="edit-contact-type">Tип на контакта</label>
+                                    <select id="edit-contact-type" name="personType" data-placeholder="Вид клиент" class="chosen-manual" data-bind="value: ContactedPersonTypeId">
+                                        <option selected="selected" value="">Вид клиент</option>
+                                        @foreach (var personType in ViewBag.PersonTypes)
+                                        {
+                                            <option value="@personType.PersonTypeId">@personType.PersonType</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="edit-deal-stage">Етап на сделката</label>
+                                    <select id="edit-deal-stage" name="dealStage" data-placeholder="Етап сделка" class="chosen-manual" data-bind="value: NegotiationStateId">
+                                        <option selected="selected" value="">Етап сделка</option>
+                                        @foreach (var negotiationStage in ViewBag.NegotiationStages)
+                                        {
+                                            <option value="@negotiationStage.NegotiationStageId">@negotiationStage.NegotiationStage</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <label>Допълнителна информация</label>
+                        </div>
+                        <div class="col-xs-12">
+                            <textarea class="form-control" rows="3" data-bind="value: AdditionalDescription"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.saveChanges">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Delete Partner modal *@
+    <div class="modal fade" id="modalDeleteContactForm" role="dialog" aria-labelledby="Изтрии Контакт" aria-hidden="true" >
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Найстина ли искате да изтриете информацията за този Контакт ?</h4>
+                </div>
+                <div class="modal-body mx-3" data-bind="with: selectedContactToDelete">
+                    <div class="row">
+                        <div class="col-xs-12 col-md-6">
+                            <div>
+                                <span>Име:</span>
+                                <b data-bind='text: Name'></b>
+                            </div>
+                            <div>
+                                <span>Телефон</span>
+                                <b data-bind='text: PhoneNumber'></b>
+                            </div>
+                            <div>
+                                <span>Вид клиент</span>
+                                <b data-bind='text: ContactedPersonType'></b>
+                            </div>
+                            <!-- ko if: PropertyType() -->
+                            <div>
+                                <span>Тип имот</span>
+                                <b data-bind='text: PropertyType'></b>
+                            </div>
+                            <!-- /ko -->
+                            <div>
+                                <span>Град</span>
+                                <b data-bind='text: CityName'></b>
+                            </div>
+                            <!-- ko if: Address() -->
+                            <div>
+                                <span>Квартал</span>
+                                <b data-bind='text: Address'></b>
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                        <div class="col-xs-12 col-md-6">
+                            <div>
+                                <span>Тип на сделката</span>
+                                <b data-bind='text: DealType'></b>
+                            </div>
+                            <div>
+                                <span>Етап на сделката</span>
+                                <b data-bind='text: NegotiationState'></b>
+                            </div>
+                            <div>
+                                <span>Създаден на:</span>
+                                <b data-bind='text: moment(CreatedOn()).format("DD.MM.YYYY HH:mm") + "ч."'></b>
+                            </div>
+                            <div>
+                                <span>Създаден от:</span>
+                                <b data-bind='text: AgentName'></b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.removeRecord">Изтрии</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section scripts{
+
+    <script type='text/javascript' src='~/Scripts/knockoutJS/knockout-3.5.0.js'></script>
+    <script type='text/javascript' src='~/Scripts/knockoutJS/knockout-extentions.js'></script>
+    <script>
+        var diaryRecords = @Html.Raw(Json.Encode(Model));
+
+
+
+        var RecordModel = function(record) {
+            this.Id = ko.observable(record.Id);
+            this.CreatedOn = ko.observable(record.CreatedOn);
+            this.PhoneNumber = ko.observable(record.PhoneNumber);
+            this.Name = ko.observable(record.Name);
+            this.CityId = ko.observable(record.CityId);
+            this.CityName = ko.observable(record.CityName);
+            this.CityDistrict = ko.observable(record.CityDistrict);
+            this.Address = ko.observable(record.Address);
+            this.PropertySource = ko.observable(record.PropertySource);
+            this.AdditionalDescription = ko.observable(record.AdditionalDescription);
+            this.ContactedPersonTypeId = ko.observable(record.ContactedPersonTypeId);
+            this.ContactedPersonType = ko.observable(record.ContactedPersonType);
+            this.DealTypeId = ko.observable(record.DealTypeId);
+            this.DealType = ko.observable(record.DealType);
+            this.PropertyTypeId = ko.observable(record.PropertyTypeId);
+            this.PropertyType = ko.observable(record.PropertyType);
+            this.NegotiationStateId = ko.observable(record.NegotiationStateId);
+            this.NegotiationState = ko.observable(record.NegotiationState);
+            this.RecordColor = ko.observable(record.RecordColor);
+            this.AgentId = ko.observable(record.AgentId);
+            this.AgentName = ko.observable(record.AgentName);
+        }
+
+        var CreateRecordModel = function()
+        {
+            this.PhoneNumber = ko.observable('');
+            this.Name = ko.observable('');
+            this.CityId = ko.observable('');
+            this.CityDistrict = ko.observable('');
+            this.Address = ko.observable('');
+            this.PropertySource = ko.observable('');
+            this.AdditionalDescription = ko.observable('');
+            this.ContactedPersonTypeId = ko.observable('');
+            this.DealTypeId = ko.observable('');
+            this.PropertyTypeId = ko.observable('');
+            this.NegotiationStateId = ko.observable('');
+        }
+
+        var PageViewModel = function(records) {
+
+            var self = this;
+
+            var observableRecords = [];
+            for (var i = 0; i < records.length; i++) {
+                observableRecords.push(new RecordModel(records[i]));
+            }
+
+            self.records = ko.observableArray(observableRecords);
+
+            self.propertyTypeId = ko.observable('');
+            self.cityId = ko.observable('');
+            self.cityDistrict = ko.observable('');
+            self.dealTypeId = ko.observable('');
+            self.negotiationStageId = ko.observable('');
+            self.personTypeId = ko.observable('');
+            self.agentId = ko.observable('');
+            self.phoneNumber = ko.observable('');
+
+            self.isSortAsc = ko.observable(true);
+            self.sortBy = ko.observable('Name');
+
+            self.filteredRecords = ko.computed(function() {
+
+                return ko.utils
+                    .arrayFilter(self.records(),
+                    function (rec) {
+                            return ((self.propertyTypeId().length === 0 ||
+                                    rec.PropertyTypeId() === Number(self.propertyTypeId())) &&
+                                (self.cityId().length === 0 ||
+                                    rec.CityId() === Number(self.cityId())) &&
+                                (self.cityDistrict().length === 0 ||
+                                    ko.utils.stringStartsWith(rec.CityDistrict().toLowerCase(),
+                                        self.cityDistrict.toLowerCase())) &&
+                                (self.dealTypeId().length === 0 ||
+                                    rec.DealTypeId() === Number(self.dealTypeId())) &&
+                                (self.negotiationStageId().length === 0 ||
+                                    rec.NegotiationStateId() === Number(self.negotiationStageId())) &&
+                                (self.personTypeId().length === 0 ||
+                                    rec.ContactedPersonTypeId() === Number(self.personTypeId())) &&
+                                (self.agentId().length === 0 ||
+                                    rec.AgentId() === self.agentId()) &&
+                                (self.phoneNumber().length === 0 ||
+                                    rec.PhoneNumber().indexOf(self.phoneNumber()) !== -1));
+                        })
+                    .sort(function(a, b) {
+
+                        var dateA;
+                        var dateB;
+                        if (self.isSortAsc() === true)
+                            switch (self.sortBy()) {
+                            case 'Name':
+                                return a.Name() > b.Name();
+                            case 'PropertyType':
+                                return a.PropertyTypeId() > b.PropertyTypeId();
+                            case 'CityName':
+                                return a.CityName() > b.CityName();
+                            case 'CityDistrict':
+                                return a.CityDistrict() > b.CityDistrict();
+                            case 'DealType':
+                                return a.DealType() > b.DealType();
+                            case 'NegotiationState':
+                                return a.NegotiationState() > b.NegotiationState();
+                            case 'CreatedOn':
+                                dateA = moment(a["CreatedOn"]()).toDate();
+                                dateB = moment(b["CreatedOn"]()).toDate();
+                                return dateB.getTime() - dateA.getTime();
+                            case 'AgentName':
+                                return a.AgentName() > b.AgentName();
+                            default:
+                            }
+                        else if (self.isSortAsc() === false) {
+                            switch (self.sortBy()) {
+                            case 'Name':
+                                return a.Name() < b.Name();
+                            case 'PropertyType':
+                                return a.PropertyTypeId() < b.PropertyTypeId();
+                            case 'CityName':
+                                return a.CityName() < b.CityName();
+                            case 'CityDistrict':
+                                return a.CityDistrict() < b.CityDistrict();
+                            case 'DealType':
+                                return a.DealType() < b.DealType();
+                            case 'NegotiationState':
+                                return a.NegotiationState() < b.NegotiationState();
+                            case 'CreatedOn':
+                                dateA = moment(a["CreatedOn"]()).toDate();
+                                dateB = moment(b["CreatedOn"]()).toDate();
+                                return dateA.getTime() - dateB.getTime();
+                            case 'AgentName':
+                                return a.AgentName() > b.AgentName();
+                            default:
+                            }
+                        }
+
+                        return a.Id > b.Id;
+                    });
+            });
+
+            //!!Create funcs!!
+            self.recordToCreate = ko.observable();
+            self.showAddRecordModal = function () {
+                $('#modalAddRecordForm').modal('show');
+                self.recordToCreate(new CreateRecordModel());
+
+                $('#modalAddRecordForm .chosen-manual').chosen();
+            }
+
+            self.addRecord = function()
+            {
+                var recordViewModel = ko.toJS(self.recordToCreate);
+
+                $.post('/ContactsDiary/Create', recordViewModel
+                    , function (data) {
+
+                        var thisForm = $('#modalAddRecordForm');
+
+                        if (data.success) {
+                            showErrorResponse(data, thisForm);
+                        } else {
+                            self.records.push(new RecordModel(data));
+                            thisForm.modal('hide');
+                            self.recordToCreate(null);
+
+                            clearFormValidationErrors(thisForm);
+                            window.alertify.success("Успешно добавен запис!");
+                        }
+                    });
+            }
+            //!!Create funcs!!
+
+            //!!Edit funcs!!
+            self.selectedRecordForEdit = ko.observable();
+            self.editRecord = function (record) {
+                //Load selected item from table to variable
+                self.selectedRecordForEdit(record);
+                //Show modal window with the binded data
+                $('#modalEditRecordForm').modal('show');
+
+                $('#modalEditRecordForm .chosen-manual').chosen();
+            }
+
+            self.saveChanges = function() {
+                var editViewModel = {
+                    id: self.selectedRecordForEdit().Id(),
+                    phoneNumber: self.selectedRecordForEdit().PhoneNumber(),
+                    name: self.selectedRecordForEdit().Name(),
+                    cityId: self.selectedRecordForEdit().CityId(),
+                    cityDistrict: self.selectedRecordForEdit().CityDistrict(),
+                    address: self.selectedRecordForEdit().Address(),
+                    propertySource: self.selectedRecordForEdit().PropertySource(),
+                    additionalDescription: self.selectedRecordForEdit().AdditionalDescription(),
+                    contactedPersonTypeId: self.selectedRecordForEdit().ContactedPersonTypeId(),
+                    dealTypeId: self.selectedRecordForEdit().DealTypeId(),
+                    propertyTypeId: self.selectedRecordForEdit().PropertyTypeId(),
+                    negotiationStateId: self.selectedRecordForEdit().NegotiationStateId()
+                };
+
+                $.post('/ContactsDiary/Edit', editViewModel,
+                    function (data) {
+
+                        var thisForm = $('#modalEditRecordForm');
+
+                        if (data.success) {
+                            showErrorResponse(data, thisForm);
+                        } else {
+                            self.selectedRecordForEdit().CityName(data.CityName);
+                            self.selectedRecordForEdit().PropertyType(data.PropertyType);
+                            self.selectedRecordForEdit().NegotiationState(data.NegotiationState);
+                            self.selectedRecordForEdit().RecordColor(data.RecordColor);
+                            self.selectedRecordForEdit().DealType(data.DealType);
+                            self.selectedRecordForEdit().ContactedPersonType(data.ContactedPersonType);
+
+                            self.selectedRecordForEdit(null);
+                            thisForm.modal('hide');
+
+                            clearFormValidationErrors(thisForm);
+                            window.alertify.success("Успешно редактиран запис!");
+                        }
+                    });
+            }
+            //!!Edit funcs!!
+
+            //!!Delete funcs!!
+            self.selectedContactToDelete = ko.observable();
+            self.showRemoveContactForm = function(record) {
+                //Load selected item from table to variable
+                self.selectedContactToDelete(record);
+                //Show modal window with the binded data
+                $('#modalDeleteContactForm').modal('show');
+            };
+
+            self.removeRecord = function () {
+                $.post('/ContactsDiary/Delete', { id: self.selectedContactToDelete().Id() },
+                    function(data) {
+                        if (data === 'STATUS_OK') {
+                            self.records.remove(self.selectedContactToDelete());
+
+                            //Hide modal window with the binded data
+                            $('#modalDeleteContactForm').modal('hide');
+                            window.alertify.success("Успешно изтрит контакт!");
+                        } else {
+                            window.alertify.error('Проблем при изтриване на запис. Моля опитайте по-късно!');
+                        }
+                    });
+            };
+            //!!Delete funcs!!
+
+
+            self.highlightRecord = function () {
+
+                var urlString = window.location.href;
+                var url = new URL(urlString);
+                var contactId = url.searchParams.get("contactId");
+
+                if (contactId) {
+                    // Using jQuery's animate() method to add smooth page scroll
+                    // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
+                    var $elementToScrollTo = $('tr[data-id="' + contactId + '"]');
+
+                    if ($elementToScrollTo[0]) {
+
+                        const viewportHeight = window.innerHeight || 0;
+
+                        $('html, body').animate({
+                                scrollTop: $elementToScrollTo.offset().top - viewportHeight / 2
+                            },
+                            800,
+                            function() {
+                                $elementToScrollTo.css('background-color', '#fff9d7');
+                            });
+                    }
+                }
+            };
+        }
+
+        var vm = new PageViewModel(diaryRecords);
+        ko.applyBindings(vm);
+
+        vm.highlightRecord();
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $(document).on('click',
+                '.ordering',
+                function (e) {
+                    var textSpan = $(this).find('.ordering-text');
+                    var property = textSpan.attr('name');
+
+                    var arrowSpan = textSpan.next();
+                    arrowSpan.toggleClass('ordering-ascending ordering-descending');
+
+                    var isOrderAsc = arrowSpan.hasClass('ordering-ascending');
+
+                    vm.isSortAsc(isOrderAsc);
+                    vm.sortBy(property);
+                });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            function toggleChevron(e) {
+                $(e.target)
+                    .closest('tr')
+                    .prev()
+                    .find("i.indicator")
+                    .toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+            }
+
+            $('.table-condensed').on('hidden.bs.collapse', toggleChevron);
+            $('.table-condensed').on('shown.bs.collapse', toggleChevron);
+
+            $(document).on('click', '.table-condensed .operation', (function (e) {
+                e.stopPropagation();
+            }));
+        });
+    </script>
+}

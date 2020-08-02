@@ -1,74 +1,150 @@
 ﻿@model RealEstate.ViewModels.WebMVC.IndexViewModel
 @{
-    ViewBag.Title = "Manage";
+    ViewBag.Title = "Управление на акаунта";
 }
 
-<h2>@ViewBag.Title.</h2>
+<div class="container" style="padding-top: 20px;">
+    <h2 align="center">@ViewBag.Title.</h2>
 
-<p class="text-success">@ViewBag.StatusMessage</p>
-<div>
-    <h4>Change your account settings</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>Password:</dt>
-        <dd>
-            [
-            @if (Model.HasPassword)
-            {
-                @Html.ActionLink("Change your password", "ChangePassword")
-            }
-            else
-            {
-                @Html.ActionLink("Create", "SetPassword")
-            }
-            ]
-        </dd>
-        <dt>External Logins:</dt>
-        <dd>
-            @Model.Logins.Count [
-            @Html.ActionLink("Manage", "ManageLogins") ]
-        </dd>
-        @*
-            Phone Numbers can used as a second factor of verification in a two-factor authentication system.
-             
-             See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
-                for details on setting up this ASP.NET application to support two-factor authentication using SMS.
-             
-             Uncomment the following block after you have set up two-factor authentication
-        *@
-        @*  
-            <dt>Phone Number:</dt>
+    <p class="text-success">@ViewBag.StatusMessage</p>
+    <div>
+        <h4 align="center">Сменете настройките на акаунта си</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            @* Manage Pictures *@
+            <dt>Снимки:</dt>
+            <dd>@Html.ActionLink("Управление на снимките", "Images")</dd>
+
+            @* Edit Personal Info *@
+            @*Change Userame*@
+            <dt>Лична информация:</dt>
             <dd>
-                @(Model.PhoneNumber ?? "None")
-                @if (Model.PhoneNumber != null)
+                @Html.ActionLink("Редактирай лична информация", "EditPersonalData", new { }, new { id = "edit-personal-info" })
+            </dd>
+
+            @*Change Userame*@
+            <dt>Потребителско име:</dt>
+            <dd>
+                <span id="username">@Model.UserName</span>
+                [ @Html.ActionLink("Смени потребителско име", "ChangeUsername", new { }, new { id = "change-username" }) ]
+            </dd>
+
+            @* Change/Create password *@
+            <dt>Парола:</dt>
+            <dd>
+                @if (Model.HasPassword)
                 {
-                    <br />
-                    <text>[&nbsp;&nbsp;@Html.ActionLink("Change", "AddPhoneNumber")&nbsp;&nbsp;]</text>
-                    using (Html.BeginForm("RemovePhoneNumber", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        <text>[<input type="submit" value="Remove" class="btn-link" />]</text>
-                    }
+                    @Html.ActionLink("Смяна на парола", "ChangePassword", new { }, new { id = "change-password" })
                 }
                 else
                 {
-                    <text>[&nbsp;&nbsp;@Html.ActionLink("Add", "AddPhoneNumber")
+                    @Html.ActionLink("Създай парола", "SetPassword")
                 }
             </dd>
-        *@
-        <dt>Two-Factor Authentication:</dt>
-        <dd>
-            <p>
-                There are no two-factor authentication providers configured. See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
-                for details on setting up this ASP.NET application to support two-factor authentication.
-            </p>
-            @*@if (Model.TwoFactor)
+
+            @if (User.IsInRole("Client") || User.IsInRole("Agent"))
+            {
+                //CheckAppointments
+                <dt>Срещи:</dt>
+                <dd>
+                    @Html.ActionLink("Управление на срещите", "GetOwnAppointments", "Appointments")
+                </dd>
+            }
+
+            @*CheckAppointments*@
+            <dt>Резервации:</dt>
+            <dd>
+                @Html.ActionLink("Управление на резервациите", "GetOwnReservations", "Reservations")
+            </dd>
+
+            <dt>Акаунти в социални медии:</dt>
+            <dd>
+                @Html.ActionLink("Управление на потребителски акаунти в социални мрежи", "SocialMediaManagement")
+            </dd>
+
+            @* Change/Add Phone number *@
+            <dt>Телефонен номер:</dt>
+            <dd>
+
+                <span id="phonenumber">@(Model.PhoneNumber ?? "Няма")</span>
+                [
+                <span id="phoneNumberOperations">
+
+                    <span @(Model.PhoneNumber != null ? "" : "hidden") id="existingPhoneOperations">
+                        <span>
+                            @Html.ActionLink("Смени телефонния номер", "AddPhoneNumber", new { }, new { id = "change-phonenumber" }) |
+                        </span>
+                        @using (Html.BeginForm("RemovePhoneNumber", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form", style = "display:inline;", id = "removePhoneNumber" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <span>
+                                <input id="remove-phonenumber" type="submit" value="Изтрий телефонния номер" class="btn-link" />
+                            </span>
+                        }
+                    </span>
+
+                    <span @(Model.PhoneNumber == null ? "" : "hidden") id="noPhoneOperations">
+                        @Html.ActionLink("Добави", "AddPhoneNumber", new { }, new { id = "add-phonenumber" })
+                    </span>
+
+                </span>
+                ]
+            </dd>
+
+            <dt>E-mail адрес:</dt>
+            <dd>
+                <span id="email">@(Model.Email ?? "Няма")</span>
+                [
+                @if (Model.Email != null)
+                {
+                    <span>
+                        @Html.ActionLink("Смени Е-mail адресът", "AddEmailAddress", new { }, new { id = "change-email" })
+                    </span>
+                }
+                else
+                {
+                    <text>
+                        @Html.ActionLink("Добави", "AddEmailAddress")
+                    </text>
+                }
+                ]
+            </dd>
+
+
+            @* External Logins *@
+            <dt title="Външни влизания (чрез акаунти от други сайтове)">Външни влизания:</dt>
+            <dd>
+                @Model.Logins.Count
+                @Html.ActionLink("Управление на външни акаунти", "ManageLogins")
+            </dd>
+
+
+            @* Approve appointments *@
+            @if (User.IsInRole("Agent"))
+            {
+                <dt title="Потвърждаване на срещи заявени от клиенти">Потвърждаване на срещи:</dt>
+                <dd>
+                    @Html.ActionLink("Управление срещи", "GetOwnAppointments", "Appointments") /
+                    <a href="/Agents/Details?agentId=@(Model.Id)#agent-appointments">Виж календара</a>
+                </dd>
+            }
+            @*
+                Phone Numbers can used as a second factor of verification in a two-factor authentication system.
+
+                 See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
+                    for details on setting up this ASP.NET application to support two-factor authentication using SMS.
+
+                 Uncomment the following block after you have set up two-factor authentication
+            *@
+            @*<dt title="Дву-факторна оторизация">Дву-факторна оторизация:</dt>
+            <dd>                
+                @if (Model.TwoFactor)
                 {
                     using (Html.BeginForm("DisableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
                     {
                         @Html.AntiForgeryToken()
-                        <text>Enabled
-                        <input type="submit" value="Disable" class="btn btn-link" />
+                        <text>Включен
+                            <input type="submit" value="Изключи" class="btn btn-link" />
                         </text>
                     }
                 }
@@ -77,11 +153,363 @@
                     using (Html.BeginForm("EnableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
                     {
                         @Html.AntiForgeryToken()
-                        <text>Disabled
-                        <input type="submit" value="Enable" class="btn btn-link" />
+                        <text>Изключен
+                            <input type="submit" value="Включи" class="btn btn-link" />
                         </text>
                     }
-                }*@
-        </dd>
-    </dl>
+                }
+            </dd>*@
+        </dl>
+    </div>
 </div>
+
+
+@section scripts
+{
+    <script type="text/javascript" src="/Scripts/tinymce/js/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript" src="/Scripts/tinymce/tinyMCE_Setup.js"></script>
+    <script type="text/javascript" src="/Scripts/genericDialog.js"></script>
+    <script type="text/javascript" src="/Scripts/phoneNumbers.js"></script>
+
+
+    <script>
+
+        $(document).ready(function () {
+
+            //Edit PersonalInfo
+
+            window.alertify.personalDataModal || window.alertify.dialog('personalDataModal',
+                    function() {
+                        return {
+                            main: function (title) {
+
+                                    var editPersonalInfoForm =
+                                        '<form action="/Manage/EditPersonalData" method="post" role="form" id="edit-personal-info-form" style="padding: 0 40px">'
+                                            + '@Html.AntiForgeryToken()' +
+                                            '<div class="row"> \
+                                                <div class="col-xs-12 col-md-6"> \
+                                                    <div class="form-group"> \
+                                                        <label class="control-label">Име</label> \
+                                                        <input id="FirstName" name="FirstName" class="form-control col-xs-12"/> \
+                                                        <span class="field-validation-valid text-danger" data-valmsg-for="FirstName" data-valmsg-replace="true"></span> \
+                                                    </div> \
+                                                </div> \
+                                                <div class="col-xs-12 col-md-6"> \
+                                                    <div class="form-group"> \
+                                                        <label class="control-label">Фамилия</label> \
+                                                        <input id="LastName" name="LastName" class="form-control col-xs-12"/> \
+                                                        <span class="field-validation-valid text-danger" data-valmsg-for="LastName" data-valmsg-replace="true"></span> \
+                                                    </div> \
+                                                </div> \
+                                                <div class="col-xs-12"> \
+                                                    <div class="form-group"> \
+                                                        <label class="control-label">Информация за мен</label> \
+                                                        <textarea id="AdditionalInformation" name="AdditionalInformation" class="form-control col-xs-12 full-tiny" rows="12"></textarea> \
+                                                        <span class="field-validation-valid text-danger" data-valmsg-for="AdditionalInformation" data-valmsg-replace="true"></span> \
+                                                    </div> \
+                                                </div> \
+                                                <div class="col-xs-12" style="padding-top:20px;"> \
+                                                    <div class="form-group"> \
+                                                        <input type="submit" class="btn btn-primary" value="Потвърди" style="width:100%;" /> \
+                                                    </div> \
+                                                </div> \
+                                            </div> \
+                                        </form>';
+
+                                    this.setContent(editPersonalInfoForm);
+                                    this.setting('title', title);
+                            },
+                            setup: function () {
+                                return {
+                                    focus: {
+                                        element: function () {
+                                            return this.elements.body.querySelector(this.get('selector'));
+                                        },
+                                        select: true
+                                    },
+                                    options: {
+                                        basic: false,
+                                        maximizable: false,
+                                        resizable: false,
+                                        padding: false
+                                    }
+                                };
+                            },
+                            settings: {
+                                selector: undefined
+                            }
+                        };
+                    });
+
+
+            var personalDataModalObj;
+
+            $('#edit-personal-info').click(function (event) {
+                event.stopPropagation();
+                event.preventDefault ? event.preventDefault() : event.returnValue = false;
+
+                if (!personalDataModalObj) {
+                    personalDataModalObj = window.alertify.personalDataModal("Редакция на личната информация");
+                    $.get('/Manage/MyPersonalData',
+                        function(data) {
+                            $('#FirstName').val(data.FirstName);
+                            $('#LastName').val(data.LastName);
+                            $('#AdditionalInformation').val(data.AdditionalInformation);
+                            tinyHelpers.fullTiny('#AdditionalInformation');
+                        });
+                } else {
+                    personalDataModalObj.show();
+                    window.tinymce.remove('#AdditionalInformation');
+                    tinyHelpers.fullTiny('#AdditionalInformation');
+                }
+
+                return false;
+            });
+
+            $(document).on('submit',
+                '#edit-personal-info-form',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    var thisForm = $(this);
+                    $.ajax({
+                        url: this.action,
+                        method: this.method,
+                        data: thisForm.serialize(),
+                        success: function (data) {
+                            if (data.success) {
+                                showErrorResponse(data, thisForm);
+                            } else {
+                                //remove the modal window
+                                window.alertify.personalDataModal().close();
+                                window.alertify.success("Успешно редактирана лична информация!");
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            //remove the modal window
+                            window.alertify.personalDataModal().close();
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+
+                    });
+                });
+            //Edit PersonalInfo
+
+            //Change username
+            var changeUsernameForm =
+                '<form action="/Manage/ChangeUsername" method="post" role="form" class="form-horizontal" id="change-username-form" style="padding: 0 40px">'
+                    + '@Html.AntiForgeryToken()' +
+                    '<div class="form-group"> \
+                        <label class="control-label">Потребителско име</label> \
+                        <input id="UserName" name="UserName" class="form-control col-xs-12"/> \
+                        <span class="field-validation-valid text-danger" data-valmsg-for="UserName" data-valmsg-replace="true"></span> \
+                    </div> \
+                    <div class="form-group"> \
+                        <input type="submit" class="btn btn-primary col-xs-12" value="Потвърди" /> \
+                    </div> \
+                </form>';
+
+            $('#change-username').click(function(event) {
+                event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                window.alertify.genericDialog(changeUsernameForm)
+                    .set('title', "Смяна на потребителско име");
+            });
+
+
+            $(document).on('submit',
+                '#change-username-form',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                    var thisForm = $(this);
+                    $.ajax({
+                        url: this.action,
+                        method: this.method,
+                        data: thisForm.serialize(),
+                        success: function (data) {
+                            if (data.success) {
+                                showErrorResponse(data, thisForm);
+                            } else {
+                                $('#username').text(data);
+                                //remove the modal window
+                                window.alertify.genericDialog().close();
+                                window.alertify.success("Успешно сменено потребителско име!");
+                            }
+
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            //remove the modal window
+                            window.alertify.genericDialog().close();
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+
+                    });
+                });
+            //Change username
+
+            //Change password
+
+            var changePasswordForm =
+                '<form action="/Manage/ChangePassword" method="post" role="form" id="change-password-form" class="form-horizontal" style="padding: 0 40px">'
+                    + '@Html.AntiForgeryToken()'
+                    + '<div class="validation-summary-valid text-danger" data-valmsg-summary="true"><ul><li style="display:none"></li></ul></div>' +
+                    '<div class="form-group"> \
+                        <label>Стара парола</label> \
+                        <input type="password" name="OldPassword" id="OldPassword" class="form-control" /> \
+                        <span class="field-validation-valid text-danger" data-valmsg-for="OldPassword" data-valmsg-replace="true"></span> \
+                    </div> \
+                    <div class="form-group"> \
+                        <label>Нова парола</label> \
+                        <input type="password" name="NewPassword" id="NewPassword" class="form-control" /> \
+                        <span class="field-validation-valid text-danger" data-valmsg-for="NewPassword" data-valmsg-replace="true"></span> \
+                    </div> \
+                    <div class="form-group"> \
+                        <label>Потвърди новата парола</label> \
+                        <input type="password" name="ConfirmPassword" id="ConfirmPassword" class="form-control" /> \
+                        <span class="field-validation-valid text-danger" data-valmsg-for="ConfirmPassword" data-valmsg-replace="true"></span> \
+                    </div> \
+                    <div class="form-group"> \
+                        <input type="submit" value="Потвърди" class="btn btn-primary btn-block" /> \
+                    </div> \
+                </form>';
+
+            $('#change-password').click(
+                function (event) {
+                event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                window.alertify.genericDialog(changePasswordForm)
+                    .set('title', 'Смяна на паролата');
+                }
+            );
+
+            $(document).on('submit',
+                '#change-password-form',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                    var thisForm = $(this);
+                    $.ajax({
+                        url: this.action,
+                        method: this.method,
+                        data: thisForm.serialize(),
+                        success: function (data) {
+                            if (data.success) {
+                                showErrorResponse(data, thisForm);
+                            } else {
+                                //remove the modal window
+                                window.alertify.genericDialog().close();
+                                window.alertify.success("Успешно сменена парола!");
+                            }
+
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            //remove the modal window
+                            window.alertify.genericDialog().close();
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+
+                    });
+                });
+            //Change password
+
+            //Change phonenumber
+            $('#change-phonenumber,#add-phonenumber').click(function (event) {
+                phoneNumberHelpers.trigger(event,
+                    (phoneNumber) => {
+                        document.getElementById('noPhoneOperations').style.display = "none";
+                        document.getElementById('existingPhoneOperations').style.display = "inline";
+                        document.getElementById('phonenumber').innerText = phoneNumber;
+                    }
+                );
+            });
+            //Change phonenumber
+
+            //Remove phoneNumber
+            $(document).on('submit',
+                '#removePhoneNumber',
+                function(event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                    var thisForm = $(this);
+                    $.ajax({
+                        url: this.action,
+                        method: this.method,
+                        data: thisForm.serialize(),
+                        success: function (data) {
+                            window.alertify.success("Успешно премахнат телефонен номер!");
+                            document.getElementById('existingPhoneOperations').style.display = "none";
+                            document.getElementById('noPhoneOperations').style.display = "inline";
+                            document.getElementById('phonenumber').innerText = "Няма";
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            //remove the modal window
+                            window.alertify.genericDialog().close();
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+                    });
+
+                });
+            //Remove phoneNumber
+
+            //Change email
+            var changeEmailForm =
+                '<form action="/Manage/AddEmailAddress" method="post" class="form-horizontal" role="form" id="change-email-form" style="padding: 0 40px">'
+                     + '@Html.AntiForgeryToken()'
+                    + '<div class="validation-summary-valid text-danger" data-valmsg-summary="true"><ul><li style="display:none"></li></ul></div>' +
+                    '<div class="form-group"> \
+                        <label class="control-label">Е-мейл</label> \
+                        <input name="Email" id="Email" class="form-control" /> \
+                        <span class="field-validation-valid text-danger" data-valmsg-for="Email" data-valmsg-replace="true"></span> \
+                    </div> \
+                    <div class="form-group"> \
+                        <input type="submit" class="btn btn-primary btn-block" value="Потвърди" /> \
+                    </div> \
+                </form>';
+
+
+            $('#change-email').click(function (event) {
+                event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                window.alertify.genericDialog(changeEmailForm)
+                    .set('title', 'Смяна на е-мейл адрес');
+            });
+
+            $(document).on('submit',
+                '#change-email-form',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                    var thisForm = $(this);
+                    $.ajax({
+                        url: this.action,
+                        method: this.method,
+                        data: thisForm.serialize(),
+                        success: function (data) {
+                            if (data.success) {
+                                showErrorResponse(data, thisForm);
+                            } else {
+                                //remove the modal window
+                                window.alertify.genericDialog().close();
+                                window.alertify.success("Успешно сменен е-мейл адрес! <br /> Влезте в емейлът си и го потвърдете!");
+                            }
+
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            //remove the modal window
+                            window.alertify.genericDialog().close();
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+
+                    });
+                });
+            //Change email
+        });
+    </script>
+}

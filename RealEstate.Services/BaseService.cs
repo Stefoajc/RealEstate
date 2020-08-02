@@ -1,25 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using Ninject;
+﻿using Ninject;
 
 namespace RealEstate.Services
 {
     public class BaseService
     {
-        internal readonly Repositories.Interfaces.IUnitOfWork UnitOfWork;
-        internal readonly IPrincipal User;
-        internal readonly ApplicationUserManager UserManager;
+        protected readonly Repositories.Interfaces.IUnitOfWork unitOfWork;
+        protected readonly ApplicationUserManager userManager;
+
+        protected static readonly string AdminRole = "Administartor";
+        protected static readonly string ClientRole = "Client";
+        protected static readonly string AgentRole = "Agent";
+        protected static readonly string MaintenanceRole = "Maintenance";
+        protected static readonly string OwnerRole = "Owner";
+        protected static readonly string MarketerRole = "Marketer";
+        protected static readonly string TeamUserRole = "TeamMember";
 
         [Inject]
-        public BaseService(RealEstate.Repositories.Interfaces.IUnitOfWork unitOfWork, IPrincipal user, ApplicationUserManager userMgr)
+        public BaseService(Repositories.Interfaces.IUnitOfWork unitOfWork, ApplicationUserManager userManager)
         {
-            this.UnitOfWork = unitOfWork;
-            this.User = user;
-            this.UserManager = userMgr;
+            this.unitOfWork = unitOfWork;
+            this.userManager = userManager;
         }
     }
 }

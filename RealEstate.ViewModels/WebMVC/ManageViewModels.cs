@@ -1,15 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
+using RealEstate.Data;
 
 namespace RealEstate.ViewModels.WebMVC
 {
     public class IndexViewModel
     {
+        public string Id { get; set; }
         public bool HasPassword { get; set; }
         public IList<UserLoginInfo> Logins { get; set; }
         public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+        public string UserName { get; set; }
         public bool TwoFactor { get; set; }
         public bool BrowserRemembered { get; set; }
     }
@@ -27,54 +32,73 @@ namespace RealEstate.ViewModels.WebMVC
 
     public class SetPasswordViewModel
     {
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [Required(ErrorMessage = "Въведете парола!")]
+        [StringLength(100, ErrorMessage = "Паролата трябва да е поне {2} символа.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "New password")]
         public string NewPassword { get; set; }
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm new password")]
-        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        [Compare("NewPassword", ErrorMessage = "Паролите не съвпадат.")]
         public string ConfirmPassword { get; set; }
     }
 
     public class ChangePasswordViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Старата паролата е задължителна!")]
         [DataType(DataType.Password)]
-        [Display(Name = "Current password")]
         public string OldPassword { get; set; }
 
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [Required(ErrorMessage = "Новата парола е задължителна!")]
+        [StringLength(100, ErrorMessage = "Паролата трябва да е между {0} и {2} символа.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "New password")]
         public string NewPassword { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm new password")]
-        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        [Compare("NewPassword", ErrorMessage = "Паролите не съвпадат.")]
         public string ConfirmPassword { get; set; }
     }
 
     public class AddPhoneNumberViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Въведете телефонен номер!")]
         [Phone]
-        [Display(Name = "Phone Number")]
         public string Number { get; set; }
+    }
+
+    public class AddEmailAddressViewModel
+    {
+        [Required(ErrorMessage = "Въведете Емейл адрес!")]
+        [EmailAddress]
+        public string Email { get; set; }
+    }
+
+    public class ChangeUserNameViewModel
+    {
+        [Required(ErrorMessage = "Потребителското име е задължително!")]
+        [UniqueUsername(ErrorMessage = "Потребителското име е заето!")]
+        public string UserName { get; set; }
+    }
+
+    public class UniqueUsernameAttribute : ValidationAttribute
+    {
+        public override bool IsValid(object value)
+        {
+            var dbContext = new RealEstateDbContext();
+            var userName = (string)value;
+            return !dbContext.Users.Any(u => u.UserName == userName);
+        }
     }
 
     public class VerifyPhoneNumberViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Въведете код!")]
         [Display(Name = "Code")]
         public string Code { get; set; }
 
         [Required]
         [Phone]
-        [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
     }
 

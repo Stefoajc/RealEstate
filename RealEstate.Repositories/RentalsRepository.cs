@@ -12,9 +12,14 @@ namespace RealEstate.Repositories
         }
 
 
-        public IQueryable<UnitTypes> GetRentalTypes()
+        public IQueryable<PropertyTypes> GetRentalTypes()
         {
-            return Context.UnitTypes.AsQueryable();
+            return Context.PropertyTypes.Where(p => p.IsPropertyOnly == false).AsQueryable();
+        }
+
+        public IQueryable<RentalHirePeriodsTypes> GetRentalPeriodTypes()
+        {
+            return Context.RentalHirePeriodsTypes.AsQueryable();
         }
     }
 }

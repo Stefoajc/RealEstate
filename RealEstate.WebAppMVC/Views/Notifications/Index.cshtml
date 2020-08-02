@@ -1,0 +1,315 @@
+﻿@using System.Globalization
+@using System.Threading
+@using RealEstate.Services.Extentions
+@model List<RealEstate.ViewModels.WebMVC.NotificationListViewModel>
+
+@{
+    ViewBag.Title = "Вашите известия";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section css{
+    <style>
+        .notifications-container {
+            padding: 30px 5px 20px 5px;
+        }
+
+            .notifications-container ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+            }
+
+        .imgNotificationCreator {
+            display: block;
+            height: 48px;
+            margin-right: 12px;
+            width: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .imgNotification {
+            background-color: #fff;
+            margin: 0 8px -4px;
+            max-height: 48px;
+            max-width: 75px;
+        }
+
+        .notificationTypeImage {
+            vertical-align: text-bottom;
+            margin-right: 5px;
+            width: 16px;
+            height: 16px;
+        }
+
+        .anchorIndexContainer {
+            display: block;
+            padding: 6px 10px 5px 12px;
+            position: relative;
+            line-height: 1.34;
+            border-bottom: 1px solid #aaa;
+        }
+
+            .anchorIndexContainer:hover {
+                background-color: #aaa;
+            }
+
+        .notClickedIndex {
+            background-color: #ffd889;
+        }
+
+        .notification-text {
+            display: block;
+            overflow: hidden;
+        }
+    </style>
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-9 notifications-container">
+            <div class="row">
+                <div class="col-xs-12" style="border-bottom: #aaa solid 1px; padding-left: 0;">
+                    <h3 class="pull-left" style="margin-bottom: 10px; "><b>Вашите известия</b></h3>
+                </div>
+            </div>
+            <div class="row">
+                <ul id="notifications-list-big">
+                    @foreach (var notification in Model)
+                    {
+                        <li class="@(notification.IsClicked ? "" : "notClickedIndex")" data-id="@notification.NotificationId">
+                            <div class="anchorIndexContainer">
+                                <div class="">
+                                    <a data-testid="notif_list_item_link" href="@notification.NotificationLink" role="button" tabindex="0">
+                                        <div direction="left" class="clearfix">
+                                            <div class="pull-left">
+                                                <img alt="" class="imgNotificationCreator" src="@notification.NotificationSourcePicture">
+                                            </div>
+                                            <div direction="right" class="clearfix">
+
+                                                <div class="pull-right">
+                                                    @if (!notification.IsClicked)
+                                                    {
+                                                        <i title="Отбележи като прочетено" data-id="@notification.NotificationId" class="markAsRead fa fa-dot-circle-o"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i title="Прочетено" class="fa fa-check" style="color: green;"></i>
+                                                    }
+                                                </div>
+
+                                                <div class="" style="line-height: 16px;">
+                                                    <span class="notification-text" style="height: 2.4em;">
+                                                        @notification.NotificationText
+                                                    </span>
+                                                    <div class="clearfix" direction="left">
+                                                        <div class="pull-left">
+                                                            <img class="notificationTypeImage" src="@notification.NotificationTypeImage" title="@notification.NotificationType" alt="">
+                                                        </div>
+                                                        <div class="">
+                                                            <div class=" ">
+                                                                <span class="">
+                                                                    @{
+                                                                        var dayToCapital = notification.CreatedOn.ToString("dddd").FirstCharToUpper();
+                                                                        var monthCapital = notification.CreatedOn.ToString("MMMM").FirstCharToUpper();
+                                                                        var dayInMonth = notification.CreatedOn.ToString("dd");
+                                                                        var resultDateFormat = dayToCapital + ", " + dayInMonth + " " + monthCapital + " " + notification.CreatedOn.ToString("yyyy в hh:mm ч.");
+                                                                    }
+                                                                    <span class="livetimestamp" title="@resultDateFormat">@notification.CreatedOn.TimeFromNowString()</span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                    }
+
+                </ul>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-9">
+
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            (function () {
+
+                var formatTime = function (date) {
+                    var now = new Date();
+
+                    const diffTime = Math.abs(now.getTime() - date.getTime());
+                    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+                    if (diffDays >= 1) {
+                        var ceiledDays = Math.ceil(diffDays);
+                        return ceiledDays === 1
+                            ? ceiledDays.toString() + " ден"
+                            : ceiledDays.toString() + " дни";
+                    } else {
+                        var diffHours = diffDays * 24;
+                        if (diffHours >= 1) {
+                            return Math.ceil(diffHours).toString() + " ч.";
+                        } else {
+                            var diffMinutes = diffDays * 24 * 60;
+                            return Math.ceil(diffMinutes).toString() + " мин.";
+                        }
+
+                    }
+                }
+
+                var notificationItemTemplate = function (notification) {
+                    return '<li class="' + (notification.IsClicked ? "" : "notClickedIndex") + '" data-id="' + notification.NotificationId + '">'
+                        + '<div class="anchorIndexContainer">'
+                        + '<div class="">'
+                        + '<a data-testid="notif_list_item_link" href="' + notification.NotificationLink + '" role="button" tabindex="0">'
+                        + '<div direction="left" class="clearfix">'
+                        + '<div class="pull-left">'
+                        + '<img alt="" class="imgNotificationCreator" src="' + notification.NotificationSourcePicture + '">'
+                        + '</div>'
+                        + '<div direction="right" class="clearfix">'
+                        + '<div class="pull-right">'
+                        + (notification.IsClicked === false
+                            ? '<i title="Отбележи като прочетено" data-id="' + notification.NotificationId + '" class="markAsRead fa fa-dot-circle-o"></i>'
+                            : '<i title="Прочетено" class="fa fa-check" style="color: green;"></i>')
+                        + '</div>'
+                        + '<div class="" style="line-height: 16px;">'
+                        + '<span class="notification-text" style="height: 2.4em;">'
+                        + notification.NotificationText
+                        + '</span>'
+                        + '<div class="clearfix" direction="left">'
+                        + '<div class="pull-left">'
+                        + '<img class="notificationTypeImage" src="' + notification.NotificationTypeImage + '" title="' + notification.NotificationType + '" alt="">'
+                        + '</div>'
+                        + '<div class="">'
+                        + '<div class=" ">'
+                        + '<span class="">'
+                        + '<span class="livetimestamp" title="' + moment(notification.CreatedOn).format('dddd, DD MMMM YYYYг. HH:mmч.') + '">' + formatTime(moment(notification.CreatedOn).toDate()) + '</span>'
+                        + '</span>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>'
+                        + '</a>'
+                        + '</div>'
+                        + '</div>'
+                        + '</li>';
+                }
+
+                var pageSize = 14;
+                var pagesCount = 0;
+                var pagesFetched = 1;
+
+                $.get('/notifications/notificationscount', function (notificationsCount) {
+                    pagesCount = Math.ceil(notificationsCount / pageSize);
+                });
+
+                var fetchNotificationsPage = function (pageNumber) {
+                    $.ajax({
+                        url: '/notifications/list?pagenumber=' + pageNumber + '&pagesize=' + pageSize,
+                        beforeSend: function (xhr) {
+                            $('#notifications-list-big').data("loading", true);
+                        },
+                        success: function (notifications) {
+                            var notificationsList = $('#notifications-list-big');
+
+                            var i;
+                            for (i = 0; i < notifications.length; i++) {
+                                notificationsList.append(notificationItemTemplate(notifications[i]));
+                            }
+
+                            notificationsList.removeData("loading");
+                        },
+                        error: function () {
+                            $('#notifications-list-big').removeData("loading");
+                        }
+                    });
+                }
+
+                $(window).scroll(function () {
+
+                        var $this = $(this);
+                        var $notificationsList = $("#notifications-list-big");
+
+                        if (!$notificationsList.data("loading")) {
+
+                            if ($this.scrollTop() + $this.height() >= $('header').height() + $('.main').height()) {
+                                if (pagesCount !== 0 && pagesCount > pagesFetched) {
+
+                                    fetchNotificationsPage(pagesFetched);
+                                    pagesFetched++;
+                                }
+                            }
+                        }
+                });
+
+                $(document).on('click',
+                    '.markAsRead',
+                    function (event) {
+                        event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                        var $this = $(this);
+
+                        $.ajax({
+                            url: '/Notifications/MarkAsRead',
+                            data: { id: $this.data('id') },
+                            type: 'post',
+                            success: function (data) {
+                                if (data === "STATUS_OK") {
+                                    $this.closest('.notClickedIndex').removeClass('notClickedIndex');
+                                    $this.parent().html('<i title="Прочетено" class="fa fa-check" style="color: green;"></i>');
+                                } else {
+                                    window.alertify.error('Проблем при маркирането на известиeтo като прочетенo !');
+                                }
+                            },
+                            error: function () {
+                                window.alertify.error('Проблем при маркирането на известиeтo като прочетенo !');
+                            }
+                        });
+
+                    });
+
+            })();
+
+
+            //Highlight notification
+            (function () {
+
+                var urlString = window.location.href;
+                var url = new URL(urlString);
+                var notificationId = url.searchParams.get("notificationId");
+
+                if (notificationId) {
+                    // Using jQuery's animate() method to add smooth page scroll
+                    // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
+                    var $elementToScrollTo = $('li[data-id="' + notificationId + '"]');
+
+                    if ($elementToScrollTo[0]) {
+
+                        const viewportHeight = window.innerHeight || 0;
+
+                        $('html, body').animate({
+                            scrollTop: $elementToScrollTo.offset().top - viewportHeight / 2
+                        },
+                            800,
+                            function () {
+                                $elementToScrollTo.css('background-color', '#fff9d7');
+                            });
+                    }
+                }
+            })();
+        })
+    </script>
+}

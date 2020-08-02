@@ -53,33 +53,75 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Addresses.cs" />
+    <Compile Include="Addresses\Addresses.cs" />
+    <Compile Include="AgentMaterials\Files.cs" />
+    <Compile Include="AgentMaterials\Folders.cs" />
+    <Compile Include="AgentQuestions\AgentAnswers.cs" />
+    <Compile Include="AgentQuestions\AgentQuestions.cs" />
     <Compile Include="ApplicationUser.cs" />
-    <Compile Include="Cities.cs" />
-    <Compile Include="Coordinates.cs" />
-    <Compile Include="Countries.cs" />
+    <Compile Include="Appointments.cs" />
+    <Compile Include="Addresses\Cities.cs" />
+    <Compile Include="ContactDiary\ContactedPersonTypes.cs" />
+    <Compile Include="ContactDiary\ContactsDiary.cs" />
+    <Compile Include="ContactDiary\DealTypes.cs" />
+    <Compile Include="ContactDiary\NegotiationStates.cs" />
+    <Compile Include="Contact\ContactMessages.cs" />
+    <Compile Include="Addresses\Coordinates.cs" />
+    <Compile Include="Addresses\Countries.cs" />
     <Compile Include="Extras.cs" />
+    <Compile Include="Forum\CommentReviews.cs" />
+    <Compile Include="Forum\Comments.cs" />
+    <Compile Include="Forum\ForumCategories.cs" />
+    <Compile Include="Forum\ForumReviews.cs" />
+    <Compile Include="Forum\PostImages.cs" />
+    <Compile Include="Forum\PostReviews.cs" />
+    <Compile Include="Forum\Posts.cs" />
+    <Compile Include="Forum\Tags.cs" />
+    <Compile Include="Forum\Themes.cs" />
+    <Compile Include="Holidays\ChangingHolidays.cs" />
+    <Compile Include="Holidays\ConstantHolidays.cs" />
     <Compile Include="Images.cs" />
     <Compile Include="KeyValuePairs.cs" />
     <Compile Include="Likes.cs" />
-    <Compile Include="Notifications.cs" />
+    <Compile Include="MailList\EmailList.cs" />
+    <Compile Include="Notifications\Notifications.cs" />
+    <Compile Include="Notifications\NotificationTypes.cs" />
+    <Compile Include="OffersForProperty.cs" />
     <Compile Include="OwnerRegisterCodes.cs" />
+    <Compile Include="Payment\Invoices.cs" />
+    <Compile Include="Payment\PayedItemsMeta.cs" />
     <Compile Include="Properties.cs" />
+    <Compile Include="PropertiesBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertySearches\PersonSearcher.cs" />
+    <Compile Include="PropertySearches\PropertySearches.cs" />
     <Compile Include="PropertySeason.cs" />
     <Compile Include="PropertyTypes.cs" />
-    <Compile Include="RentalPrice.cs" />
+    <Compile Include="RentalHirePeriodsTypes.cs" />
     <Compile Include="RentalInfo.cs" />
-    <Compile Include="RentalSingle.cs" />
-    <Compile Include="UnitTypes.cs" />
+    <Compile Include="Reports\CustomPromotionMedia.cs" />
+    <Compile Include="Reports\CustomRecommendedActions.cs" />
+    <Compile Include="Reports\Offers.cs" />
+    <Compile Include="Reports\PartnerTypes.cs" />
+    <Compile Include="Reports\Partners.cs" />
+    <Compile Include="Reports\PromotionMedia.cs" />
+    <Compile Include="Reports\Reports.cs" />
+    <Compile Include="Reports\WebPlatforms.cs" />
+    <Compile Include="Reports\WebPlatformViews.cs" />
+    <Compile Include="SearchParams.cs" />
+    <Compile Include="SearchParamsTracking.cs" />
+    <Compile Include="SmsSubSystem\SmsDeliveryStatuses.cs" />
+    <Compile Include="SmsSubSystem\SmsRequests.cs" />
+    <Compile Include="SocialMediaAccounts.cs" />
     <Compile Include="Reservations.cs" />
     <Compile Include="Reviews.cs" />
-    <Compile Include="SellingInfo.cs" />
     <Compile Include="Sights.cs" />
+    <Compile Include="Trainings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

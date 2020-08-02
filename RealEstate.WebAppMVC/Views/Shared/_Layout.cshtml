@@ -1,43 +1,305 @@
-﻿<!DOCTYPE html>
+﻿@using System.Configuration
+@using RealEstate.Services
+@using RealEstate.Services.Extentions
+@using RealEstate.Services.Helpers
+@using RealEstate.WebAppMVC.Controllers.Forum
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="fb:app_id" content="194550251149553" />
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="@Request.Url">
+    <meta http-equiv="content-language" content="bg">
+    <meta name="language" content="bg">
+    <meta name="country" content="Bulgaria">
+
+    @* SEO TAGS *@
+
+    <meta name="keywords" content="СПРОПЪРТИС, sproperties, агенция за недвижими имоти, Асеновград, Пловдив, изгодни имоти, жилища старо строителство, нови апартаменти, офиси, едностаен, двустаен, тристаен, четиристаен, многостаен, мезонет, къща" />
+    <meta name="description" content="СПРОПЪРТИС е агенция за недвижими имоти. Предлагаме апартаменти, офиси, едностаен, двустаен, тристаен, четиристаен, многостаен, мезонет, къща" />
+    <meta name="robots" content="index, follow" />
+    <meta name="revisit-after" content="1 day" />
+
+    @* SEO TAGS END *@
+    @RenderSection("meta", false)
+    <link rel="canonical" href="@Request.Url.AbsoluteUri" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
     <title>@ViewBag.Title</title>
-    @Styles.Render("~/Content/css")
-    @Styles.Render("~/Content/owl")
-    @Styles.Render("~/Content/bootstrapDatePicker")
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127997921-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-127997921-1');
+    </script>
+    <!--Google Analitics-->
+
+    @Styles.Render("~/Content/shared")
+
+
     @RenderSection("css", false)
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @Scripts.Render("~/bundles/modernizr")
-    @Scripts.Render("~/bundles/owl")
-    @Scripts.Render("~/bundles/modelstate-errors-handling")
-    @Scripts.Render("~/bundles/bootstrapDatePicker")
 
-    <!-- Bootstrap -->
-    @*<link href="/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/css/bootstrap-theme.css" rel="stylesheet">*@
-    <link href="/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script>
+        g_isUserAuthenticated = '@User.Identity.IsAuthenticated' === 'True';
+    </script>
 
-    <!-- Libs CSS -->
-    <link rel="stylesheet" href="/css/font-awesome/font-awesome.min.css" media="screen">
-    <link rel="stylesheet" href="/css/flexslider.css" media="screen">
-    <link rel="stylesheet" href="/css/chosen/chosen.css" media="screen">
+    @Scripts.Render("~/bundles/shared")
 
-    <!-- Theme -->
-    <link href="/css/theme/theme-animate.css" rel="stylesheet">
-    <link href="/css/theme/theme-elements.css" rel="stylesheet">
-    <link href="/css/theme/theme-blog.css" rel="stylesheet">
-    <link href="/css/theme/theme-map.css" rel="stylesheet">
-    <link href="/css/theme/theme.css" rel="stylesheet">
+    <script id="script-recaptcha" src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
+    <script type="text/javascript" language="javascript" src="/Scripts/reCaptcha/recaptchaHelpers.js"></script>
 
-    <!-- Style Switcher-->
-    <link rel="stylesheet" href="/css/style-switcher.css">
 
-    <!-- Theme Responsive-->
-    <link href="/css/theme/theme-responsive.css" rel="stylesheet">
+    <style>
+        .realEstate-modalbody {
+            background-color: white;
+            text-align: center;
+            color: black;
+        }
 
+        .main-menu > li > a {
+            color: #777;
+        }
+
+        .contact-field {
+            line-height: 2em;
+            max-height: 2em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        .cookies-policy {
+            display: block;
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 0;
+            z-index: 1000;
+            background: #111;
+        }
+
+            .cookies-policy div {
+                float: none;
+                font-size: 15px;
+                text-align: center;
+                padding: 10px 5px 10px 5px;
+            }
+
+        .cookie-policy-accept {
+            margin-left: 10px;
+        }
+
+        .min-width {
+            min-width: 150px;
+        }
+
+        @@media only screen and (max-width: 462px) {
+            .logo {
+                width: 190px;
+            }
+        }
+
+        @@media only screen and (max-width: 992px) {
+            #caret {
+                margin: -23px 10px 0 0;
+            }
+
+            #nav-profile-image {
+                display: none;
+            }
+
+            #top > .container {
+                padding-right: 0;
+            }
+
+            .logo {
+                left: -20px;
+                width: 169px;
+            }
+
+            .ajs-dialog {
+                max-width: 100% !important;
+            }
+        }
+
+        #nav-profile-image {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+        }
+
+        label[for] {
+            cursor: pointer;
+        }
+    </style>
+
+    <!-- SmartMenus jQuery Bootstrap Addon CSS / Dropdowns-->
+    @*<link href="/Content/smartMenus/jquery.smartmenus.bootstrap.css" rel="stylesheet">*@
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <style>
+
+            .notificationCount {
+                position: absolute;
+                top: 3px;
+                right: 3px;
+                font-size: 10px;
+                border-radius: 25%;
+                background-color: red;
+                min-width: 12px;
+                height: 14px;
+                line-height: 12px;
+                text-align: center;
+                font-weight: bold;
+                color: white;
+                padding: 0 1.2px;
+            }
+
+            .notificationCreationDate {
+                vertical-align: middle;
+            }
+
+            .uiToggleFlyout {
+                position: absolute;
+                top: 50px;
+                right: -5px;
+                z-index: 100;
+                border: 2px solid #aaa;
+                border-radius: 5px;
+                display: none;
+            }
+
+            .beeperNub {
+                width: 0;
+                height: 0;
+                border-left: 15px solid transparent;
+                border-right: 15px solid transparent;
+                border-bottom: 15px solid #aaa;
+                position: absolute;
+                top: -15px;
+                right: 9px;
+            }
+
+            .jewelHeader {
+                background-clip: padding-box;
+                background-color: #f5f5f5;
+                border-bottom: solid 1px #aaa;
+                border-top-left-radius: 3px;
+                border-top-right-radius: 3px;
+                padding: 8px 12px 6px;
+                position: relative;
+                z-index: 100;
+            }
+
+
+            .uiHeaderTitle {
+                font-size: 14px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .uiHeaderActions {
+                line-height: 16px;
+            }
+
+            .uiBody {
+                background-color: #f8f8f8;
+            }
+
+            .scrollPane > ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            .imgNotificationCreator {
+                display: block;
+                height: 48px;
+                margin-right: 12px;
+                width: 48px;
+                border-radius: 50%;
+                overflow: hidden;
+            }
+
+            .imgNotification {
+                background-color: #fff;
+                margin: 0 8px -4px;
+                max-height: 48px;
+                max-width: 75px;
+            }
+
+            .notification-link {
+                display: block;
+                padding: 6px 10px 5px 12px;
+                position: relative;
+                line-height: 1.34;
+                border-bottom: 1px solid #aaa;
+            }
+
+            .notClicked {
+                background-color: #edf2fa;
+            }
+
+            .notificationContent {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                margin-top: -1px;
+                min-height: 50px;
+                word-wrap: break-word;
+                line-height: 1.34;
+                font-size: 12px;
+            }
+
+            .jewelFooter a {
+                background-color: #fff;
+                border-bottom-left-radius: 3px;
+                border-bottom-right-radius: 3px;
+                border-top: 1px solid #dddfe2;
+                display: block;
+                font-weight: 600;
+                padding: 8px 12px;
+                position: relative;
+                text-align: center;
+                z-index: 100;
+            }
+
+            .seeMore {
+                line-height: 14px;
+            }
+
+            .jewelLoading {
+                background-image: url(/Resources/loading.png);
+                height: 12px;
+                width: 12px;
+                animation: rotateSpinner 1.2s steps(20, end) infinite;
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+            @@keyframes rotateSpinner {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .anchorContainer:hover {
+                background-color: #f5f6f7;
+            }
+        </style>
+    }
 
 </head>
 
@@ -50,241 +312,648 @@
         <div id="top">
             <div class="container">
                 <p class="pull-left text-note hidden-xs">
-                    <i class="fa fa-phone"></i> Имаш нужда от помощ? +359 876717000
+                    <i class="fa fa-phone"></i> Имаш нужда от помощ? @ConfigurationManager.AppSettings["OfficePhone"]
                 </p>
                 <ul class="nav nav-pills nav-top navbar-right">
-                    <li class="login"><a href="javascript:void(0);"><i class="fa fa-user"></i></a></li>
-                    <li><a href="#" title="" data-placement="bottom" data-toggle="tooltip" data-original-title="Email"><i class="fa fa-envelope-o"></i></a></li>
-                    <li><a href="#" title="" data-placement="bottom" data-toggle="tooltip" data-original-title="Facebook"><i class="fa fa-facebook"></i></a></li>
-                    <li><a href="#" title="" data-placement="bottom" data-toggle="tooltip" data-original-title="Twitter"><i class="fa fa-twitter"></i></a></li>
-                    <li><a href="#" title="" data-placement="bottom" data-toggle="tooltip" data-original-title="Google+"><i class="fa fa-google-plus"></i></a></li>
+                    <li><a target="_blank" href="@Url.Action("Contact", "Home")" title="Контакт с нас"><i class="fa fa-user"></i></a></li>
+                    <li><a href="mailto:@ConfigurationManager.AppSettings["OfficeEmail"]" title="Нашият Email"><i class="fa fa-envelope-o"></i></a></li>
+                    <li><a target="_blank" href="https://fb.me/SmartProperties2018" title="Нашият Facebook"><i class="fa fa-facebook"></i></a></li>
+                    <li><a target="_blank" href="https://twitter.com/sProperties4" title="Нашият Twitter"><i class="fa fa-twitter"></i></a></li>
+                    <li><a style="border-right: 1px solid #222;" target="_blank" href="https://www.linkedin.com/company/sproperties/" title="Нашият LinkedIn"><i class="fa fa-linkedin"></i></a></li>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        var notificationsCount = User.Identity.GetNewNotificationsCount();
+
+                        <li style="margin-left: 20px;">
+                            <a id="notification-icon"><i class="fa fa-bell"></i></a>
+                            @if (notificationsCount > 0)
+                            {
+                                <b class="notificationCount">@notificationsCount</b>
+                            }
+
+                            <div class="uiToggleFlyout" role="dialog" id="notificationsFlyout">
+                                <div class="beeperNub">
+                                </div>
+                                <div class="uiHeader uiHeaderBottomBorder jewelHeader">
+                                    <div class="clearfix uiHeaderTop">
+
+                                        <div class="pull-right">
+                                            <div class="uiHeaderActions fsm fwn fcg">
+                                                <a id="markAllAsRead" href="#" role="button" class="" tabindex="0">Отбелязване на всички като прочетени</a>
+                                                @*<span role="presentation" aria-hidden="true"> · </span>
+                                                    <a href="https://www.facebook.com/settings?tab=notifications&amp;section=on_facebook">Настройки</a>*@
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h3 class="uiHeaderTitle" aria-hidden="true">Известия</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="uiBody">
+                                    <div class="scrollPane" style="max-height: 370px; width: 411px; overflow-y: auto; overflow-x: hidden;">
+                                        <ul id="notifications-list" class="">
+                                            @*<li>
+                                                    <div class="">
+                                                        <div class="">НОВИ</div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="">
+                                                        <div class="">ПО-РАННИ</div>
+                                                    </div>
+                                                </li>*@
+                                        </ul>
+                                        <div id="spinner" style="text-align: center;">
+
+                                        </div>
+                                        @*<div class="uiScrollableAreaTrack hidden_elem" style="opacity: 0;">
+                                                <div class="uiScrollableAreaGripper hidden_elem" style="height: 258.818px; top: 0px;"></div>
+                                            </div>*@
+                                    </div>
+                                </div>
+                                <div class="jewelFooter">
+                                    <a class="seeMore" href="@Url.Action("Index","Notifications")" accesskey="5">
+                                        <span>Преглед на всички</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                    }
                 </ul>
+                <div class="clearfix"></div>
             </div>
         </div>
-        <nav class="navbar navbar-default pgl-navbar-main" role="navigation">
+
+        <nav class="navbar navbar-expand-md navbar-default  bg-dark pgl-navbar-main" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
-                    <a class="logo" href="@Url.Action("Index","Home")"><img src="/images/logo.png" alt="Logo"></a>
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+
+                    <a class="logo" href="@Url.Action("Index", "Home")">
+                        <img alt="Лого" src="/images/logo.png">
+                    </a>
+
                 </div>
 
                 <div class="navbar-collapse collapse width">
-                    <ul class="nav navbar-nav pull-right">
-                        <li class="dropdown active">
-                            <a href=@Url.Action("Index", "Home") data-target="#" class="dropdown-toggle disabled" data-toggle="dropdown">Начало</a>
-                            <ul class="dropdown-menu">
-                                <li><a href="@Url.Action("Activity","Home")">Дейност</a></li>
-                                <li><a href="@Url.Action("Team","Home")">Екип</a></li>
-                            </ul>
+
+                    <ul class="nav navbar-nav pull-right main-menu">
+                        <li>
+                            <a href="@Url.Action("Index", "Home")">Начало</a>
                         </li>
                         <li class="dropdown">
-                            <a href="/Properties/Index" class="dropdown-toggle disabled" data-toggle="dropdown">Имоти</a>
+                            <a href="#">Имоти <span id="caret" class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li class="dropdown">
-                                    <a href=@Url.Action("ListProperties","Properties") class="dropdown-toggle disabled" data-target="#" data-toggle="dropdown">Продажба</a>
+                                    <a href="#">Всички <span id="caret" class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href=@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, pageCount = 1, ViewBag.pageSize, sortBy = "Views", orderBy = "Descending"})>Най-разглеждани</a></li>
-                                        <li><a href=@Url.Action("ListProperties", "Properties", new {ViewBag.propertyType, pageCount = 1, ViewBag.pageSize, sortBy = "Date", orderBy = "Descending"})>Най-скорошни</a></li>
-                                        <li><a href=@Url.Action("Map","Properties")>Карта</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {ViewBag.propertyType, pageCount = 1, ViewBag.pageSize, sortBy = "Views", orderBy = "Descending"})">Най-разглеждани</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {ViewBag.propertyType, pageCount = 1, ViewBag.pageSize, sortBy = "Date", orderBy = "Descending"})">Най-скорошни</a></li>
+                                        <li><a href="@Url.Action("Map", "Properties")">Карта</a></li>
                                     </ul>
                                 </li>
                                 <li class="dropdown">
-                                    <a href=@Url.Action("ListRentProperties","Properties") class="dropdown-toggle disabled" data-target="#" data-toggle="dropdown">Под наем</a>
+                                    <a href="#">Продажба <span id="caret" class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href=@Url.Action("ListRentProperties", "Properties", new {ViewBag.propertyType, pageCount = 1, ViewBag.pageSize, sortBy = "Views", orderBy = "Descending"})>Най-разглеждани</a></li>
-                                        <li><a href=@Url.Action("ListRentProperties", "Properties", new {ViewBag.propertyType, pageCount = 1, ViewBag.pageSize, sortBy = "Date", orderBy = "Descending"})>Най-скорошни</a></li>
-                                        <li><a href=@Url.Action("Map","Properties")>Карта</a></li>
-                                        <li><a href=@Url.Action("Seasonal","Properties")>СЕЗОННИ</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = false})">Всички</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = false, propertyType = PropertiesServices.GetPropertyTypeId("Къща")})">Къщи</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = false, propertyType = PropertiesServices.GetPropertyTypeId("Апартамент")})">Апартаменти</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = false, propertyType = PropertiesServices.GetPropertyTypeId("Вила")})">Вили</a></li>
+                                        <li><a href="@Url.Action("Index","Properties", new { isForRent = false, extras = ExtraServices.GetExtraId("Зелено")})">На зелено</a></li>
+                                        <li><a href="@Url.Action("Map", "Properties", new {isForRent = false})">Карта</a></li>
                                     </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#">Под наем <span id="caret" class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = true, isShortPeriodRent = false, propertyType = PropertiesServices.GetPropertyTypeId("Къща")})">Къщи</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = true, isShortPeriodRent = false, propertyType = PropertiesServices.GetPropertyTypeId("Апартамент")})">Апартаменти</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = true, isShortPeriodRent = false, propertyType = PropertiesServices.GetPropertyTypeId("Офис")})">Офиси</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = true, isShortPeriodRent = false, propertyType = PropertiesServices.GetPropertyTypeId("Магазин")})">Магазини</a></li>
+                                        <li><a href="@Url.Action("Map", "Properties", new {IsForRent = true, isShortPeriodRent = false})">Карта</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = true, isShortPeriodRent = false})">Всички</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#">За почивка <span id="caret" class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = true, isShortPeriodRent = true, extras = ExtraServices.GetExtraId("Море")})">Море</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = true, isShortPeriodRent = true, extras = ExtraServices.GetExtraId("Планина")})">Планина</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = true, isShortPeriodRent = true, propertyType = PropertiesServices.GetPropertyTypeId("Вила")})">Вили</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = true, isShortPeriodRent = true, propertyType = PropertiesServices.GetPropertyTypeId("Стая")})">Стаи</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = true, isShortPeriodRent = true, propertyType = PropertiesServices.GetPropertyTypeId("Апартамент")})">Апартаменти</a></li>
+                                        <li><a href="@Url.Action("Index", "Properties", new {isForRent = true, isShortPeriodRent = true, ViewBag.propertyType, pageCount = 1, ViewBag.pageSize, sortBy = "Views", orderBy = "Descending"})">Най-разглеждани</a></li>
+                                        <li><a href="@Url.Action("Map", "Properties", new {IsForRent = true, isShortPeriodRent = true})">Карта</a></li>
+                                    </ul>
+                                </li>
+                                @*<li><a href="grid-sidebar.html">Изгодни</a></li>*@
+                                <li><a href="@Url.Action("Search", "Properties")">Търсене</a></li>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    @*<li><a href="@Url.Action("Recommended","Properties")">Препоръчани</a></li>*@
+
+                                    if (User.IsInRole("Administrator") || User.IsInRole("Agent") || User.IsInRole("Maintenance"))
+                                    {
+                                        <li><a href="@Url.Action("Create", "Properties")">Създай имот</a></li>
+                                        <li><a href="@Url.Action("MyProperties", "Properties")">Моите имоти</a></li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#">Търсенe<span id="caret" class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="@Url.Action("Index","PropertySearches")">Всички</a>
+                                </li>
+                                <li>
+                                    <a href="@Url.Action("Index","PropertySearches", new { onlyRentalSearches = false })">За Купуване</a>
+                                </li>
+                                <li>
+                                    <a href="@Url.Action("Index","PropertySearches", new { onlyRentalSearches = true })">За Наемане</a>
                                 </li>
                                 @if (User.Identity.IsAuthenticated)
                                 {
-                                    <li><a href="@Url.Action("Recommended","Properties")">Препоръчани</a></li>
+                                    @*<li><a href="@Url.Action("Recommended","Properties")">Препоръчани</a></li>*@
+
+                                    if (User.IsInRole("Administrator") || User.IsInRole("Agent") || User.IsInRole("Maintenance"))
+                                    {
+                                        <li><a href="@Url.Action("Create", "PropertySearches")">Създай търсене</a></li>
+                                        <li><a href="@Url.Action("MyPropertySearches", "PropertySearches")">Моите търсения</a></li>
+                                    }
                                 }
-                                <li><a href="grid-sidebar.html">Изгодни</a></li>
-                                <li><a href="@Url.Action("Search","Properties")">Търсене</a></li>
                             </ul>
                         </li>
                         <li class="dropdown">
-                            <a href=@Url.Action("Index","Agents") class="dropdown-toggle disabled" data-toggle="dropdown">Агенти</a>
+                            <a href="#">Информация <span id="caret" class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href=@Url.Action("Index","Agents")>Нашите Агенти</a></li>
-                                <li><a href=@Url.Action("Details","Agents")>Профил на Агент</a></li>
+                                <li><a href="@Url.Action("About", "Home")">За нас</a></li>
+                                <li><a href="@Url.Action("Index", "Agents")">Нашите Брокери</a></li>
+                                <li><a href="@Url.Action("Team", "Home")">Екип</a></li>
+                                <li><a href="@Url.Action("FAQ", "Home")">Често задавани въпроси</a></li>
+                                <li><a href="@Url.Action("Contact", "Home")">Контакти</a></li>
                             </ul>
                         </li>
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle disabled" data-toggle="dropdown">Информация</a>
+                            <a href="#">Форум <span id="caret" class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="@Url.Action("About","Home")">За нас</a></li>
-                                <li><a href=@Url.Action("FAQ","Home")>Често задавани въпроси</a></li>
-                                <li><a href="@Url.Action("Contact","Home")">Контакти</a></li>
+                                <li><a href="@Url.Action("Index", "Forum", new {viewType = ForumViewTypes.OneColumnWithBar})">Форум</a></li>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <li><a href="@Url.Action("Create", "Posts")">Създай пост</a></li>
+                                    <li><a href="@Url.Action("Create", "Themes")">Създай тема</a></li>
+                                    if (User.IsInRole("Administrator"))
+                                    {
+                                        <li><a href="@Url.Action("Create", "ForumCategories")">Създай категория</a></li>
+                                    }
+                                }
                             </ul>
                         </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle disabled" data-toggle="dropdown">Блог</a>
-                            <ul class="dropdown-menu">
-                                <li><a href="blog.html">Blog Large With Sidebar</a></li>
-                                <li><a href="blog-2-cols.html">Blog 2 Columns</a></li>
-                                <li><a href="blog-2-cols-sidebar.html">Blog 2 Columns With Sidebar</a></li>
-                                <li><a href="blog-single.html">Article detail</a></li>
-                            </ul>
-                        </li>
-                        @if (User.IsInRole("Administrator") || User.IsInRole("Agent") || User.IsInRole("Maintenance"))
+                        @if (User.Identity.IsAuthenticated)
                         {
                             <li class="dropdown">
-                                <a href="#" class="dropdown-toggle disabled" data-toggle="dropdown">Операции</a>
+                                <a href="#">Операции <span id="caret" class="caret"></span></a>
                                 <ul class="dropdown-menu">
-                                    <li class="dropdown">
-                                        <a href="#">Имоти</a>
-                                        <ul class="dropdown-menu" style="left:30px;top:50px;">
-                                            <li>
-                                                <a href="@Url.Action("Create","Properties")">Създаване на имот</a>
-                                            </li>
-                                            <li>
-                                                <a href="@Url.Action("List","Properties")">Списък имоти</a>
-                                            </li>
-                                        </ul>
+                                    <li>
+                                        <a href="@Url.Action("Index", "Manage")">Акаунт</a>
                                     </li>
-                                    <li class="dropdown">
-                                        <a href="#">Собственици</a>
-                                        <ul class="dropdown-menu" style="left:30px;top:50px;">
-                                            <li>
-                                                <a href="@Url.Action("RegisterOwner","Account")">Добавяне на Собственик</a>
-                                            </li>
-                                            <li>
-                                                <a href="@Url.Action("RegisterOwner","Account")">Списък на Собствениците</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    @if (User.IsInRole("Administrator") || User.IsInRole("Maintenance"))
+                                    @if (User.IsInRole("Administrator") || User.IsInRole("Agent") || User.IsInRole("Maintenance"))
                                     {
                                         <li class="dropdown">
-                                            <a href="#">Агенти</a>
-                                            <ul class="dropdown-menu" style="left:30px;top:50px;">
+                                            <a href="#">Имоти <span id="caret" class="caret"></span></a>
+                                            <ul class="dropdown-menu" style="left: 30px; top: 50px;">
+                                                @if (User.IsInRole("Agent") || User.IsInRole("Owner"))
+                                                {
+                                                    <li>
+                                                        <a href="@Url.Action("MyProperties", "Properties")">Моите имоти</a>
+                                                    </li>
+                                                }
                                                 <li>
-                                                    <a href="@Url.Action("RegisterAgent","Account")">Добавяне на Агент</a>
+                                                    <a href="@Url.Action("Create", "Properties")">Създаване на имот</a>
                                                 </li>
-                                                <li>
-                                                    <a href="@Url.Action("List","Account")">Списък на Агенти</a>
-                                                </li>
+                                                @if (User.IsInRole("Agent"))
+                                                {
+                                                    <li>
+                                                        <a href="@Url.Action("MyPropertySearches", "PropertySearches")">Моите търсения</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="@Url.Action("Create", "PropertySearches")">Създаване на търсене</a>
+                                                    </li>
+                                                }
                                             </ul>
-
                                         </li>
-
+                                        @*<li class="dropdown">
+                                                <a href="#">Собственици <span id="caret" class="caret"></span></a>
+                                                <ul class="dropdown-menu" style="left: 30px; top: 50px;">
+                                                    <li>
+                                                        <a href="@Url.Action("RegisterOwner", "Account")">Добавяне на Собственик</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="@Url.Action("RegisterOwner", "Account")">Списък на Собствениците</a>
+                                                    </li>
+                                                </ul>
+                                            </li>*@
                                         <li class="dropdown">
-                                            <a href="#">Служители</a>
-                                            <ul class="dropdown-menu" style="left:30px;top:50px;">
+                                            <a href="#">Помощ<span id="caret" class="caret"></span></a>
+                                            <ul class="dropdown-menu" style="left: 30px; top: 50px;">
                                                 <li>
-                                                    <a href="#">Добавяне на служител</a>
+                                                    <a href="@Url.Action("Index", "AgentQuestions")">Въпроси и отговори</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Списък на служителите</a>
+                                                    <a href="@Url.Action("Index", "AgentMaterials")">Материали</a>
+                                                </li>
+                                                <li>
+                                                    <a href="@Url.Action("Index", "Trainings")">Обучения</a>
                                                 </li>
                                             </ul>
-
                                         </li>
+                                        <li class="dropdown">
+                                            <a href="#">Контакти <span id="caret" class="caret"></span></a>
+                                            <ul class="dropdown-menu" style="left: 30px; top: 50px;">
+                                                <li>
+                                                    <a href="@Url.Action("MyContacts", "ContactsDiary")">Моите клиенти</a>
+                                                </li>
+                                                <li>
+                                                    <a href="@Url.Action("Index", "ContactsDiary")">Всички клиенти</a>
+                                                </li>
+                                                <li>
+                                                    <a href="@Url.Action("Index", "PartnersDiary")">Партньори</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        if (User.IsInRole("Administrator") || User.IsInRole("Maintenance"))
+                                        {
+                                            <li class="dropdown">
+                                                <a href="#">Брокери <span id="caret" class="caret"></span></a>
+                                                <ul class="dropdown-menu" style="left: 30px; top: 50px;">
+                                                    <li>
+                                                        <a href="@Url.Action("RegisterAgent", "Account")">Добавяне на Брокер</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="@Url.Action("Index", "Agents")">Списък на Брокери</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            if (User.IsInRole("Administrator"))
+                                            {
+                                                <li class="dropdown">
+                                                    <a href="#">Служители <span id="caret" class="caret"></span></a>
+                                                    <ul class="dropdown-menu" style="left: 30px; top: 50px;">
+                                                        <li>
+                                                            <a href="@Url.Action("RegisterTeamUser", "Account")">Добавяне на служител</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="#">Списък на служителите</a>
+                                                        </li>
+                                                    </ul>
+
+                                                </li>
+                                            }
+                                        }
                                     }
+                                    <li>
+                                        <a href="@Url.Action("GetOwnAppointments", "Appointments")">Срещи</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("GetOwnReservations", "Reservations")">Резервации</a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:document.getElementById('logoutForm').submit()">Изход</a>
+                                        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                        }
+                                    </li>
                                 </ul>
                             </li>
-
                         }
                         @Html.Partial("_LoginPartial")
                     </ul>
                 </div><!--/.nav-collapse -->
             </div><!--/.container-fluid -->
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a id="nav-profile-image" href="@Url.Action("Index", "Manage")">
+                    <picture>
+                        <source srcset="@(FileHelpers.ChangeFileExtension(User.Identity.GetProfileImage().Replace(" ", "%20"), ".webp"))" type="image/webp">
+                        <source srcset="@User.Identity.GetProfileImage().Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(User.Identity.GetProfileImage().Replace(" ", "%20"))">
+                        <img alt="Аватар" class="img-circle" width="60" height="60" src="@User.Identity.GetProfileImage().Replace(" ", "%20")">
+                    </picture>
+                </a>
+            }
         </nav>
+
     </header>
 
-    <div role="main" class="main">
+    <div role="main" class="main pgl-bg-grey">
         @RenderBody()
-        <!-- Begin footer -->
-        <footer class="pgl-footer">
-            <div class="container">
-                <div class="pgl-upper-foot">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <h2>Контакти</h2>
-                            <p>При нужда от помощ не се колебайте да се свържите с наш служител на посочените номера и електронна поща, както и в нашият офис.</p>
-                            <address>
-                                <i class="fa fa-map-marker"></i> Офис : 1-800-666-8888<br>
-                                <i class="fa fa-phone"></i> Мобилен : 0800-666-6666<br>
-                                <i class="fa fa-fax"></i> Факс : 1-800-666-8888<br>
-                                <i class="fa fa-envelope-o"></i> E-Mail: <a href="mailto:pixelgeklab@gmail.com">StefanPeevCorp@sPc.bg</a>
-                            </address>
-                        </div>
-                        <div class="col-sm-2">
-                            <h2>полезни линкове</h2>
-                            <ul class="list-unstyled">
-                                <li><a href="#">Помощ и Въпроси</a></li>
-                                <li><a href="#">Цена на имот</a></li>
-                                <li><a href="#">Маркетингов изглед</a></li>
-                                <li><a href="#">Кредити</a></li>
-                                <li><a href="#">Условия и правила</a></li>
-                                <li><a href="#">Политика на защита</a></li>
-                                <li><a href="#">Правила на общноста</a></li>
-                            </ul>
-                        </div>
-                        <div class="col-sm-2">
-                            <h2>Страници</h2>
-                            <ul class="list-unstyled">
-                                <li><a href="#">Font &amp; Color</a></li>
-                                <li><a href="#">Блогове</a></li>
-                                <li><a href="#">Контакти</a></li>
-                                <li><a href="#">404 Page</a></li>
-                                <li><a href="#">Разширено търсене</a></li>
-                                <li><a href="#">Форум</a></li>
-                                <li><a href="#">Google Map</a></li>
-                            </ul>
-                        </div>
-                        <div class="col-sm-4">
-                            <h2>Не пропускайте!</h2>
-                            <p>За да се абонирате за нашите услуги за известяване по Email, които ви известяват за нови имоти и специални предложения, въведете в полето Email вашият адрес</p>
-                            <form class="form-inline pgl-form-newsletter" role="form">
-                                <div class="form-group">
-                                    <label class="sr-only" for="exampleInputEmail2">Email address</label>
-                                    <input class="form-control" id="exampleInputEmail2" placeholder="Въведи Email тук" type="email">
-                                </div>
-                                <button type="submit" class="btn btn-submit"><i class="icons icon-submit"></i></button>
-                            </form>
-                        </div>
+    </div>
+
+    <!-- Begin footer -->
+    <footer class="pgl-footer">
+        <div class="container">
+            <div class="pgl-upper-foot">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h2>Контакти</h2>
+                        <p>При нужда от помощ не се колебайте да се свържете с наш служител на посочените номера и електронна поща, както и в нашият офис.</p>
+                        <address>
+                            <i class="fa fa-map-marker"></i> Офис : @ConfigurationManager.AppSettings["OfficePhone"]<br>
+                            <i class="fa fa-phone"></i> Мобилен : @ConfigurationManager.AppSettings["MobilePhone"]<br>
+                            <i class="fa fa-envelope-o"></i> E-mail: <a href="mailto:@ConfigurationManager.AppSettings["OfficeEmail"]" style="text-decoration: underline;">@ConfigurationManager.AppSettings["OfficeEmail"]</a><br />
+                            <svg style="width: 20px;height: 20px; margin-left: -2px;vertical-align: middle;margin-bottom: 5px;" aria-hidden="true" data-prefix="fab" data-icon="facebook-messenger" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-facebook-messenger fa-w-14 fa-3x"><path fill="currentColor" d="M224 32C15.9 32-77.5 278 84.6 400.6V480l75.7-42c142.2 39.8 285.4-59.9 285.4-198.7C445.8 124.8 346.5 32 224 32zm23.4 278.1L190 250.5 79.6 311.6l121.1-128.5 57.4 59.6 110.4-61.1-121.1 128.5z" class=""></path></svg> Messenger: <a target="_blank" href="https://fb.me/SmartProperties2018" style="text-decoration: underline;">Пишете ни</a>
+                        </address>
+                    </div>
+                    <div class="col-sm-2">
+                        <h2>полезни линкове</h2>
+                        <ul class="list-unstyled">
+                            <li><a href="@Url.Action("FAQ","Home")">Помощ и Въпроси</a></li>
+                            <li><a href="@Url.Action("PriceBuilding","Home")">Цена на имот</a></li>
+                            <li><a href="@Url.Action("Marketing","Home")">Маркетинг и Реклама</a></li>
+                            <li><a href="@Url.Action("Loans","Home")">Кредити</a></li>
+                            <li><a href="@Url.Action("TermsAndConditions","Home")">Условия и правила</a></li>
+                            <li><a href="@Url.Action("PersonalInfoSecurity","Home")">Политика на защита</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-2">
+                        <h2>Страници</h2>
+                        <ul class="list-unstyled">
+                            <li><a href="@Url.Action("Index","Forum")">Форум</a></li>
+                            <li><a href="@Url.Action("CommunityRules","Home")">Правила на общноста</a></li>
+                            <li><a href="@Url.Action("Contact","Home")">Контакти</a></li>
+                            <li><a href="@Url.Action("Search","Properties")">Разширено търсене</a></li>
+                            <li><a href="@Url.Action("Map","Properties")">Карта</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-4">
+                        <h2>Не пропускайте!</h2>
+                        <p>За да се абонирате за нашите услуги за известяване по Е-мейл, които ви осведомяват за нови имоти и специални предложения, въведете в полето вашият Е-мейл адрес</p>
+                        <form class="form-inline pgl-form-newsletter" id="news-subscribe" action="@Url.Action("Subscribe", "MailList")" method="post" role="form">
+                            <div class="form-group">
+                                <label class="sr-only" for="email">Е-мейл адрес</label>
+                                <input class="form-control" id="email" name="email" placeholder="Въведи Е-мейл тук">
+                            </div>
+                            <button type="submit" class="btn btn-submit" style="height: 40px;"><i class="icons icon-submit"></i></button>
+                        </form>
                     </div>
                 </div>
-                <div class="pgl-copyrights">
-                    <p>
-                        Copyright © 2018 sProperties.
-                    </p>
-                </div>
             </div>
-        </footer>
-        <!-- End footer -->
+            <div class="pgl-copyrights">
+                <p>
+                    Copyright © 2018 сПропъртис ЕООД.
+                </p>
+            </div>
+        </div>
+    </footer>
+    <!-- End footer -->
+    <!--Chosen (DropDowns)-->
+    <script src="/Scripts/chosen/chosen.jquery.min.js"></script>
+
+    <script src="/Scripts/imagesloaded.pkgd.min.js"></script>
+    <script src="/Scripts/masonry.pkgd.min.js"></script>
+
+    <!-- Theme Initializer -->
+    <script src="/Scripts/theme/theme.plugins.js"></script>
+    <script src="/Scripts/theme/theme.js"></script>
+
+
+    <!--Helpers-->
+    <script type="text/javascript" src="/Scripts/variables.js"></script>
+    <script type="text/javascript" src="/Scripts/markerclusterer.min.js"></script>
+    <script type="text/javascript" src="/Scripts/properties.js"></script>
+    <script type="text/javascript" src="/Scripts/script.js"></script>
+
+    @*<script src="/Scripts/gmap/gmap3.infobox.min.js"></script>*@
+
+
+    <!-- Style Switcher -->
+    @*<script type="text/javascript" src="/Scripts/switcher.js"></script>*@
+
+
+
+    <!-- Modals -->
+    <script type="text/javascript" src="/Scripts/modal.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('#news-subscribe').submit(function (event) {
+                event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                $.ajax({
+                    type: this.method,
+                    url: this.action,
+                    data: $(this).serialize(),
+                    success: function (data) {
+                        if (data === 'STATUS_OK') {
+                            $('#email').val('');
+                            window.alertify.success(
+                                'Успешно се абонирахте за получаване на известия от нашата система!');
+                        } else {
+                            window.alertify.error("Невалиден емейл адрес");
+                        }
+                    },
+                    error: function (err) {
+                        window.alertify.error('Възникна грешка при абониране за получаване на новини!');
+                    }
+                });
+
+            });
+        });
+    </script>
+
+    @* handling all events in /Views/Properties/AdvancedSearchVertical_Partial.cshtml and /Views/Properties/AdvancedSearchHorizontal_Partial.cshtml *@
+    <script src="/Scripts/advanced-search.js"></script>
+
+    @*ClampJs used for elipsis of text*@
+    <script type="text/javascript" src="/Scripts/clampJS/clamp.min.js"></script>
+    <script type="text/javascript" src="/Scripts/theme/clamp-classes.js"></script>
+
+    @* Policy cookie management *@
+    <script type="text/javascript" src="/Scripts/cookies/policy-cookie.js"></script>
+
+
+    <!-- SmartMenus jQuery plugin -->
+    <script type="text/javascript" src="/Scripts/smartMenus/jquery.smartmenus.min.js"></script>
+
+    <!-- SmartMenus jQuery Bootstrap Addon -->
+    <script type="text/javascript" src="/Scripts/smartMenus/jquery.smartmenus.bootstrap.min.js"></script>
+
+    <div class="cookies-policy">
+
     </div>
 
 
-    <!--Chosen (DropDowns)-->
-    <script src="/js/chosen/chosen.jquery.min.js"></script>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <script>
 
-    <script src="/js/imagesloaded.pkgd.min.js"></script>
-    <script src="/js/masonry.pkgd.min.js"></script>
+            $(document).ready(function () {
+                (function () {
+                    moment.locale('bg');
 
-    <!-- Theme Initializer -->
-    <script src="/js/theme/theme.plugins.js"></script>
-    <script src="/js/theme/theme.js"></script><a class="scroll-to-top" href="#" id="scrollToTop">
-        <i class="icons icon-up"></i>
-    </a>
+                    var formatTime = function (date) {
+                        var now = new Date();
 
-    <!--Helpers-->
-    <script type="text/javascript" src="/js/variables.js"></script>
-    <script type="text/javascript" src="/js/markerclusterer.min.js"></script>
-    <script type="text/javascript" src="/js/properties.js"></script>
-    <script type="text/javascript" src="/js/script.js"></script>
+                        const diffTime = Math.abs(now.getTime() - date.getTime());
+                        const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
-    <script src="/js/gmap/gmap3.infobox.min.js"></script>
+                        if (diffDays >= 1) {
+                            var ceiledDays = Math.ceil(diffDays);
+                            return ceiledDays === 1
+                                ? ceiledDays.toString() + " ден"
+                                : ceiledDays.toString() + " дни";
+                        } else {
+                            var diffHours = diffDays * 24;
+                            if (diffHours >= 1) {
+                                return Math.ceil(diffHours).toString() + " ч.";
+                            } else {
+                                var diffMinutes = diffDays * 24 * 60;
+                                return Math.ceil(diffMinutes).toString() + " мин.";
+                            }
 
-    <!-- Begin Style Switcher -->
-    <script src="/js/jquery/jquery.flexslider-min.js"></script>
+                        }
+                    }
 
-    <!-- Style Switcher -->
-    <script type="text/javascript" src="/js/switcher.js"></script>
+                    var notificationTemplate = function (notification) {
+
+                        return '<li class="jewelItemNew">'
+                            + '<div class="anchorContainer">'
+                            + '<a class="notification-link ' + (notification.IsClicked ? 'notClicked' : '') + '" href="' + (notification.NotificationLink ? notification.NotificationLink : '/notifications/index?notificationId=' + notification.NotificationId) + '" role="button">'
+                            + '<div direction="left" class="clearfix">'
+                            + '<div class="pull-left">'
+                            + '<img alt="" class="imgNotificationCreator" src="' + notification.NotificationSourcePicture + '">'
+                            + '</div>'
+                            + '<div direction="right" class="clearfix">'
+                            + (notification.NotificationPicture 
+                                ? '<div class=" pull-right">'
+                                    + '<img class="imgNotification" src="' + (notification.NotificationPicture) + '" alt="">'
+                                + '</div>'
+                                : '')
+                            + '<div class="notificationContent">'
+                            + '<span class="notificationText clamp-two">'
+                            + notification.NotificationText
+                            + '</span>'
+                            + '<div class="clearfix notificationDate" direction="left">'
+                            + '<div class="pull-left">'
+                            + '<img style="width:16px; height:16px; margin-right:5px;" title="' + notification.NotificationType + '" src="' + notification.NotificationTypeImage + '"/>'
+                            + '</div>'
+                            + '<span class="notificationCreationDate" title="' + moment(notification.CreatedOn).format('dddd, DD MMMM YYYYг. HH:mmч.') + '"> ' + formatTime(moment(notification.CreatedOn).toDate()) + '</span>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</a>'
+                            + '</div>'
+                            + '</li>';
+                    }
+
+                    var pageSize = 6;
+                    var pagesCount = 0;
+                    var pagesFetched = 0;
+
+                    $.get('/notifications/notificationscount', function (notificationsCount) {
+                        pagesCount = Math.ceil(notificationsCount / pageSize);
+                    });
+
+
+
+                    var fetchNotificationsPage = function (pageNumber) {
+                        $.ajax({
+                            url: '/notifications/list?pagenumber=' + pageNumber + '&pagesize=' + pageSize,
+                            beforeSend: function (xhr) {
+                                $('#spinner').html('<span class="jewelLoading"></span>');
+                                $('#notifications-list').data("loading", true);
+                            },
+                            success: function (notifications) {
+                                var notificationsList = $('#notifications-list');
+
+                                var i;
+                                for (i = 0; i < notifications.length; i++) {
+                                    notificationsList.append(notificationTemplate(notifications[i]));
+                                }
+
+                                var elementsToBeClamped = document.getElementsByClassName('clamp-two');
+                                for (i = 0; i < elementsToBeClamped.length; i++) {
+                                    window.$clamp(elementsToBeClamped[i], { clamp: 2 });
+                                }
+
+
+                                $('#spinner').html('');
+                                notificationsList.removeData("loading");
+                            },
+                            error: function () {
+                                $('#spinner').html('');
+                                $('#notifications-list').removeData("loading");
+                            }
+                        });
+                    }
+
+                    $(document).on('click',
+                        '#notification-icon',
+                        function () {
+                            $('#notificationsFlyout').toggle();
+
+                            if (pagesFetched === 0 && pagesCount > 0) {
+                                fetchNotificationsPage(pagesFetched);
+                                pagesFetched++;
+                            }
+                        });
+
+                    $(".scrollPane").scroll(function () {
+                        var $this = $(this);
+                        var $notificationsList = $("#notifications-list");
+
+                        if (!$notificationsList.data("loading")) {
+
+                            if ($this.scrollTop() + $this.height() >= $notificationsList.height()) {
+
+                                if (pagesCount !== 0 && pagesCount > pagesFetched) {
+
+                                    fetchNotificationsPage(pagesFetched);
+                                    pagesFetched++;
+                                }
+                            }
+                        }
+                    });
+
+
+                    $(document).on('click',
+                        '#markAllAsRead',
+                        function () {
+
+                            $.ajax({
+                                url: '/Notifications/MarkAllAsRead',
+                                type: 'post',
+                                success: function (data) {
+                                    if (data === 'STATUS_OK') {
+                                        $('.notClicked').each(function (i, item) {
+                                            $(item).removeClass('notClicked');
+                                        });
+                                        window.alertify.success('Всички известия са маркирани като прочетени !');
+                                    }
+                                },
+                                error: function () {
+                                    window.alertify.error('Проблем при маркирането на известията като прочетени !');
+                                }
+                            });
+                        });
+
+                })();
+            })
+        </script>
+    }
+
+    @RenderSection("bottomBody", false)
     @RenderSection("scripts", required: false)
+
+
 </body>
 </html>

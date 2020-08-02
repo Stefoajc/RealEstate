@@ -4,6 +4,7 @@ using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.DataProtection;
 using Ninject.Modules;
 using Ninject.Web.Common;
 using RealEstate.Data;
@@ -26,14 +27,14 @@ namespace RealEstate.WebAppMVC.Ninject
             Bind<RentalInfoServices>().ToSelf().InRequestScope();
             Bind<ImageServices>().ToSelf().InRequestScope();
             Bind<PropertiesServices>().ToSelf().InRequestScope();
-            Bind<IEmailService>().To<GmailMailService>().InRequestScope();
+            Bind<IEmailService>().To<OfficeMailService>().InRequestScope();
+            Bind<ISmsService>().To<NotificationSmsService>().InRequestScope();
             Bind<CityServices>().ToSelf().InRequestScope();
+
+            Bind<INotificationCreator>().To<NotificationServices>().InRequestScope();
 
             Bind<DbContext>().To<RealEstateDbContext>().InRequestScope();
             Bind<IUnitOfWork>().To<UnitOfWork>().InRequestScope();
-            Bind<IPrincipal>()
-                .ToMethod(context => HttpContext.Current.User)
-                .InRequestScope();
 
             Bind<IAuthenticationManager>().ToMethod(
                 c =>

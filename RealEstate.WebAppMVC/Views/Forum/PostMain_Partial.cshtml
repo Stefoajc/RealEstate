@@ -1,0 +1,78 @@
+﻿@using RealEstate.Services.Helpers
+@model RealEstate.ViewModels.WebMVC.Forum.PostForumIndexViewModel
+
+<article class="post post-large" style="position: relative;">
+    @if (Model.ImageUrls.Any())
+    {
+        <div class="post-image">
+            @if (Model.ImageUrls.Count == 1)
+            {
+
+                <a href="@Url.Action("Details", "Posts", new {id = Model.PostId})">
+                    <picture>
+                        <source srcset="@(FileHelpers.ChangeFileExtension(Model.ImageUrls[0].Replace(" ", "%20"), ".webp"))" type="image/webp">
+                        <source srcset="@Model.ImageUrls[0].Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(Model.ImageUrls[0].Replace(" ", "%20"))">
+                        <img class="img-responsive" src="@Model.ImageUrls[0].Replace(" ", "%20")" alt="Blog" style="max-height: 380px;" width="100%">
+                    </picture>
+                </a>
+
+            }
+            else
+            {
+                <div class="owl-carousel pgl-pro-slide pgl-img-slide" data-plugin-options='{"items": 1, "pagination": false, "autoHeight": false}'>
+                    @foreach (string imageUrl in Model.ImageUrls)
+                    {
+                        <div class="item">
+                            <picture>
+                                <source srcset="@(FileHelpers.ChangeFileExtension(imageUrl.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                                <source srcset="@imageUrl.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(imageUrl.Replace(" ", "%20"))">
+                                <img class="img-responsive" src="@imageUrl.Replace(" ", " %20")" alt="Blog" style="max-height: 380px; width:100%">
+                            </picture>
+                            @*<img class="img-responsive" src="@imageUrl.Replace(" ", "%20")" alt="Blog" style="max-height: 380px; width:100%">*@
+                            <div class="item-caption">
+                                <p>
+                                    <small class="clamp-one">@Model.Title</small>
+                                </p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        <span class="post-date" style="left: 0; top: 0;">
+            <span class="day">@Model.CreatedOn.Day</span>
+            <span class="month-year">@Model.CreatedOn.ToString("MMM") @Model.CreatedOn.Year</span>
+        </span>
+    }
+    else
+    {
+        if (!string.IsNullOrEmpty(Model.VideoUrl))
+        {
+            <div class="post-video youtube">
+                <iframe allowfullscreen frameborder="0" height="488" src="@Model.VideoUrl" width="100%"></iframe>
+            </div>
+        }
+
+        // Post with no video or image
+    }
+    <div class="post-body" style="padding-bottom: 20px;">
+        <div class="post-content">
+            <h3>
+                <a class="clamp-two" href="@Url.Action("Details", "Posts", new {id = Model.PostId})">@Model.Title</a>
+            </h3>
+            <div class="post-meta">
+                <span>От <a href="@Url.Action("Index","Forum", new {userId = Model.CreatorId, ViewBag.viewType})">@Model.AuthorName</a> в тема <a href="@Url.Action("Index","Forum", new {themeId = Model.ThemeId, ViewBag.viewType})">@Model.ThemeName</a></span>
+                <span><i class="fa fa-comment-o"></i> <a href="@Url.Action("Details","Posts", new {id = Model.PostId})#comments">@Model.CommentsCount Коментара</a></span>
+            </div>
+            <div class="formated-text post-main-description">
+                @Html.Raw(Model.Body)
+            </div>
+            <div class="fadeout"></div>
+
+            <div style="text-align: right;">
+                <a class="btn btn-default btn-sm" style="margin-top: 10px;" href="@Url.Action("Details","Posts", new {id = Model.PostId})">Виж още</a>
+            </div>
+        </div>
+    </div>
+
+</article>

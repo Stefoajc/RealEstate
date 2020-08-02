@@ -28,7 +28,7 @@ namespace RealEstate.Model
     {
         public int PropertyId { get; set; }
 
-        public virtual ISet<Properties> Properties { get; set; } = new HashSet<Properties>();
+        public virtual ISet<PropertiesBase> Properties { get; set; } = new HashSet<PropertiesBase>();
     }
 
 }

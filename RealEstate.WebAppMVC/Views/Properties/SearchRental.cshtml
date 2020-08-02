@@ -1,61 +1,20 @@
-﻿@model RealEstate.ViewModels.WebMVC.SearchRentalViewModel
-
-<section class="pgl-advanced-search pgl-bg-light">
+﻿<section class="pgl-advanced-search pgl-bg-light">
     <div class="container">
-        @using (Html.BeginForm("SearchRental", "Properties" , FormMethod.Get))
+        @using (Html.BeginForm("Index", "Properties", FormMethod.Get))
         {
+            <input type="hidden" value="True" name="IsShortPeriodRent" id="IsShortPeriodRent" />
+
             <div class="row">
                 <div class="col-xs-6 col-sm-3">
                     <div class="form-group">
                         <input readonly="readonly" value="Под наем" class="form-control" />
                     </div>
                 </div>
-                <div class="col-xs-6 col-sm-3">
-                    <div class="form-group">
-                        <label class="sr-only" for="location">Град</label>
-                        <select id="cityId" name="rentCityId" data-placeholder="Location" class="chosen-select" style="display: none;">
-                            <option selected="selected" value="">Град</option>
-                            @foreach (var city in ViewBag.Cities)
-                            {
-                                <option value="@city.CityId">@city.CityName</option>
-                            }
-                        </select>
-                        @Html.ValidationMessage("rentCityId", new { @class = "text-danger" })
-                    </div>
-                </div>
 
-                <div class="col-xs-6 col-sm-3">
-                    <div class="form-group">
-                        <div class="input-group date" id="event-start">
-                            <input class="form-control" name="from" placeholder="От" type="text">
-                            <span class="input-group-addon" style="">
-                                <span class="glyphicon glyphicon-calendar"></span>
-                            </span>
-                        </div>
-                        @Html.ValidationMessage("from", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="col-xs-6 col-sm-3">
-                    <div class="form-group">
-                        <div class="input-group date" id="event-start">
-                            <input class="form-control" name="to" placeholder="До" type="text">
-                            <span class="input-group-addon" style="">
-                                <span class="glyphicon glyphicon-calendar"></span>
-                            </span>
-                        </div>
-                        @Html.ValidationMessage("to", new { @class = "text-danger" })
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="row">
                 <div class="col-xs-6 col-sm-3">
                     <div class="form-group">
                         <label class="sr-only" for="property-types">Типове имоти</label>
-                        <select id="property-types" name="rentPropertyType" data-placeholder="Property Types" class="chosen-select" style="display: none;">
+                        <select id="property-types" name="propertyType" data-placeholder="Property Types" class="chosen-select">
                             <option selected="selected" value="">Типове имоти</option>
                             @foreach (var propertyType in ViewBag.PropertyTypes)
                             {
@@ -67,8 +26,49 @@
 
                 <div class="col-xs-6 col-sm-3">
                     <div class="form-group">
+                        <div class="input-group date" id="event-start">
+                            <input class="form-control" id="from" name="from" placeholder="От" type="text">
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                        @Html.ValidationMessage("from", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <div class="input-group date" id="event-to">
+                            <input class="form-control" id="to" name="to" placeholder="До" type="text">
+                            <span class="input-group-addon" style="">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                        @Html.ValidationMessage("to", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
+                        <label class="sr-only" for="location">Град</label>
+                        <select id="cityId" name="cityId" data-placeholder="Location" class="chosen-select">
+                            <option selected="selected" value="">Град</option>
+                            @foreach (var city in ViewBag.Cities)
+                            {
+                                <option value="@city.CityId">@city.CityName</option>
+                            }
+                        </select>
+                        @Html.ValidationMessage("cityId", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-sm-3">
+                    <div class="form-group">
                         <label class="sr-only" for="search-distancefromcity">Разстояние от града</label>
-                        <select id="distanceFromCity" name="rentDistanceFromCity" data-placeholder="Разстояние от града" class="chosen-select" style="display: none;">
+                        <select id="distanceFromCity" name="distanceFromCity" data-placeholder="Разстояние от града" class="chosen-select">
                             <option selected="selected" value="">Разстояние от града</option>
                             <option value="0">0км</option>
                             <option value="5">5км</option>
@@ -77,7 +77,7 @@
                             <option value="30">30км</option>
                             <option value="50">50км</option>
                         </select>
-                        @Html.ValidationMessage("rentDistanceFromCity", new { @class = "text-danger" })
+                        @Html.ValidationMessage("distanceFromCity", new { @class = "text-danger" })
                     </div>
                 </div>
 
@@ -86,32 +86,32 @@
                         <div class="row pgl-narrow-row">
                             <div class="col-xs-6">
                                 <label class="sr-only" for="search-minprice">Цена от</label>
-                                <select id="priceFrom" name="rentPriceFrom" data-placeholder="Price From" class="chosen-select" style="display: none;">
+                                <select id="priceFrom" name="priceFrom" data-placeholder="Price From" class="chosen-select">
                                     <option selected="selected" value="">Цена от</option>
-                                    @for (int i = 0; i <= 1000; i += 100)
+                                    @for (int i = 0; i <= 100; i += 10)
                                     {
-                                        <option value="@i">@(i)лв.</option>
+                                        <option value="@i">@(i)лв.(ден)</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-xs-6">
                                 <label class="sr-only" for="search-maxprice">Цена до</label>
-                                <select id="priceTo" name="rentPriceTo" data-placeholder="Price To" class="chosen-select" style="display: none;">
+                                <select id="priceTo" name="priceTo" data-placeholder="Price To" class="chosen-select">
                                     <option selected="selected" value="">Цена до</option>
-                                    @for (int i = 100; i <= 1000; i += 100)
+                                    @for (int i = 10; i <= 100; i += 10)
                                     {
-                                        <option value="@i">@(i)лв.</option>
+                                        <option value="@i">@(i)лв.(ден)</option>
                                     }
-                                    <option value="1000plus">&gt;1000лв.</option>
+                                    <option value="100plus">&gt;100лв.(ден)</option>
                                 </select>
                             </div>
-                            @Html.ValidationMessage("rentPriceTo", new { @class = "text-danger" })
+                            @Html.ValidationMessage("priceTo", new { @class = "text-danger" })
                         </div>
                     </div>
                 </div>
                 <div class="col-xs-6 col-sm-3">
                     <div class="form-group">
-                        <button type="submit" class="btn btn-block btn-primary">Намери своя дом</button>
+                        <button type="submit" class="btn btn-block btn-primary">Намери Почивка</button>
                     </div>
                 </div>
             </div>

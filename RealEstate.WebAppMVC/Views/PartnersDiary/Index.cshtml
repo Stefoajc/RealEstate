@@ -1,0 +1,718 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.Reports.PartnersListViewModel>
+
+@{
+    ViewBag.Title = "Партньори - Имоти СПРОПЪРТИС";
+}
+
+
+@section css{
+    <style>
+        .hiddenRow {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 2% !important;
+            border-left: 2px black solid;
+            border-right: 2px black solid;
+            border-bottom: 2px black solid;
+        }
+
+        td {
+            border-top: none !important;
+            vertical-align: middle !important;
+        }
+
+        th {
+            border: none !important;
+            /* make text in th not selectable */
+            -webkit-user-select: none; /* Chrome all / Safari all */
+            -moz-user-select: none; /* Firefox all */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Likely future */
+        }
+
+        .table-headers {
+            border: 2px black solid;
+        }
+
+        .accordion-toggle {
+            border-left: 2px black solid;
+            border-right: 2px black solid;
+        }
+
+            .accordion-toggle:hover {
+                background: darkgrey;
+                cursor: pointer;
+            }
+
+        .extended-information {
+            margin-top: 5px;
+            margin-bottom: 20px;
+        }
+
+        .arrow-up {
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 7px solid black;
+        }
+
+        .arrow-down {
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 7px solid black;
+        }
+
+        .ordering-text {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .ordering:hover, .ordering-ascending:hover, .ordering-descending:hover {
+            color: black;
+        }
+
+        .ordering-ascending, .ordering-descending {
+            cursor: pointer
+        }
+
+            .ordering-ascending:before {
+                content: "▼";
+            }
+
+            .ordering-descending:before {
+                content: "▲";
+            }
+
+        @@media only screen and (max-width: 800px) {
+            .hidden-on-mobile {
+                display: none;
+            }
+        }
+    </style>
+}
+
+<div class="container-fluid" style="padding-top: 50px;">
+    <h1 align="center">Партньори на "СПРОПЪРТИС"</h1>
+    <div class="row">
+        <div class="col-xs-6 col-sm-2">
+            <div class="form-group">
+                <label class="sr-only" for="cityId">Град</label>
+                <select data-bind="value: cityId" id="cityId" name="cityId" data-placeholder="Град" class="chosen-select">
+                    <option selected="selected" value="">Град</option>
+                    @foreach (var city in ViewBag.Cities)
+                    {
+                        <option value="@city.CityId">@city.CityName</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-2">
+            <div class="form-group">
+                <label class="sr-only" for="partner-types">Вид партньор</label>
+                <select data-bind="value: partnerTypeId" id="partner-types" name="partnerType" data-placeholder="Вид партньор" class="chosen-select">
+                    <option selected="selected" value="">Вид партньор</option>
+                    @foreach (var partnerType in ViewBag.PartnerTypes)
+                    {
+                        <option value="@partnerType.Id">@partnerType.Type</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-2">
+            <div class="form-group">
+                <label class="sr-only" for="agentId">Добавен от</label>
+                <select data-bind="value: agentId" id="agentId" name="agentId" data-placeholder="Брокер" class="chosen-select">
+                    <option selected="selected" value="">Добавен от</option>
+                    @foreach (var agent in ViewBag.Agents)
+                    {
+                        <option value="@agent.Id">@agent.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-2">
+            <div class="form-group">
+                <input class="form-control" id="name" name="name" placeholder="Име" data-bind="value: name, valueUpdate: 'input'" />
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-2">
+            <div class="form-group">
+                <button class="btn btn-primary btn-block" data-bind="click: showAddPartnerModal">Добави партньор</button>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-condensed" style="border-collapse:collapse;">
+        <thead>
+            <tr class="table-headers">
+                <th class=" hidden-on-mobile"></th>
+                <th>Телефон</th>
+                <th>
+                    <div class="ordering">
+                        <span class="ordering-text" name="Name">Име</span>
+                        <span class="ordering-ascending"></span>
+                    </div>
+                </th>
+                <th class="hidden-on-mobile"><div class="ordering"><span class="ordering-text" name="CompanyName">Фирма</span><span class="ordering-ascending"></span></div></th>
+                <th><div class="ordering"><span class="ordering-text" name="CityName">Град</span><span class="ordering-ascending"></span></div></th>
+                <th><div class="ordering"><span class="ordering-text" name="PartnerType">Тип партньор</span><span class="ordering-ascending"></span></div></th>
+                <th class="hidden-on-mobile"><div class="ordering"><span class="ordering-text" name="Email">Емейл</span><span class="ordering-ascending"></span></div></th>
+                <th class="hidden-on-mobile"><div class="ordering"><span class="ordering-text" name="CreatedOn">Добавен на</span><span class="ordering-ascending"></span></div></th>
+                <th class="hidden-on-mobile"><div class="ordering"><span class="ordering-text" name="AgentName">Добавен от</span><span class="ordering-ascending"></span></div></th>
+                <th class="hidden-on-mobile">
+                    Операции
+                </th>
+            </tr>
+        </thead>
+        <tbody data-bind='foreach:filteredPartners()'>
+
+            <tr data-toggle="collapse" data-bind="attr: {'data-target': '#accordeon' + $index()}" class="accordion-toggle">
+                <td class="indicator-container hidden-on-mobile">
+                    <i class="indicator glyphicon glyphicon-chevron-down  pull-left"></i>
+                </td>
+                <td data-bind='text: PhoneNumber'></td>
+                <td data-bind='text: Name'></td>
+                <td class="hidden-on-mobile" data-bind='text: CompanyName'></td>
+                <td data-bind='text: CityName'></td>
+                <td style="font-weight: bold;" data-bind='text: PartnerType'></td>
+                <td class="hidden-on-mobile" data-bind='text: Email'></td>
+                <td class="hidden-on-mobile" data-bind='text: moment(CreatedOn()).format("DD.MM.YYYY HH:mm") + "ч."'></td>
+                <td class="hidden-on-mobile" data-bind='text: AgentName'></td>
+                <td class="hidden-on-mobile">
+                    <!-- ko if: IsAllowedToEdit() -->
+                    <i class="fa fa-edit operation" style="font-size: 24px;" data-bind="click: $root.editPartner"></i>
+                    <!-- /ko -->
+                    <!-- ko if: IsAllowedToDelete() -->
+                    <i class="fa fa-remove operation" style="font-size: 24px;" data-bind="click: $root.showRemovePartnerModal"></i>
+                    <!-- /ko -->
+                </td>
+            </tr>
+            <tr>
+                <td colspan="11" class="hiddenRow">
+                    <div class="accordion-body collapse" data-bind="attr: {'id': 'accordeon' + $index()}">
+                        <div class="extended-information row">
+                            <div class="col-md-4">
+                                <div>
+                                    <div>
+                                        <b>Име на партньора:</b>
+                                        <span data-bind="text:Name"></span>
+                                    </div>
+                                    <div>
+                                        <b>Тип на партньора:</b>
+                                        <span data-bind="text:PartnerType"></span>
+                                    </div>
+                                    <div>
+                                        <b>Телефон:</b>
+                                        <span data-bind="text:PhoneNumber"></span>
+                                    </div>
+                                    <div>
+                                        <b>Емейл:</b>
+                                        <span data-bind="text:Email"></span>
+                                    </div>
+                                    <div>
+                                        <b>Социална медия:</b>
+                                        <span data-bind="text:SocialMediaAccount"></span>
+                                    </div>
+                                    <div>
+                                        <b>Град:</b>
+                                        <span data-bind="text: 'гр.' + CityName() "></span>
+                                    </div>
+                                    <div>
+                                        <b>Брокер:</b>
+                                        <a target="_blank" data-bind="text: AgentName, attr: {'href': '/Agents/Details?id=' + AgentId}"> </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="additionalInformation col-md-8">
+                                <div>
+                                    <b>Допълнителна инфромация</b>
+                                </div>
+                                <div data-bind="text: AdditionalInformation">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+
+@section bottomBody{
+
+    @*Create Partner modal*@
+    <div class="modal fade" id="modalAddPartnerForm" role="dialog" aria-labelledby="Добави партньор" aria-hidden="true" style="padding-top: 0px;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Добавяне на партньор</h4>
+                </div>
+                <div class="modal-body mx-3" data-bind="with: partnerToCreate">
+                    <div class="row">
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label for="add-partner-name" class="required">Име</label>
+                                    <input type="text" id="add-partner-name" class="form-control" placeholder="Иван Иванов" data-bind="value:PartnerName">
+                                    @Html.ValidationMessage("PartnerName", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-company-name">Фирма</label>
+                                    <input type="text" id="add-company-name" class="form-control" placeholder="Уникредит Булбанк" data-bind="value:PartnerCompanyName">
+                                    @Html.ValidationMessage("PartnerCompanyName", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-contact-city" class="required">Град</label>
+                                    <select id="add-contact-city" name="cityId" data-placeholder="Град" class="chosen-manual" data-bind="value: CityId">
+                                        <option selected="selected" value="">Град</option>
+                                        @foreach (var city in ViewBag.Cities)
+                                        {
+                                            <option value="@city.CityId">@city.CityName</option>
+                                        }
+                                    </select>
+                                    @Html.ValidationMessage("CityId", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-partner-type" class="required">Вид партньор</label>
+                                    <select id="add-partner-type" name="partnerType" data-placeholder="Вид партньор" class="chosen-manual" data-bind="value: PartnerTypeId">
+                                        <option selected="selected" value="">Вид партньор</option>
+                                        @foreach (var partnerType in ViewBag.PartnerTypes)
+                                        {
+                                            <option value="@partnerType.Id">@partnerType.Type</option>
+                                        }
+                                    </select>
+                                    @Html.ValidationMessage("PartnerTypeId", "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label for="add-partner-phonenumber" class="required">Телефон</label>
+                                    <input type="text" id="add-partner-phonenumber" class="form-control" placeholder="08765433219" data-bind="value:PhoneNumber">
+                                    @Html.ValidationMessage("PhoneNumber", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-partner-email">Емейл</label>
+                                    <input type="text" id="add-partner-email" class="form-control" placeholder="sample@sample.bg" data-bind="value:Email">
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-socialmedia">Социална медия</label>
+                                    <input type="text" id="add-socialmedia" class="form-control" placeholder="https://www.facebook.com/...." data-bind="value:SocialMediaAccount">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <label>Допълнителна информация</label>
+                        </div>
+                        <div class="col-xs-12">
+                            <textarea class="form-control" rows="5" data-bind="value:AdditionalInformation"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: addPartner">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @*Edit Partner modal*@
+    <div class="modal fade" id="modalEditPartnerForm" role="dialog" aria-labelledby="Редактирай партньор" aria-hidden="true" style="padding-top: 0px;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Редактиране на партньор</h4>
+                </div>
+                <div class="modal-body mx-3" data-bind="with: selectedPartnerForEdit">
+                    <input type="hidden" data-bind="value: Id" />
+                    <div class="row">
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label for="edit-partner-name" class="required">Име</label>
+                                    <input type="text" id="edit-partner-name" class="form-control" placeholder="Иван Иванов" data-bind="value:Name">
+                                    @Html.ValidationMessage("PartnerName", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="edit-company-name">Фирма</label>
+                                    <input type="text" id="edit-company-name" class="form-control" placeholder="Уникредит Булбанк" data-bind="value:CompanyName">
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="edit-contact-city" class="required">Град</label>
+                                    <select id="edit-contact-city" name="cityId" data-placeholder="Град" class="chosen-manual" data-bind="value: CityId">
+                                        <option selected="selected" value="">Град</option>
+                                        @foreach (var city in ViewBag.Cities)
+                                        {
+                                            <option value="@city.CityId">@city.CityName</option>
+                                        }
+                                    </select>
+                                    @Html.ValidationMessage("CityId", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="edit-partner-type" class="required">Вид партньор</label>
+                                    <select id="edit-partner-type" name="partnerType" data-placeholder="Вид партньор" class="chosen-manual" data-bind="value: PartnerTypeId">
+                                        <option selected="selected" value="">Вид партньор</option>
+                                        @foreach (var partnerType in ViewBag.PartnerTypes)
+                                        {
+                                            <option value="@partnerType.Id">@partnerType.Type</option>
+                                        }
+                                    </select>
+                                    @Html.ValidationMessage("PartnerTypeId", "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label for="edit-partner-phonenumber" class="required">Телефон</label>
+                                    <input type="text" id="edit-partner-phonenumber" class="form-control" placeholder="08765433219" data-bind="value:PhoneNumber">
+                                    @Html.ValidationMessage("PhoneNumber", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-partner-email">Емейл</label>
+                                    <input type="text" id="add-partner-email" class="form-control" placeholder="sample@sample.bg" data-bind="value:Email">
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-socialmedia">Социална медия</label>
+                                    <input type="text" id="add-socialmedia" class="form-control" placeholder="https://www.facebook.com/...." data-bind="value:SocialMediaAccount">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <label>Допълнителна информация</label>
+                        </div>
+                        <div class="col-xs-12">
+                            <textarea class="form-control" rows="5" data-bind="value:AdditionalInformation"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.saveChanges">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Delete Partner modal *@
+    <div class="modal fade" id="modalDeletePartnerForm" role="dialog" aria-labelledby="Изтрии Партньор" aria-hidden="true" style="padding-top: 0px;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Найстина ли искате да изтриете информацията за този Партньор ?</h4>
+                </div>
+                <div class="modal-body mx-3" data-bind="with: selectedPartnerToDelete">
+                    <div class="row">
+                        <div class="col-xs-12 col-md-6">
+                            <span>Име:</span>
+                            <b data-bind='text: Name'></b>
+                            <br />
+                            <span>Телефон</span>
+                            <b data-bind='text: PhoneNumber'></b>
+                            <br />
+                            <span>Фирма</span>
+                            <b data-bind='text: CompanyName'></b>
+                            <br />
+                            <span>Град</span>
+                            <b data-bind='text: CityName'></b>
+                        </div>
+                        <div class="col-xs-12 col-md-6">
+                            <span>Тип партньор</span>
+                            <b data-bind='text: PartnerType'></b>
+                            <br />
+                            <span>Емейл</span>
+                            <b data-bind='text: Email'></b>
+                            <br />
+                            <span>Създаден на:</span>
+                            <b data-bind='text: moment(CreatedOn()).format("DD.MM.YYYY HH:mm") + "ч."'></b>
+                            <br />
+                            <span>Създаден от:</span>
+                            <b data-bind='text: AgentName'></b>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-bind="click: $root.removePartner">Изтрии</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section scripts{
+
+    <script type="text/javascript" src="~/Scripts/knockoutJS/knockout-3.5.0.js"></script>
+    <script type="text/javascript" src="~/Scripts/knockoutJS/knockout-extentions.js"></script>
+    <script>
+        var diaryPartners = @Html.Raw(Json.Encode(Model));
+
+        var PartnerModel = function(partner) {
+            this.Id = ko.observable(partner.Id);
+            this.CreatedOn = ko.observable(partner.CreatedOn);
+            this.PhoneNumber = ko.observable(partner.PhoneNumber);
+            this.Email = ko.observable(partner.Email);
+            this.Name = ko.observable(partner.PartnerName);
+            this.CompanyName = ko.observable(partner.PartnerCompanyName);
+            this.SocialMediaAccount = ko.observable(partner.SocialMediaAccount);
+            this.AdditionalInformation = ko.observable(partner.AdditionalInformation);
+            this.CityId = ko.observable(partner.CityId);
+            this.CityName = ko.observable(partner.CityName);
+            this.PartnerTypeId = ko.observable(partner.PartnerTypeId);
+            this.PartnerType = ko.observable(partner.PartnerTypeName);
+            this.AgentId = ko.observable(partner.AgentCreatorId);
+            this.AgentName = ko.observable(partner.AgentCreatorName);
+            this.IsAllowedToEdit = ko.observable(partner.IsAllowedToEdit);
+            this.IsAllowedToDelete = ko.observable(partner.IsAllowedToDelete);
+        }
+
+        var CreatePartnerModel = function()
+        {
+            this.PartnerName = ko.observable('');
+            this.PhoneNumber = ko.observable('');
+            this.Email = ko.observable('');
+            this.SocialMediaAccount = ko.observable('');
+            this.PartnerCompanyName = ko.observable('');
+            this.CityId = ko.observable('');
+            this.AdditionalInformation = ko.observable('');
+            this.PartnerTypeId = ko.observable('');
+        }
+
+        var PageViewModel = function(partners) {
+
+            var self = this;
+
+            var observablePartners = [];
+            for (var i = 0; i < partners.length; i++) {
+                observablePartners.push(new PartnerModel(partners[i]));
+            }
+
+            self.partners = ko.observableArray(observablePartners);
+
+            self.cityId = ko.observable('');
+            self.partnerTypeId = ko.observable('');
+            self.agentId = ko.observable('');
+            self.name = ko.observable('');
+
+            self.isSortAsc = ko.observable(true);
+            self.sortBy = ko.observable('Name');
+
+            self.filteredPartners = ko.computed(function() {
+
+                return ko.utils
+                    .arrayFilter(self.partners(),
+                        function(rec) {
+                            return ((self.partnerTypeId().length === 0 ||
+                                    rec.PartnerTypeId() === Number(self.partnerTypeId())) &&
+                                (self.cityId().length === 0 ||
+                                    rec.CityId() === Number(self.cityId())) &&
+                                (self.agentId().length === 0 ||
+                                    rec.AgentId() === self.agentId()) &&
+                                (self.name().length === 0 ||
+                                    rec.Name().indexOf(self.name()) !== -1));
+                        })
+                    .sort(function(a, b) {
+
+                        var dateA;
+                        var dateB;
+                        if (self.isSortAsc() === true)
+                            switch (self.sortBy()) {
+                                case 'Name':
+                                    return a.Name() > b.Name();
+                                case 'CompanyName':
+                                    return a.CompanyName() > b.CompanyName();
+                                case 'CityName':
+                                    return a.CityName() > b.CityName();
+                                case 'PartnerType':
+                                    return a.PartnerType() > b.PartnerType();
+                                case 'Email':
+                                    return a.Email() > b.Email();
+                                case 'CreatedOn':
+                                    dateA = moment(a["CreatedOn"]()).toDate();
+                                    dateB = moment(b["CreatedOn"]()).toDate();
+                                    return dateB.getTime() - dateA.getTime();
+                                case 'AgentName':
+                                    return a.AgentName() > b.AgentName();
+                                default:
+                            }
+                        else if (self.isSortAsc() === false) {
+                            switch (self.sortBy()) {
+                                case 'Name':
+                                    return a.Name() < b.Name();
+                                case 'CompanyName':
+                                    return a.PropertyTypeId() < b.PropertyTypeId();
+                                case 'CityName':
+                                    return a.CityName() < b.CityName();
+                                case 'PartnerType':
+                                    return a.CityDistrict() < b.CityDistrict();
+                                case 'Email':
+                                    return a.Email() < b.Email();
+                                case 'CreatedOn':
+                                    dateA = moment(a["CreatedOn"]()).toDate();
+                                    dateB = moment(b["CreatedOn"]()).toDate();
+                                    return dateA.getTime() - dateB.getTime();
+                                case 'AgentName':
+                                    return a.AgentName() > b.AgentName();
+                                default:
+                            }
+                        }
+
+                        return a.Id > b.Id;
+                    });
+            });
+
+            //!!Create funcs!!
+            self.partnerToCreate = ko.observable();
+            self.showAddPartnerModal = function () {
+                $('#modalAddPartnerForm').modal('show');
+                self.partnerToCreate(new CreatePartnerModel());
+
+                $('#modalAddPartnerForm .chosen-manual').chosen();
+            }
+
+            self.addPartner = function()
+            {
+                var partnerViewModel = ko.toJS(self.partnerToCreate);
+
+                $.post('/PartnersDiary/Create', partnerViewModel
+                    , function (data) {
+
+                        var thisForm = $('#modalAddPartnerForm');
+
+                        if (data.success) {
+                            showErrorResponse(data, thisForm);
+                        } else {
+                            self.partners.push(new PartnerModel(data));
+                            thisForm.modal('hide');
+                            self.partnerToCreate(null);
+
+                            clearFormValidationErrors(thisForm);
+                            window.alertify.success("Успешно добавена информация за партньор! Ако искате да промените нещо имате " + '@System.Configuration.ConfigurationManager.AppSettings["TimeWindowForChangesInMinutes"]' + " минути да го направите!");
+                        }
+                    });
+            }
+            //!!Create funcs!!
+
+            //!!Edit funcs!!
+            self.selectedPartnerForEdit = ko.observable();
+            self.editPartner = function (partner) {
+                //Load selected item from table to variable
+                self.selectedPartnerForEdit(partner);
+                //Show modal window with the binded data
+                $('#modalEditPartnerForm').modal('show');
+
+                $('#modalEditPartnerForm .chosen-manual').chosen();
+            }
+
+            self.saveChanges = function() {
+                var editViewModel = {
+                    id: self.selectedPartnerForEdit().Id(),
+                    phoneNumber: self.selectedPartnerForEdit().PhoneNumber(),
+                    email: self.selectedPartnerForEdit().Email(),
+                    socialMediaAccount: self.selectedPartnerForEdit().SocialMediaAccount(),
+                    partnerName: self.selectedPartnerForEdit().Name(),
+                    partnerCompanyName: self.selectedPartnerForEdit().CompanyName(),
+                    cityId: self.selectedPartnerForEdit().CityId(),
+                    аdditionalInformation: self.selectedPartnerForEdit().AdditionalInformation(),
+                    partnerTypeId: self.selectedPartnerForEdit().PartnerTypeId()
+                };
+
+                $.post('/PartnersDiary/Edit', editViewModel,
+                    function (data) {
+
+                        var thisForm = $('#modalEditPartnerForm');
+
+                        if (data.success) {
+                            showErrorResponse(data, thisForm);
+                        } else {
+                            self.selectedPartnerForEdit().CityName(data.CityName);
+                            self.selectedPartnerForEdit().PartnerType(data.PartnerTypeName);
+
+                            self.selectedPartnerForEdit(null);
+                            thisForm.modal('hide');
+
+                            clearFormValidationErrors(thisForm);
+                            window.alertify.success("Успешно редактирана информация за партньор!");
+                        }
+                    });
+            }
+            //!!Edit funcs!!
+
+            //!!Delete funcs!!
+            self.selectedPartnerToDelete = ko.observable();
+            self.showRemovePartnerModal = function(partner) {
+                self.selectedPartnerToDelete(partner);
+                //Show modal window with the binded data
+                $('#modalDeletePartnerForm').modal('show');                
+            }
+
+            self.removePartner = function() {
+                $.post('/PartnersDiary/Delete', { id: self.selectedPartnerToDelete().Id() },
+                    function(data) {
+                        if (data === 'STATUS_OK') {
+                            self.partners.remove(self.selectedPartnerToDelete());
+
+                            $('#modalDeletePartnerForm').modal('hide');
+                            window.alertify.success("Успешно изтрита информация за партньор!");
+                        } else {
+                            window.alertify.error('Проблем при изтриване на партньор. Моля опитайте по-късно!');
+                        }
+                    });
+            };
+            //!!Delete funcs!!
+        }
+
+        var vm = new PageViewModel(diaryPartners);
+        ko.applyBindings(vm);
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $(document).on('click',
+                '.ordering',
+                function (e) {
+                    var textSpan = $(this).find('.ordering-text');
+                    var property = textSpan.attr('name');
+
+                    var arrowSpan = textSpan.next();
+                    arrowSpan.toggleClass('ordering-ascending ordering-descending');
+
+                    var isOrderAsc = arrowSpan.hasClass('ordering-ascending');
+
+                    vm.isSortAsc(isOrderAsc);
+                    vm.sortBy(property);
+                });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            function toggleChevron(e) {
+                $(e.target)
+                    .closest('tr')
+                    .prev()
+                    .find("i.indicator")
+                    .toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+            }
+
+            $('.table-condensed').on('hidden.bs.collapse', toggleChevron);
+            $('.table-condensed').on('shown.bs.collapse', toggleChevron);
+
+            $(document).on('click', '.table-condensed .operation', (function (e) {
+                e.stopPropagation();
+            }));
+        });
+    </script>
+}

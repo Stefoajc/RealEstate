@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
+using System.Web.Mvc;
 using RealEstate.Model;
 using RealEstate.Repositories.Interfaces;
 
@@ -9,27 +9,26 @@ namespace RealEstate.Services
 {
     public class ExtraServices:BaseService
     {
-        public ExtraServices(IUnitOfWork unitOfWork, IPrincipal user, ApplicationUserManager userMgr) : base(unitOfWork, user, userMgr)
-        {
-        }
+        public ExtraServices(IUnitOfWork unitOfWork, ApplicationUserManager userMgr)
+            : base(unitOfWork, userMgr) {}
 
-        public List<RentalExtras> AddRentalExtras(List<int> rentalExtrasToAdd)
+        public List<Extras> GetRentalExtras(List<int> rentalExtrasToAdd)
         {
-            List<RentalExtras> rentalExtras = UnitOfWork.ExtrasRepository
+            List<Extras> rentalExtras = unitOfWork.ExtrasRepository
                 .GetAll()
-                .OfType<RentalExtras>()
-                .Where(re => rentalExtrasToAdd.Any(r => r == re.ExtraId))
+                .OfType<Extras>()
+                .Where(re => rentalExtrasToAdd.Any(r => r == re.ExtraId) && !(re is PropertyExtras))
                 .ToList();
 
             return rentalExtras;
         }
 
-        public List<PropertyExtras> CreatePropertyExtras(List<int> propertyExtrasToAdd)
+        public List<Extras> GetPropertyExtras(List<int> propertyExtrasToAdd)
         {
-            List<PropertyExtras> propertyExtras = UnitOfWork.ExtrasRepository
+            List<Extras> propertyExtras = unitOfWork.ExtrasRepository
                 .GetAll()
-                .OfType<PropertyExtras>()
-                .Where(re => propertyExtrasToAdd.Any(r => r == re.ExtraId))
+                .OfType<Extras>()
+                .Where(re => propertyExtrasToAdd.Any(r => r == re.ExtraId) && !(re is RentalExtras))
                 .ToList();
 
             return propertyExtras;
@@ -43,20 +42,55 @@ namespace RealEstate.Services
         /// <returns></returns>
         public List<Extras> GetExtras(string extraType)
         {
-
-            List<Extras> extras;
+            List<Extras> extras = new List<Extras>();
             switch (extraType)
             {
                 case "PropertyExtras":
-                    extras = UnitOfWork.ExtrasRepository.FindBy(e => e is PropertyExtras).ToList();
+                    extras = unitOfWork.ExtrasRepository.Where(e => !(e is RentalExtras)).ToList();
                     break;
                 case "RentalExtras":
-                    extras = UnitOfWork.ExtrasRepository.FindBy(e => e is RentalExtras).ToList();
+                    extras = unitOfWork.ExtrasRepository.Where(e => !(e is PropertyExtras)).ToList();
                     break;
                     default: throw new ArgumentException("No such extra");
             }
 
             return extras;
         }
+
+        #region Extras for layout
+
+        private static IDictionary<int, string> extras;
+
+        private static IDictionary<int, string> Extras
+        {
+            get
+            {
+                if (extras == null)
+                {
+                    var unitOfWork = (IUnitOfWork)DependencyResolver.Current.GetService(typeof(IUnitOfWork));
+
+                    extras = unitOfWork.ExtrasRepository.GetAll()
+                        .Select(e => new { e.ExtraId, e.ExtraName })
+                        .ToDictionary(e => e.ExtraId, e => e.ExtraName);
+                }
+
+                return extras;
+            }
+        }
+
+        public static string GetExtraName(int extraId)
+        {
+            return Extras[extraId];
+        }
+
+        public static int GetExtraId(string extra)
+        {
+            return Extras
+                .Where(pt => pt.Value.ToUpper().Contains(extra.ToUpper()))
+                .Select(pt => pt.Key)
+                .FirstOrDefault();
+        }
+
+        #endregion
     }
 }

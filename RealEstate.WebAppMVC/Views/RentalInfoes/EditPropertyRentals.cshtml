@@ -1,0 +1,451 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.EditRentalInfoForPropertyViewModel>
+@{
+    ViewBag.Title = "Редактирай помещенията отдавани под наем в имот";
+}
+
+<style>
+    .attributes {
+        padding-bottom: 7px;
+    }
+
+    .additionalDescriptors {
+        width: 47%;
+        font-size: 14px;
+        line-height: 1.42857143;
+        height: 40px;
+    }
+
+    .rentalDescriptors {
+        margin-top: 20px;
+        height: 301px;
+        overflow-y: auto;
+    }
+
+    .rentalInfoTemplate {
+        margin: 20px;
+        padding-top: 10px;
+        padding-left: 10px;
+    }
+
+    .delete-rental {
+        position: absolute;
+        right: 70px;
+        color: gray;
+        cursor: pointer;
+        z-index: 1;
+    }
+</style>
+
+<br />
+<h2 align="center" style="margin-bottom: 5px;">Помещения отдавани под наем в имота</h2>
+<h6 align="center" style="margin-top: 5px;">(Това поле се попълва само ако от имота се отдават под наем отделни части.)</h6>
+<hr />
+
+@for (int i = 0; i < Model.Count; i++)
+{
+    <div class="rental-fullunit">
+        @using (Html.BeginForm("Delete", "RentalInfoes", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.Hidden("RentalInfoId", Model[i].RentalInfoId)
+            <h1 title="Изтрии отдаваното под наем помещение" class="delete-rental">
+                <b>X</b>
+            </h1>
+        }
+        @using (Html.BeginForm("Edit", "RentalInfoes", FormMethod.Post, new { @class = "edit-form" }))
+        {
+            <h3 align="center">Помещение № @(i + 1)</h3>
+            @Html.AntiForgeryToken()
+            @Html.Hidden("RentalInfoId", Model[i].RentalInfoId)
+            <section class="rentalInfoTemplate form-horizontal">
+                <div class="row">
+                    <div class="col-xs-12 col-md-6">
+                        <div class="form-group">
+                            <label class="control-label col-md-4 required"> Вид помещение </label>
+                            <div class="col-md-8">
+                                <select class="form-control unit-type chosen-select" name="UnitTypeId" id="unitType">
+                                    @foreach (var unitType in ViewBag.UnitTypeId)
+                                    {
+                                        if (unitType.UnitTypeId == Model[i].UnitTypeId)
+                                        {
+                                            <option selected="selected" value="@unitType.UnitTypeId">@unitType.RentalTypeName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@unitType.UnitTypeId">@unitType.RentalTypeName</option>
+                                        }
+                                    }
+                                </select>
+                                @Html.ValidationMessage("UnitTypeId", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4 required"> Брой помещения </label>
+                            <div class="col-md-8">
+                                <input name="UnitCount" class="form-control rental-info-field" id="beds-count" value="@Model[i].UnitCount" />
+                                @Html.ValidationMessage("UnitCount", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4 required"> Наемна цена </label>
+                            <div class="col-md-8">
+                                <input name="RentalPrice" class="form-control rental-info-field" id="rental-price" value="@Model[i].RentalPrice" />
+                                @Html.ValidationMessage("RentalPrice", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4 required"> Наемен период </label>
+                            <div class="col-md-8">
+                                <select id="rentalPricePeriod" name="RentalPricePeriodId" class="form-control price-period chosen-select">
+                                    @foreach (var item in ViewBag.RentalPeriodId)
+                                    {
+                                        if (item.PeriodId == (int)Model[i].RentalPricePeriodId)
+                                        {
+                                            <option selected="selected" value="@item.PeriodId">
+                                                @item.Period
+                                            </option>
+                                        }
+                                        else
+                                        {
+                                            <option name="RentPricePeriod" value="@item.PeriodId">
+                                                @item.Period
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                                @Html.ValidationMessage("RentalsInfo.RentalPricePeriod", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-11 col-md-offset-1 col-xs-12">
+                                <label class="rentalAdditionalInfoLabel">
+                                    <b>Допълнителна информация</b>
+                                </label>
+                            </div>
+                            <div class="col-md-11 col-md-offset-1 col-xs-12">
+                                <textarea name="AdditionalInfo" class="form-control rentalAdditionalInfoTextArea rental-info-field">@Model[i].AdditionalInfo</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12 col-md-6">
+
+                        <section class="col-xs-12 rentalDescriptors">
+                            <label>
+                                <b>Допълнителни описатели</b>
+                            </label>
+                            <div class="rentalDescripotorValues">
+                                @for (int attributeIndex = 0; attributeIndex < Model[i].Attributes.Count; attributeIndex++)
+                                {
+                                    <div class="attributes">
+                                        <input name="Attributes[@attributeIndex].Key" class="additionalDescriptors key rental-info-field" value="@Model[i].Attributes[attributeIndex].Key" />
+                                        <input name="Attributes[@attributeIndex].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност (пример: 3)" value="@Model[i].Attributes[attributeIndex].Value" />
+                                    </div>
+                                }
+                                <div class="attributes">
+                                    <input name="Attributes[@Model[i].Attributes.Count].Key" class="additionalDescriptors key rental-info-field" value="Описател" />
+                                    <input name="Attributes[@Model[i].Attributes.Count].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност" />
+                                </div>
+
+                                <input type="button" value="Добави нов атрибут" id="add-rental-attribute" class="btn btn-primary rental-info-field" style="float: right; margin-right: 35px" />
+                            </div>
+
+                        </section>
+                    </div>
+
+                    <div class="col-xs-12 col-md-12">
+                        <div class="row rental-extras">
+                            @for (int extraIndex = 0; extraIndex < ViewBag.RentalExtras.Count; extraIndex++)
+                            {
+                                <div class="col-xs-3">
+                                    <input class="rental-info-field" data-val="true" data-val-number="The field ExtraId must be a number." data-val-required="The ExtraId field is required." id="RentalsInfo_@(extraIndex)__ExtraId" name="RentalExtras[@extraIndex].ExtraId" value="@ViewBag.RentalExtras[extraIndex].ExtraId" type="hidden">
+                                    @if (Model[i].RentalExtras.Any(re => re.ExtraId == ViewBag.RentalExtras[extraIndex].ExtraId))
+                                    {
+                                        <text><input class="rental-info-field" data-val="true" data-val-required="The IsChecked field is required." id="RentalExtras[@extraIndex].IsChecked" name="RentalExtras[@extraIndex].IsChecked" checked="checked" value="true" type="checkbox">
+                                            <input class="rental-info-field" id="RentalExtras[@extraIndex].IsChecked" name="RentalExtras[@extraIndex].IsChecked" value="false" type="hidden"></text>
+                                    }
+                                    else
+                                    {
+                                        <text><input class="rental-info-field" data-val="true" data-val-required="The IsChecked field is required." id="RentalExtras[@extraIndex].IsChecked" name="RentalExtras[@extraIndex].IsChecked" value="true" type="checkbox">
+                                            <input class="rental-info-field" id="RentalExtras[@extraIndex].IsChecked" name="RentalExtras[@extraIndex].IsChecked" value="false" type="hidden"></text>
+                                    }
+                                    <label for="RentalExtras[@extraIndex].IsChecked">@ViewBag.RentalExtras[extraIndex].ExtraName</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <input type="submit" class="btn btn-primary col-lg-offset-10 save-rental" value="Запази" />
+                <hr />
+            </section>
+        }
+    </div>
+}
+<input type="button" class="btn btn-primary col-xs-12" onclick="showModal('modal-rental')" value="Добави нов" />
+
+<!-- The Modal Rental Create -->
+<div id="modal-rental" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content" style="width: 90%; margin-bottom: 7%;">
+        <div class="modal-header">
+            Създай Помещение за отдаване под наем
+            <span class="close" onclick="closeModal('modal-rental');">&times;</span>
+        </div>
+        <div class="modal-body">
+            <section class="rentalInfoTemplate">
+                <h2 align="center" style="margin-bottom: 5px;">Помещения отдавани под наем в имота</h2>
+                <h6 align="center" style="margin-top: 5px;">(Това поле се попълва само ако от имота се отдават под наем отделни части.)</h6>
+                <hr />
+                <div class="row">
+                    @using (Html.BeginForm("Create", "RentalInfoes", FormMethod.Post, new { @class = "create-form" }))
+                    {
+                        @Html.Hidden("PropertyId", (int)ViewBag.PropertyId, new { })
+                        @Html.AntiForgeryToken()
+                        <div class="col-xs-12 col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-4 required"> Вид помещение </label>
+                                <div class="col-md-8">
+                                    <select class="form-control unit-type chosen-select" name="UnitTypeId" id="unitType">
+                                        @foreach (var unitType in ViewBag.UnitTypeId)
+                                        {
+                                            <option value="@unitType.UnitTypeId">@unitType.RentalTypeName</option>
+                                        }
+                                    </select>
+                                    @Html.ValidationMessage("UnitTypeId", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4 required"> Брой помещения </label>
+                                <div class="col-md-8">
+                                    <input name="UnitsCount" class="form-control rental-info-field" id="beds-count" />
+                                    @Html.ValidationMessage("UnitsCount", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4 required"> Наемна цена </label>
+                                <div class="col-md-8">
+                                    <input name="RentalPrice" class="form-control rental-info-field" id="rental-price" />
+                                    @Html.ValidationMessage("RentalPrice", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4 required"> Наемен период </label>
+                                <div class="col-md-8">
+                                    <select id="RentalPricePeriodId" name="RentalPricePeriodId" class="form-control price-period">
+                                        <option value="" selected="selected">Изберете период</option>
+                                        @foreach (var item in ViewBag.RentalPeriodId)
+                                        {
+                                            <option name="RentPricePeriod" value="@item.PeriodId">
+                                                @item.Period
+                                            </option>
+                                        }
+                                    </select>
+                                    @Html.ValidationMessage("RentalPricePeriodId", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-11 col-md-offset-1 col-xs-12">
+                                    <label class="rentalAdditionalInfoLabel">
+                                        <b>Допълнителна информация</b>
+                                    </label>
+                                </div>
+                                <div class="col-md-11 col-md-offset-1 col-xs-12">
+                                    <textarea name="AdditionalInfo" class="form-control rentalAdditionalInfoTextArea rental-info-field"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-md-6">
+
+                            <section class="col-xs-12 rentalDescriptors">
+                                <label><b>Допълнителни описатели</b></label>
+                                <div class="rentalDescripotorValues">
+                                    <div class="attributes">
+                                        <input name="Attributes[0].Key" class="additionalDescriptors key rental-info-field" value="Брой посетители" />
+                                        <input name="Attributes[0].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност (пример: 3)" />
+                                    </div>
+                                    <div class="attributes">
+                                        <input name="Attributes[1].Key" class="additionalDescriptors key rental-info-field" placeholder="Описател (пример: Етаж)" />
+                                        <input name="Attributes[1].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност (пример: 3)" />
+                                    </div>
+                                    <div class="attributes">
+                                        <input name="Attributes[2].Key" class="additionalDescriptors key rental-info-field" placeholder="Описател (пример: Изглед)" />
+                                        <input name="Attributes[2].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност (пример: Към морето)" />
+                                    </div>
+                                    <div class="attributes">
+                                        <input name="Attributes[3].Key" class="additionalDescriptors key rental-info-field" placeholder="Описател (пример: Легла)" />
+                                        <input name="Attributes[3].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност (пример: 3)" />
+                                    </div>
+
+                                    <input type="button" value="Добави нов атрибут" id="add-rental-attribute" class="btn btn-primary rental-info-field" style="float: right; margin-right: 35px" />
+                                </div>
+
+                            </section>
+                        </div>
+
+                        <div class="col-xs-12 col-md-12">
+                            <div class="row rental-extras">
+                                @for (int i = 0; i < ViewBag.RentalExtras.Count; i++)
+                                {
+                                    <div class="col-xs-3">
+                                        <input class="rental-info-field" data-val="true" data-val-number="The field ExtraId must be a number." data-val-required="The ExtraId field is required." id="ExtraId" name="RentalExtras[@i].ExtraId" value="@ViewBag.RentalExtras[i].ExtraId" type="hidden">
+                                        <input class="rental-info-field" data-val="true" data-val-required="The IsChecked field is required." id="IsChecked" name="RentalExtras[@i].IsChecked" value="true" type="checkbox">
+                                        <input class="rental-info-field" name="RentalExtras[@i].IsChecked" value="false" type="hidden">
+                                        @ViewBag.RentalExtras[i].ExtraName
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <input class="col-xs-offset-10 col-xs-2 btn btn-primary" style="margin-bottom: 10px;" value="Запази" type="submit" />
+                    }
+                </div>
+
+
+            </section>
+        </div>
+    </div>
+</div>
+
+@*Successfull operation model*@
+<div id="modal-success" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content" style="width: 90%;">
+        <div class="modal-header">
+            Състояние на заявка
+            <span class="close" onclick="closeModal('modal-success');">&times;</span>
+        </div>
+        <div class="modal-body">
+            <h1 align="center" class="success">Успешно извършена завка!</h1>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            //Delete RentalInfo from Db and Page
+            $('body').on('click',
+                '.delete-rental',
+                function () {
+                    var form = $(this).closest('form');
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/RentalInfoes/Delete',
+                        data: $(form).serialize(),
+                        success: function () {
+                            $(form).parent().remove();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            alertify.error(shownError);
+                        }
+                    });
+                });
+
+            //Edit RentalInfo from Db
+            $('body').on('submit',
+                '.edit-form',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                    let submitedForm = $(this);
+                    var form = new FormData(this);
+                    removeEmptyAttributes(form, submitedForm);
+
+                    $.ajax({
+                        url: 'Edit',
+                        data: form,
+                        processData: false,
+                        contentType: false,
+                        type: 'POST',
+                        success: function (data) {
+                            if (data.success === false) {
+                                showErrorResponse(data, submitedForm);
+                            }
+                            if (data === "STATUS_OK") {
+                                showModal('modal-success');
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            alertify.error(shownError);
+                        }
+                    });
+                });
+
+
+            //Create RentalInfo
+            $('body').on('submit',
+                '.create-form',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+
+                    let submitedForm = $(this);
+                    var form = new FormData(this);
+                    removeEmptyAttributes(form, submitedForm);
+
+                    $.ajax({
+                        url: submitedForm.attr('action'),
+                        data: form,
+                        processData: false,
+                        contentType: false,
+                        type: submitedForm.attr('method'),
+                        success: function (data) {
+                            if (data.success === true) {
+                                showErrorResponse(data, submitedForm);
+                            }
+                            else {
+                                //location.reload();
+                                showModal('modal-success');
+                                //Add the information as rental info template
+                                //The information is in the "data"
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            alertify.error(shownError);
+                        }
+                    });
+                });
+
+            function removeEmptyAttributes(formData, htmlJQueryForm) {
+                let attributes = htmlJQueryForm.find('.attributes');
+                for (let i = 0; i < attributes.length; i++) {
+                    var key = $(attributes[i]).find('.key').val();
+                    var value = $(attributes[i]).find('.value').val();
+                    if (key === '' || value === '') {
+                        var keyName = $(attributes[i]).find('.key').attr('name');
+                        var valueName = $(attributes[i]).find('.value').attr('name');
+
+                        formData.delete(keyName);
+                        formData.delete(valueName);
+                    }
+                }
+            }
+
+
+            //Add rental Attribute
+            $('body').on('click',
+                '#add-rental-attribute',
+                function () {
+                    let prevElemIndexes = $(this).prev().children()[0].name.match(/\d+/g);
+                    let i = parseInt(prevElemIndexes[0]) + 1;
+                    var template = '<div class="attributes"><input name="Attributes[' + i +
+                        '].Key" class="additionalDescriptors key rental-info-field" placeholder="Описател (пример: Легла)" /><input name="Attributes[' + i + '].Value" class="additionalDescriptors value rental-info-field" placeholder="Стойност (пример: 3)" /></div>';
+
+                    $(template).insertBefore(this);
+                });
+        });
+    </script>
+}

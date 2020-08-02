@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
-using RealEstate.Data;
 using RealEstate.Repositories.Interfaces;
 
 namespace RealEstate.Repositories
 {
     public abstract class GenericRepository<TC, T> :
-        IGenericRepository<T> where T : class where TC : RealEstateDbContext, new()
+        IGenericRepository<T> where T : class where TC : DbContext, new()
     {
-        public GenericRepository(TC db)
+        protected GenericRepository(TC db)
         {
             Context = db;
         }
@@ -25,7 +24,7 @@ namespace RealEstate.Repositories
             return query;
         }
 
-        public IQueryable<T> FindBy(System.Linq.Expressions.Expression<Func<T, bool>> predicate)
+        public IQueryable<T> Where(Expression<Func<T, bool>> predicate)
         {
 
             IQueryable<T> query = Context.Set<T>().Where(predicate);
@@ -55,7 +54,7 @@ namespace RealEstate.Repositories
 
         public virtual void Edit(T entity)
         {
-            Context.Entry(entity).State = System.Data.Entity.EntityState.Modified;
+            Context.Entry(entity).State = EntityState.Modified;
         }
 
     }

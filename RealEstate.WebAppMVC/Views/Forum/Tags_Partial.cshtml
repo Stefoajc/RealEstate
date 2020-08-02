@@ -1,0 +1,12 @@
+﻿@model List<string>
+
+<aside class="block pgl-bg-light">
+    <h3>Тагове</h3>
+    <ul class="list-inline tagclouds">
+        @foreach (var tag in Model)
+        {
+            <li><a href="@Url.Action("Index","Forum", new{ tagName = tag , ViewBag.viewType})">@tag</a></li>
+        }
+    </ul>
+</aside>
+

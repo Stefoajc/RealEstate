@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RealEstate.Model
 {
@@ -11,7 +10,7 @@ namespace RealEstate.Model
     {
         public Extras()
         {
-            
+
         }
         public Extras(string extraName)
         {
@@ -22,31 +21,22 @@ namespace RealEstate.Model
         public int ExtraId { get; set; }
 
         public string ExtraName { get; set; }
+
+        public virtual ISet<PropertiesBase> Properties { get; set; } = new HashSet<PropertiesBase>();
+
+
+        //public string ExtraType { get; set; } // Could be Rental/Property/Null(when for both)
     }
 
     public class RentalExtras : Extras
     {
-        public RentalExtras()
-        {
-            
-        }
-        public RentalExtras(string extraName) : base(extraName)
-        {
-        }
-
-        public virtual ISet<RentalsInfo> Rentals { get; set; } = new HashSet<RentalsInfo>();
+        public RentalExtras() { }
+        public RentalExtras(string extraName) : base(extraName) { }
     }
 
     public class PropertyExtras : Extras
     {
-        public PropertyExtras()
-        {
-            
-        }
-        public PropertyExtras(string extraName) : base(extraName)
-        {
-        }
-
-        public virtual ISet<Properties> Properties { get; set; }
+        public PropertyExtras() { }
+        public PropertyExtras(string extraName) : base(extraName) { }
     }
 }

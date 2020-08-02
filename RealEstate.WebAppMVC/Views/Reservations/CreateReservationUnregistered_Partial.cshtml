@@ -1,0 +1,60 @@
+﻿@*@model int
+
+<form action="@Url.Action("CreateForUnregistered", "Reservations")" id="create-reservation" method="POST">
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="PropertyId" name="PropertyId" value="@Model" />
+    <div class="col-md-8 col-xs-12">
+        <div class="form-group">
+            <label class="control-label required" for="ClientName">Въведете вашето име</label>
+            <input class="form-control" data-val="true" data-val-required="Въведете име!" id="ClientName" name="ClientName" value="" type="text">
+            <span class="field-validation-valid text-danger" data-valmsg-for="ClientName" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group">
+            <label class="control-label required" for="ClientPhoneNumber">Въведете вашият телефон </label>
+            <input class="form-control" data-val="true" data-val-required="Въведете телефон!" id="ClientPhoneNumber" name="ClientPhoneNumber" value="" type="text">
+            <span class="field-validation-valid text-danger" data-valmsg-for="ClientPhoneNumber" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="ClientEmail">Въведете вашият емейл </label>
+            <input class="form-control" data-val="true" data-val-required="Въведете емейл!" id="ClientEmail" name="ClientEmail" value="" type="text">
+            <span class="field-validation-valid text-danger" data-valmsg-for="ClientEmail" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group">
+            <label class="control-label required" for="From">От дата </label>
+            <div class="input-group date" id="reservation-date-from">
+                <input class="form-control datetime" id="From" name="From" placeholder="Начална дата" type="text">
+                <span class="input-group-addon" for="From">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+            <span class="field-validation-valid text-danger" data-valmsg-for="From" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group">
+            <label class="control-label required" for="To">До дата </label>
+            <div class="input-group date" id="reservation-date-to">
+                <input class="form-control datetime" id="To" name="To" placeholder="Крайна дата" type="text">
+                <span class="input-group-addon" for="To">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+            <span class="field-validation-valid text-danger" data-valmsg-for="To" data-valmsg-replace="true"></span>
+        </div>
+    </div>
+    <div class="col-md-4 col-xs-12">
+        <div class="form-group" style="text-align: center;">
+            <label class="control-label" for="AdditionalDescription">Въведете допълнителна информация</label>
+            <textarea class="form-control" data-val="true" id="AdditionalDescription" name="AdditionalDescription" rows="13"></textarea>
+        </div>
+        <div class="form-group">
+            <div class="g-recaptcha not-ready"></div>
+            <span class="field-validation-valid text-danger" data-valmsg-for="reCaptcha" data-valmsg-replace="true"></span>
+        </div>
+    </div>
+    <div class="col-xs-12">
+        <div class="form-group">
+            <button class="btn btn-primary" style="float: right; margin-bottom: 10px;">
+                Заяви среща
+            </button>
+        </div>
+    </div>
+</form>*@

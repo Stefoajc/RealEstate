@@ -1,0 +1,464 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.Trainings.TrainingListViewModel>
+@{
+    ViewBag.Title = "Обучения - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+        .hiddenRow {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 2% !important;
+            border-left: 2px black solid;
+            border-right: 2px black solid;
+            border-bottom: 2px black solid;
+        }
+
+        td {
+            border-top: none !important;
+            vertical-align: middle !important;
+        }
+
+        th {
+            border: none !important;
+            /* make text in th not selectable */
+            -webkit-user-select: none; /* Chrome all / Safari all */
+            -moz-user-select: none; /* Firefox all */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Likely future */
+        }
+
+        .table-headers {
+            border: 2px black solid;
+        }
+
+        .accordion-toggle {
+            border-left: 2px black solid;
+            border-right: 2px black solid;
+        }
+
+            .accordion-toggle:hover {
+                background: darkgrey;
+                cursor: pointer;
+            }
+
+        .extended-information {
+            margin-top: 5px;
+            margin-bottom: 20px;
+        }
+
+        @@media only screen and (max-width: 800px) {
+            .hidden-on-mobile {
+                display: none;
+            }
+        }
+    </style>
+}
+
+<div class="container-fluid" style="padding-top: 50px;">
+    <h1 align="center">Обучения на "СПРОПЪРТИС"</h1>
+    @if (User.IsInRole("Administrator"))
+    {
+        <div class="row">
+            <div class="col-xs-12 col-sm-3 col-md-2 pull-right">
+                <div class="form-group">
+                    <input data-bind="click: showAddQuestionModal" class="btn btn-primary btn-block" id="createTraining" name="createTraining" type="button" value="Добави обучение" />
+                </div>
+            </div>
+        </div>
+    }
+    <table class="table table-condensed" style="border-collapse:collapse;">
+        <thead>
+            <tr class="table-headers">
+                <th class="hidden-on-mobile" style="width: 20px;"></th>
+                <th>
+                    <span name="Date">Дата</span>
+                </th>
+                <th>
+                    <span name="Theme">Тема</span>
+                </th>
+                <th class="hidden-on-mobile" style="width: 100px;">
+                    <span name="Materials">Материали</span>
+                </th>
+                <th class="hidden-on-mobile">
+                    <span name="CreatedOn">Създадено</span>
+                </th>
+                @if (User.IsInRole("Administrator"))
+                {
+                    <th class="hidden-on-mobile" style="width: 82px;">
+                        Операции
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.Count; i++)
+            {
+                var training = Model[i];
+                <tr data-toggle="collapse" class="accordion-toggle" data-target="#accordeon@(i)" style="height: 38px;">
+                    <td class="indicator-container hidden-on-mobile">
+                        <i class="indicator glyphicon glyphicon-chevron-down  pull-left"></i>
+                    </td>
+                    <td class="trainingDate" style="width: 100px; white-space: nowrap;">@training.TrainingDate.ToString("dd.MM.yyyy hh:mm")</td>
+                    <td class="themeName">@training.TrainingTheme</td>
+                    <td class="hidden-on-mobile materials" style="width: 100px; white-space: nowrap;">
+                        @if (!string.IsNullOrEmpty(training.TrainingMaterialsFolderLink))
+                        {
+                            <a target="_blank" href="@training.TrainingMaterialsFolderLink">Материали</a>
+                        }
+                        else
+                        {
+                            <span>Няма материали</span>
+                        }
+                    </td>
+                    <td class="hidden-on-mobile createdOn" style="width: 100px;">@training.CreatedOn.ToString("dd.MM.yyyy")</td>
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <td class="hidden-on-mobile">
+                            <i id="editTraining" data-trainingid="@training.Id" class="fa fa-edit operation" style="font-size: 24px;"></i>
+                            <i id="deleteTraining" data-trainingid="@training.Id" class="fa fa-remove operation" style="font-size: 24px;"></i>
+                        </td>
+                    }
+                </tr>
+                <tr>
+                    <td colspan="11" class="hiddenRow">
+                        <div class="accordion-body collapse" id="accordeon@(i)">
+                            <div class="extended-information row">
+                                <div class="col-md-4">
+                                    <div>
+                                        <div>
+                                            <b>Кога ? </b>
+                                            <span>@training.TrainingDate.ToString("dddd, dd MMMM yyyy г. в hh:mm ч.")</span>
+                                        </div>
+                                        <div>
+                                            <b>Тема: </b>
+                                            <span>@training.TrainingTheme</span>
+                                        </div>
+                                        <div>
+                                            <b>Създадено на:</b>
+                                            <span>@training.CreatedOn.ToString("dd.MM.yyyy")</span>
+                                        </div>
+                                        <div>
+                                            @if (!string.IsNullOrEmpty(training.TrainingMaterialsFolderLink))
+                                            {
+                                                <b>
+                                                    <a target="_blank" href="@training.TrainingMaterialsFolderLink">Прегледай Материали</a>
+                                                </b>
+                                            }
+                                            else
+                                            {
+                                                <span>Няма материали</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="additionalInformation col-md-8">
+                                    <div>
+                                        <b>Допълнителна инфромация</b>
+                                    </div>
+                                    <div>
+                                        @training.AdditionalDescription
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section bottomBody{
+    @*Create training modal*@
+    <div class="modal fade" id="modalAddTrainingForm" role="dialog" aria-labelledby="Добави обучение" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Създаване на обучение</h4>
+                </div>
+                <div class="modal-body mx-3">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label for="themeName" class="required">Тема на обучението</label>
+                                <input id="themeName" type="text" class="form-control" />
+                                @Html.ValidationMessage("TrainingTheme", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="trainingDate" class="required">Дата на обучението</label>
+                                <div class="input-group date" id="event-start">
+                                    <input id="trainingDate" type="text" class="form-control" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                                @Html.ValidationMessage("TrainingDate", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="trainingMaterials">Връзка към материалите</label>
+                                <input id="trainingMaterials" type="text" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label for="additionalInformation">Допълнителна информация</label>
+                            <textarea rows="3" id="additionalInformation" name="additionalInformation" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="createTrainingBtn" class="btn btn-success">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Edit training modal*@
+    <div class="modal fade" id="modalEditTrainingForm" role="dialog" aria-labelledby="Редактирай обучение" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Редактиране на обучение</h4>
+                </div>
+                <div class="modal-body mx-3">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label for="themeNameEdit" class="required">Тема на обучението</label>
+                                <input id="themeNameEdit" type="text" class="form-control" />
+                                @Html.ValidationMessage("TrainingTheme", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="trainingDateEdit" class="required">Дата на обучението</label>
+                                <div class="input-group date" id="event-start">
+                                    <input id="trainingDateEdit" type="text" class="form-control" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                                @Html.ValidationMessage("TrainingDate", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="trainingMaterialsEdit">Връзка към материалите</label>
+                                <input id="trainingMaterialsEdit" type="text" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label for="additionalInformationEdit">Допълнителна информация</label>
+                            <textarea rows="3" id="additionalInformationEdit" name="additionalInformation" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="editTrainingBtn" class="btn btn-success">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Delete training modal*@
+    <div class="modal fade" id="modalDeleteTrainingForm" role="dialog" aria-labelledby="Изтрии обучение" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Изтриване на обучение</h4>
+                </div>
+                <div class="modal-body mx-3">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label for="themeNameEdit">Найстина ли искате да изтриете обучението на <span id="deleteTrainingDate"></span> ?</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="deleteTrainingBtn" class="btn btn-success">Изтрии</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts{
+    @if (User.IsInRole("Administrator"))
+    {
+        <script>
+            $(document).ready(function() {
+
+                var trainings = @Html.Raw(Json.Encode(Model));
+
+                $.datetimepicker.setLocale('bg');
+                $('#trainingDate, #trainingDateEdit').datetimepicker({
+                    format: 'd.m.Y h:m',
+                    locale: 'bg',
+                    minDate: new Date()
+                });
+
+                $('#createTraining').click(function() {
+                    $('#modalAddTrainingForm').modal('show');
+                });
+
+                $(document).on('click',
+                    '#createTrainingBtn',
+                    function() {
+                        var createTrainingModel = {
+                            TrainingDate: moment($('#trainingDate').val(), "DD.MM.YYYY HH:mm").format(),
+                            TrainingTheme: $('#themeName').val(),
+                            AdditionalDescription: $('#additionalInformation').val(),
+                            TrainingMaterialsFolderLink: $('#trainingMaterials').val()
+                        };
+
+                        $.ajax({
+                            url: '/trainings/create',
+                            type: 'post',
+                            data: createTrainingModel,
+                            success: function (data) {
+                                if (data.success) {
+                                    showErrorResponse(data, $('#modalAddTrainingForm'));
+                                } else {
+                                    $('#modalAddTrainingForm').modal('hide');
+                                    window.alertify.success("Успешно създадено обучение!");
+                                }
+                            },
+                            error: function() {
+                                $('#modalAddTrainingForm').modal('hide');
+                                window.alertify.error("Неуспешно създадено обучение!");
+                            }
+                        });
+                    });
+
+
+                var trainingToEditId;
+                $('#editTraining').click(function() {
+
+                    trainingToEditId = $(this).data('trainingid');
+                    var trainingsToEdit = trainings.filter(function(t) { return t.Id === trainingToEditId });
+                    if (trainingsToEdit.length > 0) {
+
+                        var trainingToEdit = trainingsToEdit[0];
+
+                        $('#trainingDateEdit').val(moment(trainingToEdit.TrainingDate).format('DD.MM.YYYY HH:mm'));
+                        $('#themeNameEdit').val(trainingToEdit.TrainingTheme);
+                        $('#additionalInformationEdit').val(trainingToEdit.AdditionalDescription);
+                        $('#trainingMaterialsEdit').val(trainingToEdit.TrainingMaterialsFolderLink);
+
+                        $('#modalEditTrainingForm').modal('show');
+                    }
+                });
+
+                $(document).on('click',
+                    '#editTrainingBtn',
+                    function() {
+
+
+                        var editTrainingModel = {
+                            Id: Number(trainingToEditId),
+                            TrainingDate: moment($('#trainingDateEdit').val(), "DD.MM.YYYY HH:mm").format(),
+                            TrainingTheme: $('#themeNameEdit').val(),
+                            AdditionalDescription: $('#additionalInformationEdit').val(),
+                            TrainingMaterialsFolderLink: $('#trainingMaterialsEdit').val()
+                        };
+
+                        $.ajax({
+                            url: '/trainings/edit',
+                            type: 'post',
+                            data: editTrainingModel,
+                            success: function (data) {
+                                if (data.success) {
+                                    showErrorResponse(data, $('#modalEditTrainingForm'));
+                                } else {
+                                    $('#modalEditTrainingForm').modal('hide');
+                                    window.alertify.success("Успешно редактирано обучение!");
+                                }
+                            },
+                            error: function() {
+                                $('#modalEditTrainingForm').modal('hide');
+                                window.alertify.error("Неуспешно редактирано обучение!");
+
+                            }
+                        });
+
+                    });
+
+
+                var trainingToDeleteId;
+                $('#deleteTraining').click(function() {
+
+                    trainingToDeleteId = $(this).data('trainingid');
+                    var trainingsToDelete = trainings.filter(function(t) { return t.Id === trainingToDeleteId });
+                    if (trainingsToDelete.length > 0) {
+                        var trainingToDelete = trainingsToDelete[0];
+
+                        $('#deleteTrainingDate').text(moment(trainingToDelete.TrainingDate).format('DD.MM.YYYY HH:mm'));
+                        $('#modalDeleteTrainingForm').modal('show');
+                    }
+                });
+
+                $(document).on('click',
+                    '#deleteTrainingBtn',
+                    function() {
+
+                        $.ajax({
+                            url: '/trainings/delete',
+                            type: 'post',
+                            data: { id: trainingToDeleteId },
+                            success: function(data) {
+                                $('#modalDeleteTrainingForm').modal('hide');
+                                window.alertify.success("Успешно изтрито обучение!");
+                            },
+                            error: function() {
+                                $('#modalDeleteTrainingForm').modal('hide');
+                                window.alertify.error("Неуспешно изтрито обучение!");
+
+                            }
+                        });
+
+                    });
+            });
+        </script>
+    }
+
+    <script>
+        $(document).ready(function () {
+            function toggleChevron(e) {
+                $(e.target)
+                    .closest('tr')
+                    .prev()
+                    .find("i.indicator")
+                    .toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+            }
+
+            $('.table-condensed').on('hidden.bs.collapse', toggleChevron);
+            $('.table-condensed').on('shown.bs.collapse', toggleChevron);
+
+            $(document).on('click',
+                '.table-condensed .operation',
+                (function (e) {
+                    e.stopPropagation();
+                }));
+        });
+    </script>
+}

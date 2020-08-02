@@ -1,0 +1,148 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.UserImageViewModel>
+
+@{
+    ViewBag.Title = "Снимки";
+}
+
+@section css{
+    <style>
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 80%;
+        }
+
+        .fixedSize {
+            width: 95px;
+            height: 95px;
+            cursor: pointer;
+        }
+
+        .topright {
+            position: absolute;
+            top: -10px;
+            right: 0;
+            font-size: 18px;
+            color: red;
+            cursor: pointer;
+        }
+
+        .image-single {
+            height: 100px;
+        }
+
+        #images-container {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+}
+
+<div class="container">
+    <div class="col-md-4 col-md-offset-4 top-bottom-marginated">
+        <h2 align="center">Снимки</h2>
+        <hr />
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+
+        <div>
+            <img alt="Снимка" class="center" src="@(Model.Any() ? Model[0].ImagePath.Replace(" ","%20") : "/Resources/no-image-agent.jpg")" />
+        </div>
+
+        <div id="images-container" class="row">
+            @foreach (var image in Model)
+            {
+                <div class="col-xs-3 image-single" style="padding: 0px;">
+                    @using (Html.BeginForm("RemoveImage", "Manage", FormMethod.Post, new { style = "display: contents;" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <img alt="Снимка" class="fixedSize" src="@image.ImagePath.Replace(" ","%20")" />
+                        <input hidden="hidden" name="id" value="@image.ImageId" />
+                        <span class="topright"><b>x</b></span>
+                    }
+                </div>
+            }
+        </div>
+        <div class="row">
+            <button id="add-image" class="btn btn-primary btn-block">Добави изображение</button>
+            @using (Html.BeginForm("AddImage", "Manage", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <input style="display: none" type="file" id="image" name="image" />
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function () {
+
+            //Remove the image from the database and if success remove it from the small images collection
+            $('body').on('click',
+                '.topright',
+                function () {
+                    var form = $(this).closest('form');
+                    $.post('/Manage/RemoveImage', form.serialize(),
+                        function (data, status) {
+                            if (status === 'success') {
+                                form.remove();
+                            }
+                        });
+                });
+
+            //Change the large image on clicking a small one
+            $('body').on('click',
+                '.fixedSize',
+                function () {
+                    let thisElem = $(this);
+                    let largeImage = $('.center');
+
+                    largeImage.attr('src', thisElem.attr('src'));
+                });
+
+
+            $('#add-image').click(function () {
+                var imageBrowser = document.getElementById('image');
+                imageBrowser.click();
+            });
+
+            $('body').on('change',
+                '#image',
+                //Add image to db and html doc
+                function () {
+
+                    var thisElem = $(this);
+                    var form = new FormData(thisElem.closest('form')[0]);
+
+                    $.ajax({
+                        url: '/Manage/AddImage',
+                        type: 'POST',
+                        data: form,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            let formTemplate = '<div class="col-xs-3 image-single" style="padding: 0px;">' +
+                                '<form action="/Manage/RemoveImage" method="post" style="display: contents;">' +
+                                '<img alt="Снимка" class="fixedSize" src="' + data.ImagePath.replace(' ', '%20') + '">' +
+                                '@Html.AntiForgeryToken()' +
+                                '<input name="id" value="' + data.ImageId + '" hidden="hidden">' +
+                                '<span class="topright"><b>x</b></span>' +
+                                '</form>' +
+                                '</div>';
+
+                            let imagesContainer = $('#images-container');
+                            $(formTemplate).appendTo(imagesContainer);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            alertify.error(shownError);
+                        }
+                    });
+                });
+        });
+    </script>
+}

@@ -1,0 +1,11 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.Forum.ThemeLinkViewModel>
+    
+<aside class="block pgl-cat pgl-bg-light">
+    <h3>Постове по теми</h3>
+    <ul class="list-unstyled list-cat">
+        @foreach (var theme in Model)
+        {
+            <li><a href="@Url.Action("Index","Forum", new {themeId = theme.ThemeId, ViewBag.viewType})">@theme.Name </a> <span>@theme.PostCount </span></li>
+        }
+    </ul>
+</aside>

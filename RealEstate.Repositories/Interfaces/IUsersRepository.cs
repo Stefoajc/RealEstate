@@ -8,5 +8,6 @@ namespace RealEstate.Repositories.Interfaces
     {
         List<IdentityRole> GetRoles();
         string GetRoleId(string role);
+        void AddNonRegisteredUser(NonRegisteredAppointmentUsers nonRegisteredAppointmentUser);
     }
 }

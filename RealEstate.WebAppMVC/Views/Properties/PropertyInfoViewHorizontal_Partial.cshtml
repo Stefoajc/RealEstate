@@ -1,0 +1,53 @@
+﻿@using RealEstate.Model
+@using RealEstate.Services.Helpers
+@model RealEstate.ViewModels.WebMVC.PropertyInfoViewModel
+
+<div class="pgl-property animation">
+    <div class="row">
+        <div class="col-sm-6 col-md-4">
+            <div class="property-thumb-info-image regular-image-container">
+                <picture>
+                    <source srcset="@(FileHelpers.ChangeFileExtension(Model.ImagePath.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                    <source srcset="@Model.ImagePath.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(Model.ImagePath.Replace(" ", "%20"))">
+                    <img alt="Снимка" class="img-responsive img-ratio1" src="@Model.ImagePath.Replace(" ", "%20")">
+                </picture>
+                <span class="property-thumb-info-label">
+                    @if ((PropertyState) Model.PropertyState != PropertyState.Available)
+                    {
+                        <span class="label price">@((PropertyState) Model.PropertyState == PropertyState.Sold ? "Продаден" : "Нает")</span>
+                    }
+                    else
+                    {
+                        <span class="label price">@(Model.Price.ToString("0"))лв.</span>
+                        <span class="label">@Model.Status</span>
+                    }
+                </span>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-8">
+            <div class="property-thumb-info">
+
+                <div class="property-thumb-info-content" style="position: relative;">
+                    <h3 class="h3-one-line">
+                        <a class="clamp-two" style="display: block;" href="@Url.Action("Details", "Properties" , new {id = Model.PropertyId, isRentSearching = Model.Status != "Продажна"})">@Model.PropertyName</a>
+                    </h3>
+                    <address><i class="fa fa-map-marker"></i> @Model.FullAddress</address>
+                    <div style="position: relative;">
+                        @Html.Raw(Model.Info)
+                    </div>
+                    <div class="fadeout-slider"></div>
+                </div>
+                <div class="amenities clearfix">
+                    <ul class="pull-left">
+                        <li><strong>Площ:</strong> @Model.AreaInSquareMeters<sup>m2</sup></li>
+                    </ul>
+                    <ul class="pull-right">
+                        <li title="Преглеждания"><i class="fa fa-eye"></i> @Model.Views</li>
+                        @Html.Raw(Model.BottomRight)
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

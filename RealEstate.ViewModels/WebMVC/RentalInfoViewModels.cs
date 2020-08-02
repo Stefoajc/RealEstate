@@ -14,10 +14,28 @@ namespace RealEstate.ViewModels.WebMVC
         public int UnitTypeId { get; set; }
         [Required(ErrorMessage = "Броят на помещенията е задължителен")]
         public int UnitsCount { get; set; }
-        [Required(ErrorMessage = "Наемната цена е задължителен")]
+        [Required(ErrorMessage = "Наемната цена е задължителенa")]
         public decimal RentalPrice { get; set; }
         [Required(ErrorMessage = "Периодът на наема е задължителен")]
-        public RentalPeriod RentalPricePeriod { get; set; }
+        public int RentalPricePeriodId { get; set; }
+        public string AdditionalInfo { get; set; }
+
+        [Required(ErrorMessage = "Не е избран имот на ,който това е част!")]
+        public int PropertyId { get; set; }
+        public List<ExtraCheckBoxViewModel> RentalExtras { get; set; } = new List<ExtraCheckBoxViewModel>();
+        public List<AttributesKeyValueViewModel> Attributes { get; set; } = new List<AttributesKeyValueViewModel>();
+    }
+
+    public class AddRentalInfoToPropertyViewModel
+    {
+        [Required(ErrorMessage = "Типът на помещенията е задължителен")]
+        public int UnitTypeId { get; set; }
+        [Required(ErrorMessage = "Броят на помещенията е задължителен")]
+        public int UnitsCount { get; set; }
+        [Required(ErrorMessage = "Наемната цена е задължителенa")]
+        public decimal RentalPrice { get; set; }
+        [Required(ErrorMessage = "Периодът на наема е задължителен")]
+        public int RentalPricePeriodId { get; set; }
         public string AdditionalInfo { get; set; }
 
         public List<ExtraCheckBoxViewModel> RentalExtras { get; set; } = new List<ExtraCheckBoxViewModel>();
@@ -27,13 +45,37 @@ namespace RealEstate.ViewModels.WebMVC
     public class EditRentalInfoForPropertyViewModel
     {
         public int? RentalInfoId { get; set; }
-        public int RentalTypeId { get; set; }
-        public int RoomsCount { get; set; }
-        public byte BedsCount { get; set; }
+        [Required(ErrorMessage = "Типът на помещенията е задължителен")]
+        public int UnitTypeId { get; set; }
+        [Required(ErrorMessage = "Броят на помещенията е задължителен")]
+        public int UnitCount { get; set; }
+        [Required(ErrorMessage = "Наемната цена е задължителенa")]
+        public decimal RentalPrice { get; set; }
+        [Required(ErrorMessage = "Периодът на наема е задължителен")]
+        public int RentalPricePeriodId { get; set; }
         public string AdditionalInfo { get; set; }
 
-        public List<int> RentalExtrasIds = new List<int>();
-        public AddRentalPriceForPeriodViewModel RentalPrices;
+        public List<ExtraCheckBoxViewModel> RentalExtras { get; set; } = new List<ExtraCheckBoxViewModel>();
+        public List<AttributesKeyValueViewModel> Attributes { get; set; } = new List<AttributesKeyValueViewModel>();
+    }
+
+    public class EditRentalInfoViewModel
+    {
+        public int PropertyId { get; set; }
+        public string PropertyName { get; set; }
+        public int? RentalInfoId { get; set; }
+        [Required(ErrorMessage = "Типът на помещенията е задължителен")]
+        public int UnitTypeId { get; set; }
+        [Required(ErrorMessage = "Броят на помещенията е задължителен")]
+        public int UnitCount { get; set; }
+        [Required(ErrorMessage = "Наемната цена е задължителенa")]
+        public decimal RentalPrice { get; set; }
+        [Required(ErrorMessage = "Периодът на наема е задължителен")]
+        public int RentalPricePeriodId { get; set; }
+        public string AdditionalInfo { get; set; }
+
+        public List<ExtraCheckBoxViewModel> RentalExtras { get; set; } = new List<ExtraCheckBoxViewModel>();
+        public List<AttributesKeyValueViewModel> Attributes { get; set; } = new List<AttributesKeyValueViewModel>();
     }
 
     public class RentalInfoDetails

@@ -1,0 +1,27 @@
+﻿@using RealEstate.Services.Helpers
+@model List<RealEstate.ViewModels.WebMVC.Forum.PostSideViewModel>
+
+<div class="tab-pane active" id="popularPosts">
+    <ul class="list-unstyled simple-post-list">       
+        @foreach (var post in Model)
+        {
+            <li>
+                <div class="post-image">
+                    <a href="@Url.Action("Details", "Posts", new {id = post.PostId})">
+                        <picture>
+                            <source srcset="@(FileHelpers.ChangeFileExtension(post.MediaUrl.Replace(" ", "%20"), ".webp"))" type="image/webp">
+                            <source srcset="@post.MediaUrl.Replace(" ", "%20")" type="@MimeMapping.GetMimeMapping(post.MediaUrl.Replace(" ", "%20"))">
+                            <img class="img-responsive" style="width: 65px; height: 65px;" src="@post.MediaUrl" alt="Blog">
+                        </picture>
+                    </a>
+                </div>
+                <div class="post-info">
+                    <a style="display: block;" class="clamp-three" href="@Url.Action("Details", "Posts", new {id = post.PostId})">@post.Title</a>
+                    <div class="post-meta">
+                        <i class="fa fa-eye"></i> @post.Views прегл.
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+</div>

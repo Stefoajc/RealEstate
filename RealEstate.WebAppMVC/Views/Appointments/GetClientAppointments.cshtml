@@ -1,0 +1,209 @@
+﻿@model List<RealEstate.ViewModels.WebMVC.ClientAppointmentsViewModel>
+
+@{
+    ViewBag.Title = "Мои срещи - Имоти СПРОПЪРТИС";
+}
+
+@section css{
+    <style>
+        .regular-image-container {
+            width: 360px;
+            height: 240px;
+        }
+
+            .regular-image-container > .regular-image {
+                width: 396px;
+                height: 264px;
+            }
+
+        .appointment-date-info {
+            line-height: 1.8em;
+            font-size: 18px;
+            padding-top: 4px;
+            display: inline-block;
+        }
+
+        .appointment-property-info {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 7em;
+        }
+
+        .panel-group {
+            margin-top: 20px;
+        }
+
+
+        .pgl-property {
+            margin: 0px !important;
+        }
+
+        @@media screen and (min-width:992px) {
+            .col-md-3-5 {
+                width: 29.16667% !important;
+            }
+
+            .col-md-8-5 {
+                width: 70.83333% !important;
+            }
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    <br />
+    <h1 align="center">Всички заявки за срещи/огледи</h1>
+    <!-- Begin FAQs -->
+    <div class="panel-group pgl-group-faqs" id="accordion">
+        @if (Model.Count != 0)
+        {
+            for (int i = 0; i < Model.Count; i++)
+            {
+
+                <div class="panel panel-default pgl-panel">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            @{ var appointmentStatus = Model[i].IsApprovedByAgent ? "Потвърдена" : "Непотвърдена"; }
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@i" class="collapsed appointment-heading">Среща в @Model[i].AppointmentDate.ToString("dd.MM.yyyy HH:mm") с @Model[i].Agent.AgentName / тел:@Model[i].Agent.PhoneNumber (@appointmentStatus)</a>
+                        </h4>
+                    </div>
+                    <div id="collapse-@i" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="pgl-property animation">
+                                <div class="row">
+                                    <div class="col-md-3 col-md-3-5 col-xs-12">
+                                        <div class="property-thumb-info-image">
+                                            <img alt="Снимка" class="img-responsive" src="@Model[i].Property.ImagePath.Replace(" ", "%20")">
+                                            <span class="property-thumb-info-label">
+                                                <span class="label price">@Model[i].Property.Price</span>
+                                                <span class="label">@Model[i].Property.Status</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9 col-md-8-5 col-xs-12">
+                                        <div class="row">
+                                            <div class="col-md-6 col-xs-12">
+                                                <div class="property-thumb-info">
+                                                    <div class="property-thumb-info-content" style="height: 197.8px;">
+                                                        <h3 class="h3-one-line">
+                                                            <a class="clamp" href="@Url.Action("Details", "Properties", new {id = Model[i].Property.PropertyId})">@Model[i].Property.PropertyName</a>
+                                                        </h3>
+                                                        <address>@Model[i].Property.FullAddress</address>
+                                                        <p class="clamp-four">@Model[i].Property.Info</p>
+                                                    </div>
+                                                    <div class="amenities clearfix">
+                                                        <ul class="pull-left">
+                                                            <li><strong>Площ:</strong> @Model[i].Property.AreaInSquareMeters<sup>m2</sup></li>
+                                                        </ul>
+                                                        <ul class="pull-right">
+                                                            <li title="Преглеждания"><i class="fa fa-eye"></i> @Model[i].Property.Views</li>
+                                                            @Html.Raw(Model[i].Property.BottomRight)
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-xs-12">
+                                                <div class="property-thumb-info">
+                                                    <div class="property-thumb-info-content" style="height: 197.8px;">
+                                                        <h3 style="margin-bottom: 8px;">Заявена среща с:</h3>
+                                                        <div class="appointer-info">
+                                                            <span>Име: </span><a style="font-weight: bold;" href="@Url.Action("Details", "Agents", new {agentId = Model[i].Agent.AgentId})">@Model[i].Agent.AgentName</a>
+                                                            <br/>
+                                                            <span>Телефон: </span><label>@Model[i].Agent.PhoneNumber</label>
+                                                            <br/>
+                                                            @if (!string.IsNullOrEmpty(Model[i].Agent.Email))
+                                                            {
+                                                                <span>Име: </span>
+                                                                <label>@Model[i].Agent.Email</label>
+                                                                <br/>
+                                                            }
+                                                            <div id="current-date" class="form-group toggle-date">
+                                                                <div class="input-group date" id="event-start">
+                                                                    <input id="old-date" class="form-control" value="Дата: @Model[i].AppointmentDate.ToString("dd.MM.yyyy HH:mm")" type="text" disabled="disabled"/>
+                                                                    <span class="input-group-addon" style="">
+                                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="form-group">
+
+                                                                @if (Model[i].IsApprovedByAgent)
+                                                                {
+                                                                    <button class="btn btn-success col-xs-12">Потвърдена среща</button>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <form method="post" action="@Url.Action("Delete", "Appointments")" id="remove-appointment-form">
+                                                                        @Html.AntiForgeryToken()
+                                                                        <input id="appointment-@i" name="id" value="@Model[i].AppointmentId" type="hidden"/>
+                                                                        <button id="remove-appointment-btn" class="btn btn-primary col-xs-12">Отмени срещата</button>
+                                                                    </form>
+                                                                }
+                                                                <div class="clearfix"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        }
+        else
+        {
+            <h3 align="center">Тук ще се покажат направените от вас заявки за срещи за оглед. </h3>
+            <h4 align="center">
+                Заявка за среща за оглед се прави от страницата на всеки отделен имот от бутона
+                <button class="btn btn-primary">Резервирай час за оглед</button>
+            </h4>
+        }
+    </div>
+    <!-- End FAQs -->
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(document).on('submit',
+                '#remove-appointment-form',
+                function (event) {
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                    var thisForm = $(this);
+
+                    window.alertify.confirm('Изтриване на заявка за среща',
+                        'Сигурни ли сте че искате да изтриете заявката ви за среща ?',
+                        function () {
+                            $.ajax({
+                                url: thisForm.attr('action'),
+                                method: thisForm.attr('method'),
+                                data: thisForm.serialize(),
+                                success: function (result) {
+                                    if (result === 'STATUS_OK') {
+                                        //Remove deleted appointment accordion panel
+                                        thisForm.closest('.panel').remove();
+                                        window.alertify.success('Успешно изтрита заявка за среща с агент!');
+                                    } else {
+                                        window.alertify.error('Проблем при изтриване моля опитайте по късно!');
+                                    }
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                                    let shownError = titles ? titles[1] : errorThrown;
+                                    window.alertify.error(shownError);
+                                }
+                            });
+                        },
+                        function () { })
+                        .set('labels', { ok: 'Потвърди', cancel: 'Откажи' });
+                });
+        });
+    </script>
+}

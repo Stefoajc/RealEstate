@@ -1,0 +1,895 @@
+﻿@using Microsoft.AspNet.Identity
+@using RealEstate.ViewModels.WebMVC.Reports
+@model int
+
+@{
+    ViewBag.Title = "Създай Доклад - Имоти СПРОПЪРТИС";
+    //Layout = null;
+}
+
+
+@section css{
+    <style>
+        input[type="checkbox"] {
+            -webkit-appearance: initial;
+            background: gray;
+            width: 16px;
+            height: 16px;
+            border: none;
+            position: relative;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+        }
+
+            input[type="checkbox"]:checked {
+                background: grey;
+            }
+
+                input[type="checkbox"]:checked:after {
+                    /* Heres your symbol replacement */
+                    content: "X";
+                    color: #fff;
+                    /* The following positions my tick in the center,
+                        * but you could just overlay the entire box
+                        * with a full after element with a background if you want to */
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    -webkit-transform: translate(-50%,-50%);
+                    -moz-transform: translate(-50%,-50%);
+                    -ms-transform: translate(-50%,-50%);
+                    transform: translate(-50%,-50%);
+                }
+
+        td {
+            border: black 2px solid;
+        }
+
+        .report * {
+            font-family: Liberation Serif;
+            color: black;
+            align-items: center;
+        }
+
+        #add-broker {
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            position: absolute;
+            top: 5px;
+            right: 53px;
+            font-size: 30px;
+            line-height: 25px;
+            font-weight: bold;
+            display: inline-block;
+            font-family: fantasy;
+            border-radius: 25%;
+            color: white;
+            background-color: #d84949;
+        }
+
+        /*Overwrite chosen default styles*/
+        table .chosen-container-single .chosen-single {
+            height: 27.2px;
+            border: none;
+            line-height: 1.6;
+            font-size: 17.3px;
+        }
+
+        table .chosen-container-active.chosen-with-drop .chosen-single {
+            border: none;
+        }
+
+        table .chosen-container-single .chosen-single div {
+            top: -4px;
+        }
+        /*Overwrite chosen default styles END*/
+
+
+
+        @@media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .report * {
+                visibility: visible;
+            }
+
+            .report {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+        }
+    </style>
+}
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+            $(document).on('input',
+                '.digitOnly',
+                function () {
+                    this.value = this.value.replace(/[^\d]+/, '');
+                });
+
+            // Disable for option which is already selected in other dropdown
+            $(".platforms").change(function () {
+                var selectedPlatform = [];
+                $(".platforms").each(function () {
+                    selectedPlatform.push(this.value);
+                });
+
+                $(".platforms")
+                    .find("option")
+                    .removeAttr("disabled")
+                    .filter(function () {
+                        var a = $(this).parent("select").val();
+                        return (($.inArray(this.value, selectedPlatform) > -1) &&
+                            (this.value !== a) &&
+                            (this.value !== ""));
+                    })
+                    .attr("disabled", "disabled");
+
+                var associatedViews = $($(this).parent().next()).find('.views');
+                if (this.value != "") {
+                    associatedViews.removeAttr("disabled");
+                } else {
+                    associatedViews.attr('disabled', 'disabled');
+                    associatedViews.val("");
+                }
+            });
+
+            $(".platforms").eq(0).trigger('change');
+
+
+            // Disable for option which is already selected in other dropdown
+            $(".broker").change(function () {
+                var selectedBroker = [];
+                $(".broker").each(function () {
+                    selectedBroker.push(this.value);
+                });
+
+                $(".broker")
+                    .find("option")
+                    .removeAttr("disabled")
+                    .filter(function () {
+                        var a = $(this).parent("select").val();
+                        return (($.inArray(this.value, selectedBroker) > -1) &&
+                            (this.value !== a) &&
+                            (this.value !== ""));
+                    })
+                    .attr("disabled", "disabled");
+
+                $(".broker").trigger("chosen:updated");
+            });
+
+            $(".broker").eq(0).trigger('change');
+
+
+            //Total views calculation
+            $('.views').keyup(function () {
+                var totalViews = 0;
+                $('.views').each(function (index, item) {
+                    totalViews += Number(item.value);
+                });
+
+                $('#totalViews').val(totalViews);
+            });
+
+
+            //Submit
+            $(document).on('click',
+                '#submitReport',
+                function () {
+                    var promotionTypes = [];
+                    $('.promotionType').each(function (i, item) {
+                        var thisItem = $(item);
+                        if (thisItem.prop('checked')) {
+                            var checkedPromotionTypeId = thisItem.next().val();
+                            promotionTypes.push(checkedPromotionTypeId);
+                        }
+                    });
+
+                    var customPromotionTypes = [];
+                    $('.customPromotionType').each(function (i, item) {
+                        var thisItem = $(item);
+                        var customPromotionType = thisItem.next().val();
+                        if (thisItem.prop('checked') && customPromotionType) {
+                            customPromotionTypes.push(customPromotionType);
+                        }
+                    });
+
+                    var platformsUsed = [];
+                    $('.platforms').each(function (i, item) {
+
+                        var associatedViews = $($(item).parent().next()).find('.views').val();
+                        if (item.value !== "" && associatedViews !== "") {
+                            platformsUsed.push({
+                                PlatformId: item.value,
+                                Views: associatedViews
+                            });
+                        }
+                    });
+
+                    var brokersSharedWith = [];
+                    $('.broker').each(function (i, item) {
+                        var selectedBroker = $(item).val();
+                        if (selectedBroker !== "") {
+                            brokersSharedWith.push(selectedBroker);
+                        }
+                    });
+
+                    var totalViews = $('#totalViews').val();
+                    var totalCalls = $('#totalCalls').val();
+                    var totalInspections = $('#totalInspections').val();
+                    var totalOffers = $('#totalOffers').val();
+
+                    var offers = [];
+                    $('.offer').each(function (i, item) {
+                        var thisItem = $(item);
+                        if (thisItem.val() !== "") {
+                            offers.push(thisItem.val());
+                        }
+                    });
+
+                    var conclusions = $('#conclusions').val();
+
+                    var marketingChange = $('#change-marketing').prop('checked');
+                    var priceChange = $('#price-correction').prop('checked');
+
+
+                    var customRecommendations = [];
+                    $('.customRecommendationCheck').each(function (i, item) {
+                        var thisItem = $(item);
+                        var isCustomRecommentdationChecked = thisItem.prop('checked');
+                        var customRecommendation = $(thisItem.next()).val();
+                        if (isCustomRecommentdationChecked && customRecommendation !== "") {
+                            customRecommendations.push(customRecommendation);
+                        }
+                    });
+
+                    var changeArguments = $('#changeArguments').val();
+
+                    var propertyId = $('#propertyId').val();
+                    var sendToowner = $('#sendToOwner').prop('checked');
+
+                    var createReportModel = {
+                        PromotionMediaUsedIds: promotionTypes,
+                        CustomPromotionMediae: customPromotionTypes,
+                        WebPlatformViews: platformsUsed,
+                        ColleguesIds: brokersSharedWith,
+
+                        TotalViews: totalViews,
+                        TotalCalls: totalCalls,
+                        TotalInspections: totalInspections,
+                        TotalOffers: totalOffers,
+                        Offers: offers,
+
+                        ActionsConclusion: conclusions,
+
+                        IsPriceChangeIssued: priceChange,
+                        IsMarketingChangeIssued: marketingChange,
+                        CustomRecommendedActions: customRecommendations,
+                        ChangeArguments: changeArguments,
+
+                        SendToOwnersViaEmail: sendToowner,
+
+                        PropertyId: propertyId
+                    };
+
+                    $('#errors-summary').hide();
+                    $.post('/Reports/Create',
+                        createReportModel,
+                        function (data) {
+                            var errorsForm = $('#errors-summary');
+                            if (data.success) {
+                                errorsForm.show();
+                                showErrorResponse(data, errorsForm);
+                                $('html, body').animate({ scrollTop: 0 }, 'fast');
+                            } else {
+                                window.alertify.success("Успешно създаден доклад!");
+                            }
+                        });
+                });
+
+
+            //Create broker
+            $(document).on('click',
+                '#add-broker',
+                function () {
+                    $('#modalAddPartnerForm').modal('show');
+                    $('#modalAddPartnerForm .chosen-manual').chosen();
+                });
+
+            $(document).on('click',
+                '#create-Broker-btn',
+                function () {
+                    var createBrokerModel = {
+                        PartnerName: $('#add-partner-name').val(),
+                        PhoneNumber: $('#add-partner-phonenumber').val(),
+                        Email: $('#add-partner-email').val(),
+                        SocialMediaAccount: $('#add-socialmedia').val(),
+                        PartnerCompanyName: $('#add-company-name').val(),
+                        CityId: $('#add-partner-city').val(),
+                        AdditionalInformation: $('#additional-information').val()
+                    };
+
+                    $.ajax({
+                        url: '/PartnersDiary/CreateBroker',
+                        type: 'post',
+                        data: createBrokerModel,
+                        success: function (data) {
+
+                            var thisForm = $('#modalAddPartnerForm');
+
+                            if (data.success) {
+                                showErrorResponse(data, thisForm);
+                            } else {
+                                var brokerAndCompany = data.PartnerName + (data.PartnerCompanyName != null ? " от " + data.PartnerCompanyName : "");
+                                var dropDownOption = '<option value="' + data.Id + '">' + brokerAndCompany + '</option>';
+                                $('.broker').each(function (i, item) {
+                                    $(item).append(dropDownOption);
+                                });
+
+                                thisForm.modal('hide');
+                                window.alertify.success("Успешно добавен брокер-партньор!");
+                                $('.broker').trigger('chosen:updated');
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var titles = jqXHR.responseText.match("<title>(.*?)</title>");
+                            let shownError = titles ? titles[1] : errorThrown;
+                            window.alertify.error(shownError);
+                        }
+                    });
+                });
+        });
+    </script>
+}
+
+<br />
+<div class="container-fluid">
+    <div id="errors-summary" style="width: 22cm; margin: auto; margin-bottom: 10px; display: none; border: #d84949 2px solid;">
+        <h3 align="center" style="color: #d84949; margin-bottom: 10px;">Грешки</h3>
+
+        @Html.ValidationMessage("TotalViews", new { @class = "text-danger", style = "font-weight:bold;text-size:14pt;" })
+        @Html.ValidationMessage("TotalCalls", new { @class = "text-danger", style = "font-weight:bold;text-size:14pt;" })
+        @Html.ValidationMessage("ActionsConclusion", new { @class = "text-danger", style = "font-weight:bold;text-size:14pt;" })
+
+        @Html.ValidationMessage("TotalOffers", new { @class = "text-danger", style = "font-weight:bold;text-size:14pt;" })
+        @Html.ValidationMessage("TotalInspections", new { @class = "text-danger", style = "font-weight:bold;text-size:14pt;" })
+        @Html.ValidationMessage("ChangeArguments", new { @class = "text-danger", style = "font-weight:bold;text-size:14pt;" })
+
+    </div>
+    <div class="report" style="width: 22cm; height: 28.7cm; margin: auto; margin-bottom: 10px;">
+        <input type="hidden" name="propertyId" id="propertyId" value="@Model" />
+        <h1 align="center" style="margin-top: 0; margin-bottom: 20px; font-size: 32px; text-transform: none;">Доклад за извършени дейности „СПРОПЪРТИС“</h1>
+        <table style="border-collapse: collapse; width: 100%; margin-bottom: 18px;">
+            <tbody>
+                <tr>
+                    <td colspan="4">
+                        <p align="center" style="font-size: 18pt; margin: 0; line-height: 36.5px;">
+                            <b>Извършена реклама</b>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="2">
+                        <p align="center" style="font-size: 14pt; margin: 0;">
+                            <b>Начини на реклама</b>
+                        </p>
+                    </td>
+                    <td colspan="2">
+                        <p align="center" style="font-size: 14pt; margin: 0;">
+                            <b>Използвани платформи</b>
+                        </p>
+                    </td>
+                    <td rowspan="2">
+                        <div align="center" style="font-size: 14pt; margin: 0; position: relative;">
+                            <b> Споделен с колеги</b>
+                            <div id="add-broker" class="unselectable" title="Добави колега">+</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;"><b>Платформа</b></td>
+                    <td style="text-align: center;"><b>Прегл.</b></td>
+                </tr>
+                <tr>
+                    <td width="22%;" rowspan="10">
+                        @for (var i = 0; i < ViewBag.PromotionMediae.Count; i++)
+                        {
+                            <div style="margin: 0; padding: 3px; position: relative;">
+                                <input class="promotionType" Id="IsChecked_@(i)_" name="IsChecked[@(i)]" type="checkbox" />
+                                <input type="hidden" value="@ViewBag.PromotionMediae[i].Id" />
+                                <label for="IsChecked_@(i)_" style="font-size: 16px; position: absolute; left: 23px; top: -2px; font-weight: normal;">@(ViewBag.PromotionMediae[i].Media)</label>
+                            </div>
+                        }
+
+                        <div style="margin: 0; padding: 3px; position: relative;">
+                            <input class="customPromotionType" type="checkbox">
+                            <input type="text" style="position: absolute; left: 23px; top: -2px; width: 150px;" placeholder="Друг начин">
+                        </div>
+                        <div style="margin: 0; padding: 3px; position: relative;">
+                            <input class="customPromotionType" type="checkbox">
+                            <input type="text" style="position: absolute; left: 23px; top: -2px; width: 150px;" placeholder="Друг начин">
+                        </div>
+                    </td>
+                    <td style="width: 33.5%;">
+                        <select class="platforms" name="platform1" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете платформа</option>
+                            @foreach (WebPlatformKeyValueViewModel platform in ViewBag.Platforms)
+                            {
+                                <option value="@platform.Id">@platform.WebPlatform</option>
+                            }
+                        </select>
+                    </td>
+                    <td style="width: 5%;"><input type="text" class="views digitOnly" id="view1" name="views1" max="99999" min="0" maxlength="5" disabled="disabled" style="width: 100%; font-size: 14px; margin: 0; border: 0;" /></td>
+                    <td>
+                        <select class="broker chosen-select" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете брокер</option>
+                            @foreach (PartnersDropdownViewModel broker in ViewBag.Brokers)
+                            {
+                                <option value="@broker.Id">@broker.BrokerInfo</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.5%;">
+                        <select class="platforms" name="platform2" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете платформа</option>
+                            @foreach (WebPlatformKeyValueViewModel platform in ViewBag.Platforms)
+                            {
+                                <option value="@platform.Id">@platform.WebPlatform</option>
+                            }
+                        </select>
+                    </td>
+                    <td style="width: 5%;"><input type="text" class="views digitOnly" id="view2" name="views2" max="99999" min="0" maxlength="5" disabled="disabled" style="width: 100%; font-size: 14px; margin: 0; border: 0;" /></td>
+                    <td>
+                        <select class="broker chosen-select" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете брокер</option>
+                            @foreach (PartnersDropdownViewModel broker in ViewBag.Brokers)
+                            {
+                                <option value="@broker.Id">@broker.BrokerInfo</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.5%;">
+                        <select class="platforms" name="platform3" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете платформа</option>
+                            @foreach (WebPlatformKeyValueViewModel platform in ViewBag.Platforms)
+                            {
+                                <option value="@platform.Id">@platform.WebPlatform</option>
+                            }
+                        </select>
+                    </td>
+                    <td style="width: 5%;"><input type="text" class="views digitOnly" id="view3" name="views3" max="99999" min="0" maxlength="5" disabled="disabled" style="width: 100%; font-size: 14px; margin: 0; border: 0;" /></td>
+                    <td>
+                        <select class="broker chosen-select" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете брокер</option>
+                            @foreach (PartnersDropdownViewModel broker in ViewBag.Brokers)
+                            {
+                                <option value="@broker.Id">@broker.BrokerInfo</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.5%;">
+                        <select class="platforms" name="platform4" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете платформа</option>
+                            @foreach (WebPlatformKeyValueViewModel platform in ViewBag.Platforms)
+                            {
+                                <option value="@platform.Id">@platform.WebPlatform</option>
+                            }
+                        </select>
+                    </td>
+                    <td style="width: 5%;"><input type="text" class="views digitOnly" id="view4" name="views4" max="99999" min="0" maxlength="5" disabled="disabled" style="width: 100%; font-size: 14px; margin: 0; border: 0;" /></td>
+                    <td>
+                        <select class="broker chosen-select" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете брокер</option>
+                            @foreach (PartnersDropdownViewModel broker in ViewBag.Brokers)
+                            {
+                                <option value="@broker.Id">@broker.BrokerInfo</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.5%;">
+                        <select class="platforms" name="platform5" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете платформа</option>
+                            @foreach (WebPlatformKeyValueViewModel platform in ViewBag.Platforms)
+                            {
+                                <option value="@platform.Id">@platform.WebPlatform</option>
+                            }
+                        </select>
+                    </td>
+                    <td style="width: 5%;"><input type="text" class="views digitOnly" id="view5" name="views5" max="99999" min="0" maxlength="5" disabled="disabled" style="width: 100%; font-size: 14px; margin: 0; border: 0;" /></td>
+                    <td>
+                        <select class="broker chosen-select" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете брокер</option>
+                            @foreach (PartnersDropdownViewModel broker in ViewBag.Brokers)
+                            {
+                                <option value="@broker.Id">@broker.BrokerInfo</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.5%;">
+                        <select class="platforms" name="platform6" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете платформа</option>
+                            @foreach (WebPlatformKeyValueViewModel platform in ViewBag.Platforms)
+                            {
+                                <option value="@platform.Id">@platform.WebPlatform</option>
+                            }
+                        </select>
+                    </td>
+                    <td style="width: 5%;"><input type="text" class="views digitOnly" id="view6" name="views6" max="99999" min="0" maxlength="5" disabled="disabled" style="width: 100%; font-size: 14px; margin: 0; border: 0;" /></td>
+                    <td>
+                        <select class="broker chosen-select" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете брокер</option>
+                            @foreach (PartnersDropdownViewModel broker in ViewBag.Brokers)
+                            {
+                                <option value="@broker.Id">@broker.BrokerInfo</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.5%;">
+                        <select class="platforms" name="platform7" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете платформа</option>
+                            @foreach (WebPlatformKeyValueViewModel platform in ViewBag.Platforms)
+                            {
+                                <option value="@platform.Id">@platform.WebPlatform</option>
+                            }
+                        </select>
+                    </td>
+                    <td style="width: 5%;"><input type="text" class="views digitOnly" id="view7" name="views7" max="99999" min="0" maxlength="5" disabled="disabled" style="width: 100%; font-size: 14px; margin: 0; border: 0;" /></td>
+                    <td>
+                        <select class="broker chosen-select" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете брокер</option>
+                            @foreach (PartnersDropdownViewModel broker in ViewBag.Brokers)
+                            {
+                                <option value="@broker.Id">@broker.BrokerInfo</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.5%;">
+                        <select class="platforms" name="platform8" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете платформа</option>
+                            @foreach (WebPlatformKeyValueViewModel platform in ViewBag.Platforms)
+                            {
+                                <option value="@platform.Id">@platform.WebPlatform</option>
+                            }
+                        </select>
+                    </td>
+                    <td style="width: 5%;"><input type="text" class="views digitOnly" id="view8" name="views8" max="99999" min="0" maxlength="5" disabled="disabled" style="width: 100%; font-size: 14px; margin: 0; border: 0;" /></td>
+                    <td>
+                        <select class="broker chosen-select" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете брокер</option>
+                            @foreach (PartnersDropdownViewModel broker in ViewBag.Brokers)
+                            {
+                                <option value="@broker.Id">@broker.BrokerInfo</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.5%;">
+                        <select class="platforms" name="platform9" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете платформа</option>
+                            @foreach (WebPlatformKeyValueViewModel platform in ViewBag.Platforms)
+                            {
+                                <option value="@platform.Id">@platform.WebPlatform</option>
+                            }
+                        </select>
+                    </td>
+                    <td style="width: 5%;"><input type="text" class="views digitOnly" id="view9" name="views9" max="99999" min="0" maxlength="5" disabled="disabled" style="width: 100%; font-size: 14px; margin: 0; border: 0;" /></td>
+                    <td>
+                        <select class="broker chosen-select" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете брокер</option>
+                            @foreach (PartnersDropdownViewModel broker in ViewBag.Brokers)
+                            {
+                                <option value="@broker.Id">@broker.BrokerInfo</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.5%;">
+                        <select class="platforms" name="platform10" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете платформа</option>
+                            @foreach (WebPlatformKeyValueViewModel platform in ViewBag.Platforms)
+                            {
+                                <option value="@platform.Id">@platform.WebPlatform</option>
+                            }
+                        </select>
+                    </td>
+                    <td style="width: 5%;"><input type="text" class="views digitOnly" id="view10" name="views10" max="99999" min="0" maxlength="5" disabled="disabled" style="width: 100%; font-size: 14px; margin: 0; border: 0;" /></td>
+                    <td>
+                        <select class="broker chosen-select" style="width: 99.8%; font-size: 14px; margin: 0; border: 0; height: 27.2px; font-size: 17.3px;">
+                            <option value="">Изберете брокер</option>
+                            @foreach (PartnersDropdownViewModel broker in ViewBag.Brokers)
+                            {
+                                <option value="@broker.Id">@broker.BrokerInfo</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table style="border-collapse: collapse; width: 100%; margin-bottom: 18px;">
+            <tbody>
+                <tr>
+                    <td colspan="4">
+                        <p align="center" style="font-size: 18pt; margin: 0; line-height: 36.5px;">
+                            <b>Резултати от извършените дейности</b>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p align="center" style="font-size: 18pt; margin: 0">
+                            <b>Общо преглеждания</b>
+                        </p>
+                    </td>
+                    <td>
+                        <p align="center" style="font-size: 18pt; margin: 0">
+                            <b>Общо обаждания</b>
+                        </p>
+                    </td>
+                    <td>
+                        <p align="center" style="font-size: 18pt; margin: 0">
+                            <b>Общо огледи</b>
+                        </p>
+                    </td>
+                    <td>
+                        <p align="center" style="font-size: 18pt; margin: 0">
+                            <b>Общо оферти</b>
+                        </p>
+                    </td>
+                </tr>
+                <tr height="50px;">
+                    <td width="30%"><input id="totalViews" class="digitOnly" value="0" disabled="disabled" type="text" maxlength="12" style="width: 100%; font-size: 36px; text-align: center; border: 0;"></td>
+                    <td><input id="totalCalls" class="digitOnly" value="0" type="text" maxlength="2" style="width: 100%; font-size: 36px; text-align: center; border: 0;"></td>
+                    <td><input id="totalInspections" class="digitOnly" value="0" type="text" maxlength="2" style="width: 100%; font-size: 36px; text-align: center; border: 0;"></td>
+                    <td><input id="totalOffers" class="digitOnly" value="0" type="text" maxlength="2" style="width: 100%; font-size: 36px; text-align: center; border: 0;"></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <div style="width: 33%; display: inline-block;">
+                            <span>Цена на оферта:</span>
+                            <input class="offer digitOnly" type="text" style="width: 40%;">
+                            <span>лв.</span>
+                        </div>
+                        <div style="width: 33%; display: inline-block;">
+                            <span>Цена на оферта:</span>
+                            <input class="offer digitOnly" type="text" style="width: 40%;">
+                            <span>лв.</span>
+                        </div>
+                        <div style="width: 33%; display: inline-block;">
+                            <span>Цена на оферта:</span>
+                            <input class="offer digitOnly" type="text" style="width: 40%;">
+                            <span>лв.</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <div style="width: 33%; display: inline-block;">
+                            <span>Цена на оферта:</span>
+                            <input class="offer digitOnly" type="text" style="width: 40%;">
+                            <span>лв.</span>
+                        </div>
+                        <div style="width: 33%; display: inline-block;">
+                            <span>Цена на оферта:</span>
+                            <input class="offer digitOnly" type="text" style="width: 40%;">
+                            <span>лв.</span>
+                        </div>
+                        <div style="width: 33%; display: inline-block;">
+                            <span>Цена на оферта:</span>
+                            <input class="offer digitOnly" type="text" style="width: 40%;">
+                            <span>лв.</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <div style="width: 33%; display: inline-block;">
+                            <span>Цена на оферта:</span>
+                            <input class="offer digitOnly" type="text" style="width: 40%;">
+                            <span>лв.</span>
+                        </div>
+                        <div style="width: 33%; display: inline-block;">
+                            <span>Цена на оферта:</span>
+                            <input class="offer digitOnly" type="text" style="width: 40%;">
+                            <span>лв.</span>
+                        </div>
+                        <div style="width: 33%; display: inline-block;">
+                            <span>Цена на оферта:</span>
+                            <input class="offer digitOnly" type="text" style="width: 40%;">
+                            <span>лв.</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table style="border-collapse: collapse; width: 100%; margin-bottom: 18px;">
+            <tbody>
+                <tr>
+                    <td>
+                        <p align="center" style="font-size: 18pt; margin: 0; line-height: 36.5px;">
+                            <b>Изводи от извършените дейности</b>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 0;">
+                        <textarea id="conclusions" rows="5" style="width: 100%; margin: 0 0 -3px 0; padding: 0; border: 0; line-height: 100%;"></textarea>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        @Html.ValidationMessage("ActionsConclusion", new { @class = "text-danger", style = "font-weight:bold;text-size:14pt;" })
+        <table style="border-collapse: collapse; width: 100%; margin-bottom: 14px;">
+            <tbody>
+                <tr>
+                    <td colspan="2">
+                        <p align="center" style="font-size: 18pt; margin: 0; line-height: 36.5px;">
+                            <b>Препоръки за последваща работа</b>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="margin: 0; padding: 0; position: relative; height: 25.2px;">
+                            <input id="change-marketing" type="checkbox" style="position: absolute; top: 5px; left: 3px;" />
+                            <label for="change-marketing" style="font-size: 16px; position: absolute; left: 22px; top: 2px; line-height: 20px;">Промяна на маркетинг</label>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="text-align: center; position: relative; line-height: 1.6;">
+                            <strong style="font-size: 22px; line-height: 28px">Аргументи</strong>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="30%">
+                        <div style="margin: 0; padding: 0px; position: relative; height: 25.2px;">
+                            <input id="price-correction" type="checkbox" style="position: absolute; top: 4px; left: 3px" />
+                            <label for="price-correction" style="font-size: 16px; position: absolute; left: 22px; top: 2px; line-height: 20px; margin-bottom: 0px;">Корекция на цената</label>
+                        </div>
+                    </td>
+                    <td rowspan="4">
+                        <textarea name="changeArguments" id="changeArguments" style="border: 0; width: 100%; line-height: 100%; height: 106px; margin-bottom: -5px;"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="margin: 0; padding: 0px; position: relative; height: 25.2px;">
+                            <input class="customRecommendationCheck" type="checkbox" style="position: absolute; top: 4px; left: 3px" />
+                            <input class="customRecommendation" style="font-size: 16px; position: absolute; left: 22px; top: 0; line-height: 20px;" placeholder="   Друга препоръка">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="margin: 0; padding: 0px; position: relative; height: 25.2px;">
+                            <input class="customRecommendationCheck" type="checkbox" style="position: absolute; top: 4px; left: 3px" />
+                            <input class="customRecommendation" style="font-size: 16px; position: absolute; left: 22px; top: 0; line-height: 20px;" placeholder="   Друга препоръка">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="margin: 0; padding: 0px; position: relative; height: 25.2px;">
+                            <input class="customRecommendationCheck" type="checkbox" style="position: absolute; top: 4px; left: 3px" />
+                            <input class="customRecommendation" style="font-size: 16px; position: absolute; left: 22px; top: 0; line-height: 20px;" placeholder="   Друга препоръка">
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div style="width: 22cm; margin: auto;">
+        <input type="checkbox" id="sendToOwner" />&nbsp;
+        <label for="sendToOwner" style="display: inline-block; font-size: 16px;">Искате ли да изпратите този Доклад до собственика на имота към емейл: <span style="text-decoration: underline;">@ViewBag.Owner.Email</span></label>
+    </div>
+    <div style="width: 22cm; margin: auto; font-size: 16px;">
+        <div class="row">
+            <div class="col-xs-12">
+                <span style="float: left;">Изготвен на:</span>
+                <span id="createdOn" style="float: left;">@DateTime.Now.ToString("dd.MM.yyyy")</span>
+                <span id="agentName" style="float: right;">@User.Identity.GetUserName()</span>
+                <span style="float: right;">От:</span>
+            </div>
+            <div class="col-xs-12">
+                <button class="pull-right btn btn-primary" id="submitReport">Публикувай</button>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+
+@section bottomBody{
+
+    @*Create Partner modal*@
+    <div class="modal fade" id="modalAddPartnerForm" role="dialog" aria-labelledby="Добави партньор" aria-hidden="true" style="padding-top: 0px;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin: 2px -7px 0 0;">&times;</button>
+                    <h4 class="modal-title">Добавяне на партньор</h4>
+                </div>
+                <div class="modal-body mx-3">
+                    <div class="row">
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label for="add-partner-name" class="required">Име</label>
+                                    <input type="text" id="add-partner-name" class="form-control" placeholder="Иван Иванов">
+                                    @Html.ValidationMessage("PartnerName", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-partner-city" class="required">Град</label>
+                                    <select id="add-partner-city" name="cityId" data-placeholder="Град" class="chosen-manual">
+                                        <option selected="selected" value="">Град</option>
+                                        @foreach (var city in ViewBag.Cities)
+                                        {
+                                            <option value="@city.CityId">@city.CityName</option>
+                                        }
+                                    </select>
+                                    @Html.ValidationMessage("CityId", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-company-name">Фирма</label>
+                                    <input type="text" id="add-company-name" class="form-control" placeholder="Уникредит Булбанк">
+                                    @Html.ValidationMessage("PartnerCompanyName", "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <label for="add-partner-phonenumber" class="required">Телефон</label>
+                                    <input type="text" id="add-partner-phonenumber" class="form-control" placeholder="08765433219">
+                                    @Html.ValidationMessage("PhoneNumber", "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-partner-email">Емейл</label>
+                                    <input type="text" id="add-partner-email" class="form-control" placeholder="sample@sample.bg">
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="add-socialmedia">Социална медия</label>
+                                    <input type="text" id="add-socialmedia" class="form-control" placeholder="https://www.facebook.com/....">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <label>Допълнителна информация</label>
+                        </div>
+                        <div class="col-xs-12">
+                            <textarea id="additional-information" class="form-control" rows="5"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="create-Broker-btn" class="btn btn-success">Запиши</button>
+                    <button class="btn btn-primary" data-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

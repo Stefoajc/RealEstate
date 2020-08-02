@@ -1,0 +1,43 @@
+﻿@model RealEstate.ViewModels.WebMVC.ReviewsStarsPartialViewModel
+
+@{int reviewScore = (int)Math.Round(Model?.AverageScore ?? 0, MidpointRounding.AwayFromZero); reviewScore = reviewScore > 10 ? 10 : reviewScore;}
+<fieldset class="rating">
+    @Html.RadioButton("score", 10, reviewScore == 10, new { id = "start5" })
+    <label class="full" for="star5" title="Превъзходно - 5 звезди"></label>
+    @Html.RadioButton("score", 9, reviewScore == 9, new { id = "star4half" })
+    <label class="half" for="star4half" title="Отлично - 4.5 звезди"></label>
+    @Html.RadioButton("score", 8, reviewScore == 8, new { id = "star4" })
+    <label class="full" for="star4" title="Много добре - 4 звезди"></label>
+    @Html.RadioButton("score", 7, reviewScore == 7, new { id = "star3half" })
+    <label class="half" for="star3half" title="Добро - 3.5 звезди"></label>
+    @Html.RadioButton("score", 6, reviewScore == 6, new { id = "star3" })
+    <label class="full" for="star3" title="Добро - 3 звезди"></label>
+    @Html.RadioButton("score", 5, reviewScore == 5, new { id = "star2half" })
+    <label class="half" for="star2half" title="Средно - 2.5 звезди"></label>
+    @Html.RadioButton("score", 4, reviewScore == 4, new { id = "star2" })
+    <label class="full" for="star2" title="Средно - 2 звезди"></label>
+    @Html.RadioButton("score", 3, reviewScore == 3, new { id = "star1half" })
+    <label class="half" for="star1half" title="Зле - 1.5 звезди"></label>
+    @Html.RadioButton("score", 2, reviewScore == 2, new { id = "star1" })
+    <label class="full" for="star1" title="Много зле - 1 звезда"></label>
+    @Html.RadioButton("score", 1, reviewScore == 1, new { id = "starhalf" })
+    <label class="half" for="starhalf" title="Много зле - 0.5 звезда"></label>
+</fieldset>
+@if (Model != null)
+{
+    if(Model.ReviewsCount > 1)
+    { 
+        <label title="Брой получени оценки" class="rating-count">(@Model.ReviewsCount)</label>
+    }
+}
+
+@* to work properly add the following:
+    <script type="text/javascript" src="/Scripts/reviewStarsManagement.js"></script>
+
+    and in the page script section:
+        //Set the review score
+        let avgReviewScore = @Model.AvgReviewScore;
+        $('.rating > input[value="' + avgReviewScore + '"] , ' +
+            '.rating-inactive > input[value="' + avgReviewScore + '"] ')
+            .attr('checked', 'true');
+*@

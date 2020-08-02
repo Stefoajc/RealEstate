@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Configuration;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
+using Microsoft.Owin.Security.Twitter;
 using Owin;
 using Owin.Security.Providers.Instagram;
 using Owin.Security.Providers.LinkedIn;
@@ -20,9 +22,9 @@ namespace RealEstate.WebAppMVC
         public void ConfigureAuth(IAppBuilder app)
         {
             // Configure the db context, user manager and signin manager to use a single instance per request
-            app.CreatePerOwinContext(RealEstateDbContext.Create);
-            app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
-            app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
+            //app.CreatePerOwinContext(RealEstateDbContext.Create);
+            //app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
+            //app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
 
             // Enable the application to use a cookie to store information for the signed in user
             // and to use a cookie to temporarily store information about a user logging in with a third party login provider
@@ -57,22 +59,35 @@ namespace RealEstate.WebAppMVC
             //    clientSecret: "");
 
             app.UseLinkedInAuthentication(
-                "Id",
-                "secret");
+                ConfigurationManager.AppSettings.Get("LinkedInClientID"),
+                ConfigurationManager.AppSettings.Get("LinkedInClientSecret"));
 
             app.UseInstagramInAuthentication(
-                "Id",
-                "secret");
+                ConfigurationManager.AppSettings.Get("InstagramClientID"),
+                ConfigurationManager.AppSettings.Get("InstagramClientSecret"));
 
             app.UseTwitterAuthentication(
-               consumerKey: "dasdsa",
-               consumerSecret: "dsadsa");
+                new TwitterAuthenticationOptions
+                {
+                    ConsumerKey = ConfigurationManager.AppSettings.Get("TwitterClientID"),
+                    ConsumerSecret = ConfigurationManager.AppSettings.Get("TwitterClientSecret"),
+                    Provider = new Microsoft.Owin.Security.Twitter.TwitterAuthenticationProvider
+                    {
+                        OnAuthenticated = (context) =>
+                        {
+                            context.Identity.AddClaim(new System.Security.Claims.Claim("urn:twitter:access_token", context.AccessToken));
+                            context.Identity.AddClaim(new System.Security.Claims.Claim("urn:twitter:access_secret", context.AccessTokenSecret));
+                            context.Identity.AddClaim(new System.Security.Claims.Claim("urn:twitter:email", context.Identity.NameClaimType));
+                            return Task.FromResult(0);
+                        }
+                    }
+                });
 
             app.UseFacebookAuthentication(
                appId: ConfigurationManager.AppSettings.Get("FacebookClientID"),
                appSecret: ConfigurationManager.AppSettings.Get("FacebookClientSecret"));
 
-            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions
             {
                 ClientId = ConfigurationManager.AppSettings.Get("GoogleClientID"),
                 ClientSecret = ConfigurationManager.AppSettings.Get("GoogleClientSecret")

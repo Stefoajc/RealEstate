@@ -1,0 +1,42 @@
+﻿<div class="payment-field">
+    <div>Начини за плащане:</div>
+    <div>
+        <div class="col-md-4 col-xs-12">
+            <input id="ad-pay-card" class="payment-method" type="radio" name="PaymentInfo.PaymentMethod" data-target=".pay-card" value="DIRECTCREDITCARD" checked="">
+            <label for="ad-pay-card">
+                <span class="pay-icon card"></span>
+                Кредитна/Дебитна карта
+            </label>
+        </div>
+        <div class="col-md-4 col-xs-12">
+            <input id="ad-pay-easy" class="payment-method" type="radio" name="PaymentInfo.PaymentMethod" data-target=".pay-easy" value="EASYPAY">
+            <label for="ad-pay-easy">
+                <span class="pay-icon easy"></span>
+                EasyPay
+            </label>
+        </div>
+        <div class="col-md-4 col-xs-12">
+            <input id="ad-pay-epay" class="payment-method" type="radio" name="PaymentInfo.PaymentMethod" data-target=".pay-epay" value="EPAYPAYMENT">
+            <label for="ad-pay-epay">
+                <span class="pay-icon epay"></span>
+                ePay.bg
+            </label>
+        </div>
+    </div>
+    <div class="field-validation-valid text-danger" data-valmsg-for="PaymentInfo.PaymentMethod" data-valmsg-replace="true"></div>
+    <div class="single-payment row pay-easy hidden">
+        <div class="col col-xs-6">
+            <div class="row">
+                <div class="col col-xs-12">Име:</div>
+                <div class="col col-xs-12">
+                    <input type="text" name="PaymentInfo.PayerName" placeholder="до 26 символа" class="form-control" disabled="">
+                    <div class="field-validation-valid text-danger" data-valmsg-for="PaymentInfo.PayerName" data-valmsg-replace="true"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col col-xs-12">Тази информация няма да бъде съхранена в системата на еТемида.</div>
+    </div>
+    <div class="single-payment pay-card pay-epay">
+        За да извършите плащане ще бъдете пратени към системата на ePay.
+    </div>
+</div>

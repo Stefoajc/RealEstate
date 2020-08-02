@@ -1,0 +1,51 @@
+﻿@model RealEstate.ViewModels.WebMVC.AppointmentCreatePartialViewModel
+
+<form action="@Url.Action("Create", "Appointments")" id="create-appointment" method="POST">
+    @Html.AntiForgeryToken()
+    <input id="PropertyId" name="PropertyId" type="hidden" value="@Model.PropertyId" />
+    <input id="AgentId" name="AgentId" type="hidden" value="@Model.AgentId" />
+    <div class="col-md-8 col-xs-12">
+        <div class="form-group">
+            <label class="control-label required" for="ClientName">Въведете вашето име</label>
+            <input class="form-control" data-val="true" data-val-required="Въведете име!" id="ClientName" name="ClientName" value="" type="text">
+            <span class="field-validation-valid text-danger" data-valmsg-for="ClientName" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group">
+            <label class="control-label required" for="ClientPhoneNumber">Въведете вашият телефон</label>
+            <input class="form-control" data-val="true" data-val-required="Въведете телефон!" id="ClientPhoneNumber" name="ClientPhoneNumber" value="" type="text">
+            <span class="field-validation-valid text-danger" data-valmsg-for="ClientPhoneNumber" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="ClientEmail">Въведете вашият емейл </label>
+            <input class="form-control" data-val="true" data-val-required="Въведете емейл!" id="ClientEmail" name="ClientEmail" value="" type="text">
+            <span class="field-validation-valid text-danger" data-valmsg-for="ClientEmail" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group">
+            <label class="control-label required" for="AppointmentDate">Изберете дата</label>
+            <div class="input-group date" id="appointment-date">
+                <input class="form-control" id="AppointmentDate" name="AppointmentDate" placeholder="Дата и час на среща" type="text">
+                <span class="input-group-addon" for="AppointmentDate">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+            <span class="field-validation-valid text-danger" data-valmsg-for="AppointmentDate" data-valmsg-replace="true"></span>
+        </div>
+    </div>
+    <div class="col-md-4 col-xs-12">
+        <div class="form-group" style="text-align: center;">
+            <label class="control-label" for="AppointmentDescription">Въведете допълнителна информация</label>
+            <textarea class="form-control" data-val="true" id="AppointmentDescription" name="AppointmentDescription" rows="9"></textarea>
+        </div>
+        <div class="form-group" style="text-align: center;">
+            <div class="g-recaptcha not-ready"></div>
+            <span class="field-validation-valid text-danger" data-valmsg-for="reCaptcha" data-valmsg-replace="true"></span>
+        </div>
+    </div>
+    <div class="col-xs-12">
+        <div class="form-group">
+            <button class="btn btn-primary" style="float: right; margin-bottom: 10px;">
+                Заяви среща
+            </button>
+        </div>
+    </div>
+</form>

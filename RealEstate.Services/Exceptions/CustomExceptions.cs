@@ -31,4 +31,28 @@ namespace RealEstate.Services.Exceptions
             
         }
     }
+
+    public class NotAuthorizedException : Exception
+    {
+        public NotAuthorizedException()
+        {
+            
+        }
+
+        public NotAuthorizedException(string message) : base(message)
+        {
+            
+        }
+    }
+
+    public class UniquenessException : Exception
+    {
+        public UniquenessException()
+        {
+        }
+
+        public UniquenessException(string message) : base(message)
+        {
+        }
+    }
 }

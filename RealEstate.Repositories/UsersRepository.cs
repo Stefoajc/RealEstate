@@ -22,5 +22,10 @@ namespace RealEstate.Repositories
         {
             return Context.Roles.Where(r => r.Name == role).Select(r => r.Id).FirstOrDefault();
         }
+
+        public void AddNonRegisteredUser(NonRegisteredAppointmentUsers nonRegisteredAppointmentUser)
+        {
+            Context.NonRegisteredUsers.Add(nonRegisteredAppointmentUser);
+        }
     }
 }
