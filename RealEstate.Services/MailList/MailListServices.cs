@@ -13,44 +13,48 @@ namespace RealEstate.Services.MailList
 {
     public class MailListServices
     {
+        private RealEstateDbContext realEstateDbContext;
+        private IEmailService emailsManager;
+        private string createUnsubscribeLink(string emailId) 
+            => "</br></br> <p style=\"margin: 0px; padding: 0px; color:#8a8a8a;font-size:14px;line-height:18px;\">Ако искаш да изключиш всички известия, <a href=\" " + ConfigurationManager.AppSettings["Domain"] + "maillist/removemailfromlist/" + emailId + " \" style=\"color:#1d66e5;text-decoration:none;\">кликни тук</a></p>";
+
         [Inject]
-        public RealEstateDbContext RealEstateDbContext { get; set; }
-        [Inject]
-        public IEmailService EmailsManager { get; set; }
+        public MailListServices(RealEstateDbContext realEstateDbContext, IEmailService emailsManager)
+        {
+            this.realEstateDbContext = realEstateDbContext;
+            this.emailsManager = emailsManager;
+        }        
 
         public async Task Subscribe(string email)
         {
-            if (string.IsNullOrEmpty(email))
-                throw new ArgumentNullException();
-            if (!RealEstateDbContext.EmailList.Any(e => e.EmailAddress == email))
-            {
-                RealEstateDbContext.EmailList.Add(new EmailList { EmailAddress = email });
-                await RealEstateDbContext.SaveChangesAsync();
-            }
+            if (string.IsNullOrEmpty(email) || realEstateDbContext.EmailList.Any(e => e.EmailAddress == email))
+                return;
+
+            realEstateDbContext.EmailList.Add(new EmailList { EmailAddress = email });
+            await realEstateDbContext.SaveChangesAsync();
         }
 
-        public async Task UnSubscribe(string id)
+        public async Task Unsubscribe(string id)
         {
             if (string.IsNullOrEmpty(id))
-                throw new ArgumentNullException();
+                return;
 
-            var emailToRemove = await RealEstateDbContext.EmailList.Where(e => e.EmailId == id).FirstOrDefaultAsync();
-            RealEstateDbContext.EmailList.Remove(emailToRemove);
-            await RealEstateDbContext.SaveChangesAsync();
+            var emailToRemove = await realEstateDbContext.EmailList.FirstOrDefaultAsync(e => e.EmailId == id);
+
+            if(emailToRemove != null)
+            {
+                realEstateDbContext.EmailList.Remove(emailToRemove);
+                await realEstateDbContext.SaveChangesAsync();
+            }
         }
 
         public async Task SendBroadcastMail(string subject, string body)
         {
-            var mailList = await RealEstateDbContext.EmailList.ToListAsync();
-
+            var mailList = await realEstateDbContext.EmailList.ToListAsync();
 
             foreach (var email in mailList)
             {
-                //Unsubscribe 
-                body = body +
-                       "</br></br> <p style=\"margin: 0px; padding: 0px; color:#8a8a8a;font-size:14px;line-height:18px;\">Ако искаш да изключиш всички известия, <a href=\" " + ConfigurationManager.AppSettings["Domain"] + "maillist/removemailfromlist/" + email.EmailId + " \" style=\"color:#1d66e5;text-decoration:none;\">кликни тук</a></p>";
-
-                await EmailsManager.SendEmailAsync(email.EmailAddress, subject, body, true);
+                await emailsManager.SendHtmlEmailAsync(email.EmailAddress, subject, body + createUnsubscribeLink(email.EmailId));
             }
         }
     }

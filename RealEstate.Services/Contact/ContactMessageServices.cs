@@ -33,7 +33,7 @@ namespace RealEstate.Services.Contact
             RealEstateDbContext.ContactMessages.Add(message);
             await RealEstateDbContext.SaveChangesAsync();
 
-            await EmailsManager.SendEmailAsync(message.Email, "Съобщение изпратено до sProperties","Благодаря за обратната връзка, която ни пратихте. Оценяваме времето, което отделихте. Поздрави, sProperties.", true);
+            await EmailsManager.SendHtmlEmailAsync(message.Email, "Съобщение изпратено до sProperties","Благодаря за обратната връзка, която ни пратихте. Оценяваме времето, което отделихте. Поздрави, sProperties.", true);
 
         }
 

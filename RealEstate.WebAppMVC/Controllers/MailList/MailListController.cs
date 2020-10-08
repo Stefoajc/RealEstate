@@ -16,10 +16,16 @@ namespace RealEstate.WebAppMVC.Controllers.MailList
     public class MailListController : Controller
     {
         [Inject]
-        public MailListServices MailListManager { get; set; }
+        private MailListServices mailListManager;
+
+        public MailListController(MailListServices mailListManager)
+        {
+            this.mailListManager = mailListManager;
+        }
+
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        // POST: /MailList/AddMailToList
+        // POST: /MailList/Subscribe
         [HttpPost]
         public async Task<ActionResult> Subscribe(EmailDTO model)
         {
@@ -33,7 +39,7 @@ namespace RealEstate.WebAppMVC.Controllers.MailList
 
             try
             {
-                await MailListManager.Subscribe(model.email);
+                await mailListManager.Subscribe(model.email);
                 _logger.Info("User posted subscription Successfully!");
             }
             catch (Exception ex)
@@ -44,8 +50,8 @@ namespace RealEstate.WebAppMVC.Controllers.MailList
             return Json("STATUS_OK");
         }
 
-        // GET: /MailList/AddMailToList
-        [HttpGet]
+        // Delete: /MailList/AddMailToList
+        [HttpDelete]
         public async Task<ActionResult> RemoveMailFromList([Required(ErrorMessage = "Въведете е-мейл")] string id)
         {
             _logger.Info("User requested Mail removal from the Mail List! EmailId:" + id);
@@ -58,7 +64,7 @@ namespace RealEstate.WebAppMVC.Controllers.MailList
 
             try
             {
-                await MailListManager.UnSubscribe(id);
+                await mailListManager.Unsubscribe(id);
                 _logger.Info("User Mail removed from the Email list!");
 
                 return View();

@@ -125,7 +125,7 @@ namespace RealEstate.Services.Reports
             {
                 var ownerEmail = propertyToCreateReportTo.Owner.Email;
                 // send mail to owner
-                await _noReplayMail.SendEmailAsync(ownerEmail, "Доклад за имот от СПРОПЪРТИС", htmlReport, true);
+                await _noReplayMail.SendHtmlEmailAsync(ownerEmail, "Доклад за имот от СПРОПЪРТИС", htmlReport, true);
             }
         }
 

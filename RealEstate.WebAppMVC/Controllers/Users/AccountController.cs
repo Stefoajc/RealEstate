@@ -190,7 +190,7 @@ namespace RealEstate.WebAppMVC.Controllers
                         {
                             var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code },
                                 Request.Url.Scheme);
-                            await EmailNotifications.NoReplyMailService.SendEmailAsync(user.Email,
+                            await EmailNotifications.NoReplyMailService.SendHtmlEmailAsync(user.Email,
                                 "Потвърдете акаунтът си в sProperties",
                                 "За да потвърдите регистрацията си натиснете <a href=\"" + callbackUrl + "\">ТУК</a>");
                         }
@@ -315,7 +315,7 @@ namespace RealEstate.WebAppMVC.Controllers
                         if (Request.Url != null)
                         {
                             var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = owner.Id, code }, Request.Url.Scheme);
-                            await EmailNotifications.NoReplyMailService.SendEmailAsync(owner.Email, "Потвърдете акаунтът си в sProperties", "За да потвърдите регистрацията си натиснете <a href=\"" + callbackUrl + "\">ТУК</a>");
+                            await EmailNotifications.NoReplyMailService.SendHtmlEmailAsync(owner.Email, "Потвърдете акаунтът си в sProperties", "За да потвърдите регистрацията си натиснете <a href=\"" + callbackUrl + "\">ТУК</a>");
                         }
 
                         return RedirectToAction("Login", "Account", new { confirm = "email" });
@@ -373,7 +373,7 @@ namespace RealEstate.WebAppMVC.Controllers
                 // Send an email with this link
                 string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
                 var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                await EmailNotifications.NoReplyMailService.SendEmailAsync(user.Id, "Забравена парола в sproperties.net", "Моля променете паролата си като кликнете <a href=\"" + callbackUrl + "\">ТУК</a>");
+                await EmailNotifications.NoReplyMailService.SendHtmlEmailAsync(user.Id, "Забравена парола в sproperties.net", "Моля променете паролата си като кликнете <a href=\"" + callbackUrl + "\">ТУК</a>");
                 return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 

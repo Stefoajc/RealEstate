@@ -5,6 +5,7 @@ namespace RealEstate.Services.Interfaces
 {
     public interface IEmailService
     {
-        Task SendEmailAsync(string To, string Subject, string Body, bool isBodyHtml = true);
+        Task SendHtmlEmailAsync(string to, string subject, string body);
+        Task SendPlainTextEmailAsync(string to, string subject, string body);
     }
 }

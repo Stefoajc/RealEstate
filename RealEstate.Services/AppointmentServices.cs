@@ -321,7 +321,7 @@ namespace RealEstate.Services
                 var emailTitle = $"Срещата ви с {agentName} е потвърдена";
                 var emailBody = $"<div style=\"text-align:center\"> Агент <a href=\"www.sProperties.com/Agents/Details?agentId={appointment.AgentId}\">{agentName}</a> потвърди заявката ви за среща <br/> Срещата е на {appointment.AppointmentDate:DD.MM.YYYY HH:mm} за имот <a href=\"www.sProperties.com/Properties/Details/{appointment.PropertyId}\">{appointment.PropertyId}</a>  </div>";
 
-                await emailService.SendEmailAsync(clientEmail, emailTitle, emailBody, true);
+                await emailService.SendHtmlEmailAsync(clientEmail, emailTitle, emailBody);
             }
         }
 
@@ -350,7 +350,7 @@ namespace RealEstate.Services
 
                 string mailTemplate = $"<div style=\"text-align:center\">Заявена среща от Клиент : <h3>{clientName}</h3> тел.:<h4>{clientPhoneNumber}</h4> е-поща:<h4>{clientEmail}</h4> Имот: <h3><a href=\"sProperties.com/Properties/Details/{propertyInfo.Id}\">{propertyInfo.Id}</a> - {propertyInfo.Address} </h3></div>";
 
-                await emailService.SendEmailAsync(agentEmailAndPhone.Email, "Заявка за оглед на имот", mailTemplate, true);
+                await emailService.SendHtmlEmailAsync(agentEmailAndPhone.Email, "Заявка за оглед на имот", mailTemplate);
             }
             //Send sms if agent has phoneNumber
             if (!string.IsNullOrEmpty(agentEmailAndPhone.PhoneNumber))

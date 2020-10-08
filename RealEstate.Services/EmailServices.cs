@@ -6,96 +6,72 @@ using RealEstate.Services.Interfaces;
 
 namespace RealEstate.Services
 {
-    public class GmailMailService : IEmailService
+    public class GmailMailService : BaseEmailService
     {
-        private readonly string emailDomain = ConfigurationManager.AppSettings["GmailDomain"];
-        private readonly int emailServerPort = int.Parse(ConfigurationManager.AppSettings["GmailSmtpPort"]);
-        private readonly string emailUserName = ConfigurationManager.AppSettings["GmailUserName"];
-        private readonly string emailPassword = ConfigurationManager.AppSettings["GmailPassword"];
-
-        public async Task SendEmailAsync(string to, string subject, string body, bool isBodyHtml = true)
-        {
-            using (SmtpClient smtpClient = new SmtpClient(emailDomain, emailServerPort))
-            {
-                smtpClient.EnableSsl = true;
-                smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-                smtpClient.Credentials = new NetworkCredential(emailUserName, emailPassword);
-
-                using (MailMessage message = new MailMessage(emailUserName, to, subject, body))
-                {
-                    message.IsBodyHtml = isBodyHtml;
-                    await smtpClient.SendMailAsync(message);
-                }
-
-            }
-        }
+        public GmailMailService()
+            : base(ConfigurationManager.AppSettings["GmailDomain"],
+                  int.Parse(ConfigurationManager.AppSettings["GmailSmtpPort"]),
+                  ConfigurationManager.AppSettings["GmailUserName"],
+                  ConfigurationManager.AppSettings["GmailPassword"])
+        { }
     }
 
-    public class AbvMailService : IEmailService
+    public class AbvMailService : BaseEmailService
     {
-        private readonly string emailDomain = ConfigurationManager.AppSettings["AbvDomain"];
-        private readonly int emailServerPort = int.Parse(ConfigurationManager.AppSettings["AbvSmtpPort"]);
-        private readonly string emailUserName = ConfigurationManager.AppSettings["AbvUserName"];
-        private readonly string emailPassword = ConfigurationManager.AppSettings["AbvPassword"];
-
-        public async Task SendEmailAsync(string to, string subject, string body, bool isBodyHtml = true)
-        {
-            using (SmtpClient smtpClient = new SmtpClient(emailDomain, emailServerPort))
-            {
-                smtpClient.EnableSsl = true;
-                smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-                smtpClient.Credentials = new NetworkCredential(emailUserName, emailPassword);
-                smtpClient.Timeout = 2000;
-
-                using (MailMessage message = new MailMessage(emailUserName, to, subject, body))
-                {
-                    message.IsBodyHtml = isBodyHtml;
-                    
-                    await smtpClient.SendMailAsync(message);
-                }
-
-            }
-        }
+        public AbvMailService()
+            : base(ConfigurationManager.AppSettings["AbvDomain"],
+                  int.Parse(ConfigurationManager.AppSettings["AbvSmtpPort"]),
+                  ConfigurationManager.AppSettings["AbvUserName"],
+                  ConfigurationManager.AppSettings["AbvPassword"])
+        { }
     }
 
 
-    public class NoReplyMailService : IEmailService
+    public class NoReplyMailService : BaseEmailService
     {
-        private readonly string emailDomain = ConfigurationManager.AppSettings["CompanySmtpHost"];
-        private readonly int emailServerPort = int.Parse(ConfigurationManager.AppSettings["CompanySmtpPort"]);
-        private readonly string emailUserName = ConfigurationManager.AppSettings["No-ReplyEmail"];
-        private readonly string emailPassword = ConfigurationManager.AppSettings["CompanyMailsPassword"];
-
-        public async Task SendEmailAsync(string to, string subject, string body, bool isBodyHtml = true)
-        {
-            using (SmtpClient smtpClient = new SmtpClient(emailDomain, emailServerPort))
-            {
-                smtpClient.EnableSsl = false;
-                smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-                smtpClient.Credentials = new NetworkCredential(emailUserName, emailPassword);
-
-                using (MailMessage message = new MailMessage(emailUserName, to, subject, body))
-                {
-                    message.IsBodyHtml = isBodyHtml;
-                    await smtpClient.SendMailAsync(message);
-                }
-
-            }
-        }
+        public NoReplyMailService()
+        : base(ConfigurationManager.AppSettings["CompanySmtpHost"],
+              int.Parse(ConfigurationManager.AppSettings["CompanySmtpPort"]),
+              ConfigurationManager.AppSettings["ReplyEmail"],
+              ConfigurationManager.AppSettings["CompanyMailsPassword"])
+        { }
     }
 
-    public class OfficeMailService : IEmailService
+    public class OfficeMailService : BaseEmailService
     {
-        private readonly string emailDomain = ConfigurationManager.AppSettings["CompanySmtpHost"];
-        private readonly int emailServerPort = int.Parse(ConfigurationManager.AppSettings["CompanySmtpPort"]);
-        private readonly string emailUserName = ConfigurationManager.AppSettings["OfficeEmail"];
-        private readonly string emailPassword = ConfigurationManager.AppSettings["CompanyMailsPassword"];
+        public OfficeMailService()
+        : base(ConfigurationManager.AppSettings["CompanySmtpHost"],
+              int.Parse(ConfigurationManager.AppSettings["CompanySmtpPort"]),
+              ConfigurationManager.AppSettings["OfficeEmail"],
+              ConfigurationManager.AppSettings["CompanyMailsPassword"])
+        { }
+    }
 
-        public async Task SendEmailAsync(string to, string subject, string body, bool isBodyHtml = true)
+    public abstract class BaseEmailService : IEmailService
+    {
+        private readonly string emailDomain;
+        private readonly int emailServerPort;
+        private readonly string emailUserName;
+        private readonly string emailPassword;
+
+        public BaseEmailService(string emailDomain, int emailServerPort, string emailUserName, string emailPassword)
+        {
+            this.emailDomain = emailDomain;
+            this.emailServerPort = emailServerPort;
+            this.emailUserName = emailUserName;
+            this.emailPassword = emailPassword;
+        }
+
+        public Task SendHtmlEmailAsync(string to, string subject, string body)
+            => SendEmailAsync(to, subject, body, isBodyHtml: true);
+        public Task SendPlainTextEmailAsync(string to, string subject, string body)
+             => SendEmailAsync(to, subject, body, isBodyHtml: false);
+
+        private async Task SendEmailAsync(string to, string subject, string body, bool isBodyHtml, bool enableSsl = false)
         {
             using (SmtpClient smtpClient = new SmtpClient(emailDomain, emailServerPort))
             {
-                smtpClient.EnableSsl = false;
+                smtpClient.EnableSsl = enableSsl;
                 smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
                 smtpClient.Credentials = new NetworkCredential(emailUserName, emailPassword);
 
