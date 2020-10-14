@@ -12,12 +12,12 @@ namespace RealEstate.WebAppMVC.Controllers
 {
     public class AppointmentsController : Controller
     {
-        private AppointmentServices AppointmentsManager { get; }
+        private readonly AppointmentServices appointmentsManager;
 
         [Inject]
         public AppointmentsController(AppointmentServices appointmentsManager)
         {
-            AppointmentsManager = appointmentsManager;
+            this.appointmentsManager = appointmentsManager;
         }
 
         //Used for users to see the events of the Agent
@@ -26,12 +26,7 @@ namespace RealEstate.WebAppMVC.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAppointments(string agentId, DateTime? start = null, DateTime? end = null)
         {
-            if (string.IsNullOrEmpty(agentId) || start == null || end == null)
-            {
-                return HttpNotFound();
-            }
-
-            var appointments = (await AppointmentsManager.GetAgentAppointmentsForClient(agentId, start, end))
+            var appointments = (await appointmentsManager.GetAgentAppointmentsForClient(agentId, start, end))
                 .Select(a => new
                 {
                     id = a.Id,
@@ -51,20 +46,20 @@ namespace RealEstate.WebAppMVC.Controllers
             if (User.IsInRole("Agent"))
             {
                 var agentId = User.Identity.GetUserId();
-                var appointments = await AppointmentsManager.GetAgentOwnAppointments(agentId, from, to);
+                var appointments = await appointmentsManager.GetAgentOwnAppointments(agentId, from, to);
                 return View("GetAgentAppointments", appointments);
             }
 
             if (User.IsInRole("Client"))
             {
                 var clientId = User.Identity.GetUserId();
-                var appointments = await AppointmentsManager.GetClientAppointments(clientId);
+                var appointments = await appointmentsManager.GetClientAppointments(clientId);
                 return View("GetClientAppointments", appointments);
             }
 
             if (User.IsInRole("Admin"))
             {
-                var appointments = await AppointmentsManager.GetAgentOwnAppointments(null);
+                var appointments = await appointmentsManager.GetAgentOwnAppointments(null);
                 return View("GetAgentAppointments", appointments);
             }
 
@@ -81,14 +76,9 @@ namespace RealEstate.WebAppMVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Agent,Admininstrator")]
-        public async Task<ActionResult> ApproveAppointment(int? appointmentId)
+        public async Task<ActionResult> ApproveAppointment(int appointmentId)
         {
-            if (appointmentId == null)
-            {
-                return HttpNotFound();
-            }
-
-            await AppointmentsManager.ApproveAppointment((int)appointmentId, User.Identity.GetUserId());
+            await appointmentsManager.ApproveAppointment(appointmentId, User.Identity.GetUserId());
 
             return Json("STATUS_OK");
         }
@@ -115,7 +105,7 @@ namespace RealEstate.WebAppMVC.Controllers
                 return Json(ModelState.ToDictionary());
             }
 
-            await AppointmentsManager.ChangeAppointmentDate((int)appointmentId, User.Identity.GetUserId(), (DateTime)newDate);
+            await appointmentsManager.ChangeAppointmentDate((int)appointmentId, User.Identity.GetUserId(), (DateTime)newDate);
 
             return Json("STATUS_OK");
         }
@@ -142,11 +132,11 @@ namespace RealEstate.WebAppMVC.Controllers
             int appointmentId;
             if (User.Identity.IsAuthenticated)
             {
-                appointmentId = await AppointmentsManager.Create(new AppointmentCreateDTO(model), User.Identity.GetUserId());
+                appointmentId = await appointmentsManager.Create(new AppointmentCreateDTO(model), User.Identity.GetUserId());
             }
             else
             {
-                appointmentId = await AppointmentsManager.Create(new AppointmentCreateDTO(model), new NonRegisteredUserCreateDTO(model));
+                appointmentId = await appointmentsManager.Create(new AppointmentCreateDTO(model), new NonRegisteredUserCreateDTO(model));
             }
 
             return Json(appointmentId);
@@ -157,14 +147,9 @@ namespace RealEstate.WebAppMVC.Controllers
         //POST: /Appointments/Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return HttpNotFound();
-            }
-
-            await AppointmentsManager.Delete((int) id, User.Identity.GetUserId());
+        public async Task<ActionResult> Delete(int id)
+        {           
+            await appointmentsManager.Delete(id, User.Identity.GetUserId());
 
             return Json("STATUS_OK");
         }
