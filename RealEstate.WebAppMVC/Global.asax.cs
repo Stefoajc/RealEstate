@@ -24,12 +24,10 @@ namespace RealEstate.WebAppMVC
     public class MvcApplication : NinjectHttpApplication
     {
 
-
         protected override IKernel CreateKernel()
         {
             return new StandardKernel(new NinjectBindings());
         }
-
 
         protected override void OnApplicationStarted()
         {

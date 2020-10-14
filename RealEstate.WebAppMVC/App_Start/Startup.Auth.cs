@@ -53,45 +53,36 @@ namespace RealEstate.WebAppMVC
             // This is similar to the RememberMe option when you log in.
             app.UseTwoFactorRememberBrowserCookie(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
 
-            // Uncomment the following lines to enable logging in with third party login providers
-            //app.UseMicrosoftAccountAuthentication(
-            //    clientId: "",
-            //    clientSecret: "");
-
             app.UseLinkedInAuthentication(
-                ConfigurationManager.AppSettings.Get("LinkedInClientID"),
-                ConfigurationManager.AppSettings.Get("LinkedInClientSecret"));
-
-            app.UseInstagramInAuthentication(
-                ConfigurationManager.AppSettings.Get("InstagramClientID"),
-                ConfigurationManager.AppSettings.Get("InstagramClientSecret"));
-
-            app.UseTwitterAuthentication(
-                new TwitterAuthenticationOptions
-                {
-                    ConsumerKey = ConfigurationManager.AppSettings.Get("TwitterClientID"),
-                    ConsumerSecret = ConfigurationManager.AppSettings.Get("TwitterClientSecret"),
-                    Provider = new Microsoft.Owin.Security.Twitter.TwitterAuthenticationProvider
+                    ConfigurationManager.AppSettings.Get("LinkedInClientID"),
+                    ConfigurationManager.AppSettings.Get("LinkedInClientSecret"))
+                .UseInstagramInAuthentication(
+                    ConfigurationManager.AppSettings.Get("InstagramClientID"),
+                    ConfigurationManager.AppSettings.Get("InstagramClientSecret"))
+                .UseTwitterAuthentication(
+                    new TwitterAuthenticationOptions
                     {
-                        OnAuthenticated = (context) =>
+                        ConsumerKey = ConfigurationManager.AppSettings.Get("TwitterClientID"),
+                        ConsumerSecret = ConfigurationManager.AppSettings.Get("TwitterClientSecret"),
+                        Provider = new Microsoft.Owin.Security.Twitter.TwitterAuthenticationProvider
                         {
-                            context.Identity.AddClaim(new System.Security.Claims.Claim("urn:twitter:access_token", context.AccessToken));
-                            context.Identity.AddClaim(new System.Security.Claims.Claim("urn:twitter:access_secret", context.AccessTokenSecret));
-                            context.Identity.AddClaim(new System.Security.Claims.Claim("urn:twitter:email", context.Identity.NameClaimType));
-                            return Task.FromResult(0);
+                            OnAuthenticated = (context) =>
+                            {
+                                context.Identity.AddClaim(new System.Security.Claims.Claim("urn:twitter:access_token", context.AccessToken));
+                                context.Identity.AddClaim(new System.Security.Claims.Claim("urn:twitter:access_secret", context.AccessTokenSecret));
+                                context.Identity.AddClaim(new System.Security.Claims.Claim("urn:twitter:email", context.Identity.NameClaimType));
+                                return Task.FromResult(0);
+                            }
                         }
-                    }
-                });
-
-            app.UseFacebookAuthentication(
-               appId: ConfigurationManager.AppSettings.Get("FacebookClientID"),
-               appSecret: ConfigurationManager.AppSettings.Get("FacebookClientSecret"));
-
-            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions
-            {
-                ClientId = ConfigurationManager.AppSettings.Get("GoogleClientID"),
-                ClientSecret = ConfigurationManager.AppSettings.Get("GoogleClientSecret")
-            });
+                    })
+                .UseFacebookAuthentication(
+                   appId: ConfigurationManager.AppSettings.Get("FacebookClientID"),
+                   appSecret: ConfigurationManager.AppSettings.Get("FacebookClientSecret"))
+                .UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions
+                    {
+                        ClientId = ConfigurationManager.AppSettings.Get("GoogleClientID"),
+                        ClientSecret = ConfigurationManager.AppSettings.Get("GoogleClientSecret")
+                    });
         }
     }
 }
