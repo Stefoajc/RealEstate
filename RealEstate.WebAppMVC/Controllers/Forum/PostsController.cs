@@ -120,13 +120,8 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
 
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult> Edit(int? id)
+        public async Task<ActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return HttpNotFound();
-            }
-
             var postToEdit = await _postsManager.Get((int)id);
 
             return View(postToEdit);

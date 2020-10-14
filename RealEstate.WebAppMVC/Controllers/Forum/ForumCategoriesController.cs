@@ -14,12 +14,12 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
 {
     public class ForumCategoriesController : Controller
     {
-        private readonly ForumCategoryServices _forumCategriesManager;
+        private readonly ForumCategoryServices forumCategriesManager;
 
         [Inject]
         public ForumCategoriesController(ForumCategoryServices forumCategoryServices)
         {
-            _forumCategriesManager = forumCategoryServices;
+            forumCategriesManager = forumCategoryServices;
         }
 
         // GET: ForumCategories
@@ -31,10 +31,7 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
         //
         // GET: ForumCategories/List
         [HttpGet]
-        public async Task<ActionResult> ListNames()
-        {
-            return Json(await _forumCategriesManager.ListCategoriesForLinks());
-        }
+        public async Task<ActionResult> ListNames() => Json(await forumCategriesManager.ListCategoriesForLinks());
 
 
         //
@@ -43,7 +40,7 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
         [HttpGet]
         public  async Task<ActionResult> Create()
         {
-            ViewBag.ParentCategory = await _forumCategriesManager.ListCategoriesForLinks();
+            ViewBag.ParentCategory = await forumCategriesManager.ListCategoriesForLinks();
             return View();
         }
 
@@ -57,11 +54,11 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.ParentCategory = await _forumCategriesManager.ListCategoriesForLinks();
+                ViewBag.ParentCategory = await forumCategriesManager.ListCategoriesForLinks();
                 return View(model);
             }
 
-            ForumCategoryDetailViewModel category = await _forumCategriesManager.Create(model, User.Identity.GetUserId());
+            ForumCategoryDetailViewModel category = await forumCategriesManager.Create(model, User.Identity.GetUserId());
 
             return RedirectToAction("Index", "Forum");
         }
@@ -80,7 +77,7 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
                 return Json(ModelState.ToDictionary());
             }
 
-            ForumCategoryDetailViewModel category = await _forumCategriesManager.Edit(model, User.Identity.GetUserId());
+            ForumCategoryDetailViewModel category = await forumCategriesManager.Edit(model, User.Identity.GetUserId());
 
             return Json(category);
         }
@@ -96,7 +93,7 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
                 return HttpNotFound();
             }
 
-            await _forumCategriesManager.Close((int) id, User.Identity.GetUserId());
+            await forumCategriesManager.Close((int) id, User.Identity.GetUserId());
 
             return Json("STATUS_OK");
         }
@@ -112,7 +109,7 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
                 return HttpNotFound();
             }
 
-            await _forumCategriesManager.Open((int)id, User.Identity.GetUserId());
+            await forumCategriesManager.Open((int)id, User.Identity.GetUserId());
 
             return Json("STATUS_OK");
         }

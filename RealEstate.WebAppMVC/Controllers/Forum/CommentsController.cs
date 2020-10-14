@@ -14,15 +14,15 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
     [Authorize]
     public class CommentsController : Controller
     {
-        private PostServices PostsManager { get; set; }
-        private CommentServices CommentsManager { get; set; }
+        private readonly PostServices postsManager;
+        private readonly CommentServices commentsManager;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Inject]
         public CommentsController(PostServices postServices, CommentServices commentServices)
         {
-            PostsManager = postServices;
-            CommentsManager = commentServices;
+            postsManager = postServices;
+            commentsManager = commentServices;
         }
 
         //
@@ -38,14 +38,14 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
                 _logger.Info("Invalid comment Form! Errors: " + ModelState.ToJson());
                 return Json(ModelState.ToDictionary());
             }
-            if (!await PostsManager.Exists(model.PostId))
+            if (!await postsManager.Exists(model.PostId))
             {
                 ModelState.AddModelError("PostId", "Постът, който искате да коментирате не съществува.");
                 return Json(ModelState.ToDictionary());
             }
             try
             {
-                var createdComment = await CommentsManager.Create(model, User.Identity.GetUserId());
+                var createdComment = await commentsManager.Create(model, User.Identity.GetUserId());
                 _logger.Info("Comment created successfully!");
 
                 return Json(new
@@ -62,7 +62,6 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
                 _logger.Error(ex, "Creating comment failed!");
                 throw;
             }
-
         }
 
         //
@@ -81,7 +80,7 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
 
             try
             {
-                await CommentsManager.Edit(model, User.Identity.GetUserId());
+                await commentsManager.Edit(model, User.Identity.GetUserId());
                 _logger.Info("Comment edited successfully!");
 
                 return Json(model.Body);
@@ -104,7 +103,7 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
 
             try
             {
-                await CommentsManager.Delete(id, User.Identity.GetUserId());
+                await commentsManager.Delete(id, User.Identity.GetUserId());
                 _logger.Info("Deleting comment successfully!");
 
                 return Json("STATUS_OK");

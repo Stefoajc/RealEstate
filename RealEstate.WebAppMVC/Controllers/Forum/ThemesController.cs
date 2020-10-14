@@ -14,18 +14,23 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
     [Authorize(Roles = "Administrator,Agent")]
     public class ThemesController : Controller
     {
-        [Inject]
-        public ThemeServices ThemesManager { get; set; }
-        [Inject]
-        public ForumCategoryServices ForumCategoriesManager { get; set; }
+        public readonly ThemeServices themesManager;
+        public readonly ForumCategoryServices forumCategoriesManager;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+        [Inject]
+        public ThemesController(ThemeServices themeService, ForumCategoryServices forumCategoryService)
+        {
+            themesManager = themeService;
+            forumCategoriesManager = forumCategoryService;
+        }
 
         //
         // GET: /Themes/Create
         [HttpGet]
         public async Task<ActionResult> Create()
         {
-            ViewBag.Categories = await ForumCategoriesManager.ListCategoriesForLinks();
+            ViewBag.Categories = await forumCategoriesManager.ListCategoriesForLinks();
             return View();
         }
 
@@ -42,20 +47,20 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
             {
                 _logger.Error("Creating Theme Form Invalid! Errors: " + ModelState.ToJson());
 
-                ViewBag.Categories = await ForumCategoriesManager.ListCategoriesForLinks();
+                ViewBag.Categories = await forumCategoriesManager.ListCategoriesForLinks();
                 return View(model);
             }
-            if (!await ForumCategoriesManager.Exists(model.CategoryId))
+            if (!await forumCategoriesManager.Exists(model.CategoryId))
             {
                 ModelState.AddModelError("CategoryId", "Категорията не съществува!");
                 _logger.Error("Creating Theme Form Invalid! Errors: " + ModelState.ToJson());
 
-                ViewBag.Categories = await ForumCategoriesManager.ListCategoriesForLinks();
+                ViewBag.Categories = await forumCategoriesManager.ListCategoriesForLinks();
                 return View(model);
             }
             try
             {
-                await ThemesManager.Create(model, User.Identity.GetUserId());
+                await themesManager.Create(model, User.Identity.GetUserId());
                 _logger.Info("Creating Theme Successfully!");
 
                 return RedirectToAction("Index", "Forum");
@@ -82,7 +87,7 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
                 _logger.Error("Editing Theme Form Invalid! Errors: " + ModelState.ToJson());
                 return Json(ModelState.ToDictionary());
             }
-            if (!await ForumCategoriesManager.Exists(model.CategoryId))
+            if (!await forumCategoriesManager.Exists(model.CategoryId))
             {
                 ModelState.AddModelError("CategoryId", "Категорията не съществува!");
                 _logger.Error("Editing Theme Form Invalid! Errors: " + ModelState.ToJson());
@@ -92,7 +97,7 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
 
             try
             {
-                await ThemesManager.Edit(model, User.Identity.GetUserId());
+                await themesManager.Edit(model, User.Identity.GetUserId());
                 _logger.Info("Editing Theme Successfully!");
 
                 return Json("STATUS_OK");
@@ -119,7 +124,7 @@ namespace RealEstate.WebAppMVC.Controllers.Forum
 
             try
             {
-                await ThemesManager.Delete((int)id, User.Identity.GetUserId());
+                await themesManager.Delete((int)id, User.Identity.GetUserId());
                 _logger.Info("Deleting Theme Successfully!");
 
                 return Json("STATUS_OK");

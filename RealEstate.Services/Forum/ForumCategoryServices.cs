@@ -14,19 +14,15 @@ namespace RealEstate.Services.Forum
     {
         public ForumCategoryServices(IUnitOfWork unitOfWork, ApplicationUserManager userMgr) : base(unitOfWork, userMgr) {}
 
-        public async Task<List<ForumCategoriesLinkViewModel>> ListCategoriesForLinks()
-        {
-            var forumCategories = await unitOfWork.ForumCategoriesRepository.GetAll()
-                .Select(c =>new ForumCategoriesLinkViewModel
+        public Task<List<ForumCategoriesLinkViewModel>> ListCategoriesForLinks() 
+            => unitOfWork.ForumCategoriesRepository.GetAll()
+                .Select(c => new ForumCategoriesLinkViewModel
                 {
                     ForumCategoryId = c.ForumCategoryId,
                     Name = c.Name,
                     PostCount = c.Themes.SelectMany(t => t.Posts).Count()
                 })
                 .ToListAsync();
-
-            return forumCategories;
-        }
 
         public async Task<List<ForumCategoryDetailViewModel>> List()
         {
@@ -59,10 +55,7 @@ namespace RealEstate.Services.Forum
             return Mapper.Map<ForumCategoryDetailViewModel>(forumCategory);
         }
 
-        public async Task<bool> Exists(int categoryId)
-        {
-            return await unitOfWork.ForumCategoriesRepository.GetAll().AnyAsync(fc => fc.ForumCategoryId == categoryId);
-        }
+        public Task<bool> Exists(int categoryId) => unitOfWork.ForumCategoriesRepository.GetAll().AnyAsync(fc => fc.ForumCategoryId == categoryId);
 
         public async Task<ForumCategoryDetailViewModel> Create(ForumCategoryCreateViewModel model, string creatorId)
         {
@@ -106,15 +99,9 @@ namespace RealEstate.Services.Forum
             return Mapper.Map<ForumCategoryDetailViewModel>(forumCategoryToEdit);
         }
 
-        public async Task Close(int categoryId, string closerId)
-        {
-            await SetIsClosed(categoryId, closerId, true);
-        }
+        public Task Close(int categoryId, string closerId) => SetIsClosed(categoryId, closerId, true);
 
-        public async Task Open(int categoryId, string openerId)
-        {
-            await SetIsClosed(categoryId, openerId, false);
-        }
+        public Task Open(int categoryId, string openerId) => SetIsClosed(categoryId, openerId, false);
 
         private async Task SetIsClosed(int categoryId, string closerId, bool isClosed)
         {

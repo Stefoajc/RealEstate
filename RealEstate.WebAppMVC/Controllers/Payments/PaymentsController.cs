@@ -13,11 +13,16 @@ namespace RealEstate.WebAppMVC.Controllers.Payments
 {
     [AllowAnonymous]
     public class PaymentsController : Controller
-    {
+    {        
+        public readonly InvoiceServices invoicesManager;
+        public readonly PaymentServices paymentsManager;
+
         [Inject]
-        public InvoiceServices InvoicesManager { get; set; }
-        [Inject]
-        public PaymentServices PaymentsManager { get; set; }
+        public PaymentsController(InvoiceServices invoicesManager, PaymentServices paymentsManager)
+        {
+            this.invoicesManager = invoicesManager;
+            this.paymentsManager = paymentsManager;
+        }
 
         /// <summary>
         /// CallBack API waiting for ePay to send information about the status of the payment
@@ -28,13 +33,9 @@ namespace RealEstate.WebAppMVC.Controllers.Payments
         /// <param name="checksum"></param>
         /// <returns></returns>
         // POST: Payments/PaymentAccept
-        [HttpPost, AllowAnonymous]
+        [HttpPost]
         public async Task<ContentResult> PaymentAccept(string encoded, string checksum)
         {
-            //Log
-            System.IO.File.AppendAllText(@"D:\RealEstate\RealEstate.WebAppMVC\PaymentsBeforeNotification\Log.txt", "Encoded: " + encoded + " Checksum: " + checksum);
-            //
-
             var infoStatus = "";
             var ePayQueryDataAsString = Encoding.UTF8.GetString(Convert.FromBase64String(encoded)); //ex. INVOICE=00050:STATUS=PAID:PAY_TIME=20171204163636:STAN=058030:BCODE=058030
             var ePayQueryData = ePayQueryDataAsString.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -60,9 +61,9 @@ namespace RealEstate.WebAppMVC.Controllers.Payments
                         case "PAID":
                             try  // if invoice with this id is not found
                             {
-                                await InvoicesManager.UpdateInvoiceOnNotification(paymentData);
+                                await invoicesManager.UpdateInvoiceOnNotification(paymentData);
                                 infoStatus = $"INVOICE={paymentData.Invoice}:STATUS=OK\n";
-                                await PaymentsManager.AcceptPayment(paymentData.Invoice);
+                                await paymentsManager.AcceptPayment(paymentData.Invoice);
                             }
                             catch (ContentNotFoundException)
                             {
@@ -78,7 +79,7 @@ namespace RealEstate.WebAppMVC.Controllers.Payments
                         case "EXPIRED":
                             try // if invoice with this id is not found
                             {
-                                await InvoicesManager.UpdateInvoiceOnNotification(paymentData);
+                                await invoicesManager.UpdateInvoiceOnNotification(paymentData);
                                 infoStatus = $"INVOICE={paymentData.Invoice}:STATUS=OK\n";
                             }
                             catch (ContentNotFoundException)

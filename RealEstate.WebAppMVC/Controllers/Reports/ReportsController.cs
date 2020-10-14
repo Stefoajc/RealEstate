@@ -34,21 +34,16 @@ namespace RealEstate.WebAppMVC.Controllers.Reports
 
         // GET
         [HttpGet]
-        public async Task<ActionResult> Create(int? propertyId)
+        public async Task<ActionResult> Create(int propertyId)
         {
-            if (propertyId == null)
-            {
-                return HttpNotFound();
-            }
-
             ViewBag.Platforms = await _webPlatformsManager.ListAsync();
             ViewBag.PromotionMediae = await _promotionMediaServices.ListAsKeyValue();
             ViewBag.Brokers = await _partnerServices.ListBrokersForDropdown();
             ViewBag.Cities = await _cityServices.GetCitiesForDropDown(40);
 
-            ViewBag.Owner = await _ownersManager.GetOwner((int)propertyId);
+            ViewBag.Owner = await _ownersManager.GetOwner(propertyId);
 
-            return View((int)propertyId);
+            return View(propertyId);
         }
 
         [HttpPost]
