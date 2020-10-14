@@ -35,7 +35,7 @@ namespace RealEstate.Services
 
         public async Task SendAsync(IdentityMessage message)
         {
-            await EmailManager.SendHtmlEmailAsync(message.Destination, message.Subject, message.Body, true);
+            await EmailManager.SendHtmlEmailAsync(message.Destination, message.Subject, message.Body);
         }
     }
 }

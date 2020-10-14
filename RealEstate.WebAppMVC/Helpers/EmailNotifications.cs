@@ -25,12 +25,12 @@ namespace RealEstate.WebAppMVC.Helpers
             string userMailTitle = "Регистрацията ви в \"sproperties.net\" е успешна!";            
             string userMailBody = $"Успешна регистрация<br> Може да влезете в системата от <a href=\"https://www.sproperties.net/Account/Login\">тук.</a>";
 
-            await NoReplyMailService.SendHtmlEmailAsync(userMail, userMailTitle, userMailBody, true);
+            await NoReplyMailService.SendHtmlEmailAsync(userMail, userMailTitle, userMailBody);
         }
 
         private static async Task OfficeMailNotification(string title, string body)
         {
-            await NoReplyMailService.SendHtmlEmailAsync(ConfigurationManager.AppSettings["OfficeEmail"], title, body, true);
+            await NoReplyMailService.SendHtmlEmailAsync(ConfigurationManager.AppSettings["OfficeEmail"], title, body);
         }
     }
 }
