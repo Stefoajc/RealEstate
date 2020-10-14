@@ -10,7 +10,7 @@ namespace RealEstate.WebAppMVC.Controllers
         /// <param name="errorMessage"></param>
         /// <param name="errorStackTrace"></param>
         /// <returns></returns>
-        // GET: Errors
+        // GET: /errors
         public ActionResult Index(string errorMessage = null, string errorStackTrace = null)
         {
             return View(new ErrorMessageViewModel(errorMessage, errorStackTrace));

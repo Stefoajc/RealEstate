@@ -137,16 +137,8 @@ namespace RealEstate.WebAppMVC.Controllers
         [HttpPost]
         public async Task<ActionResult> Delete(int id)
         {
-            try
-            {
-                await _contactsDiaryServices.DeleteRecord(id, User.Identity.GetUserId());
-                return Json("STATUS_OK");
-            }
-            catch (Exception)
-            {
-                throw;
-                //return Json("STATUS_ERR");
-            }
+            await _contactsDiaryServices.DeleteRecord(id, User.Identity.GetUserId());
+            return Json("STATUS_OK");
         }
     }
 }

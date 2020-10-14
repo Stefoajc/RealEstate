@@ -20,7 +20,6 @@ namespace RealEstate.WebAppMVC.Controllers.Notifications
         public async Task<ActionResult> Index()
         {
             var userId = User.Identity.GetUserId();
-            //var notifications = _notificationsManager.GetAllUserNotificationsMock(userId, 0, 14);
             var notifications = await _notificationsManager.GetAllUserNotifications(userId, 0, 14);
             await _notificationsManager.MarkAllAsSeen(userId);
 
@@ -31,7 +30,6 @@ namespace RealEstate.WebAppMVC.Controllers.Notifications
         public async Task<ActionResult> List(int pageNumber, int pageSize)
         {
             var userId = User.Identity.GetUserId();
-            //var notifications = _notificationsManager.GetAllUserNotificationsMock(userId, pageNumber, pageSize);
             var notifications = await _notificationsManager.GetAllUserNotifications(userId, pageNumber, pageSize);
             await _notificationsManager.MarkAllAsSeen(userId);
 
@@ -41,8 +39,7 @@ namespace RealEstate.WebAppMVC.Controllers.Notifications
         [HttpGet]
         public async Task<ActionResult> NotificationsCount()
         {
-            var userId = User.Identity.GetUserId();
-            //var notificationsCount = _notificationsManager.GetNotificationsCountMock(userId);
+            var userId = User.Identity.GetUserId();           
             var notificationsCount = await _notificationsManager.GetNotificationsCount(userId);
 
             return Json(notificationsCount, JsonRequestBehavior.AllowGet);

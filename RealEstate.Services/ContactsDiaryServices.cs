@@ -254,9 +254,9 @@ namespace RealEstate.Services
 
         #region DealTypes
 
-        public async Task<List<DealTypeListViewModel>> ListDealTypes()
+        public Task<List<DealTypeListViewModel>> ListDealTypes()
         {
-            return await dbContext.DealTypes
+            return dbContext.DealTypes
                 .Select(d => new DealTypeListViewModel
                 {
                     DealTypeId = d.Id,
@@ -284,9 +284,9 @@ namespace RealEstate.Services
 
         #region PersonType
 
-        public async Task<List<PersonTypeListViewModel>> ListPersonType()
+        public Task<List<PersonTypeListViewModel>> ListPersonType()
         {
-            return await dbContext.ContactedPersonTypes
+            return dbContext.ContactedPersonTypes
                 .Select(p => new PersonTypeListViewModel
                 {
                     PersonTypeId = p.Id,

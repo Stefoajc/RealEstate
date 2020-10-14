@@ -21,33 +21,34 @@ namespace RealEstate.WebAppMVC.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly PropertiesServices _propertyManager;
-        private RentalInfoServices RentalsManager { get; set; }
-        private ReservationServices ReservationsManager { get; set; }
-        private ReviewServices ReviewsManager { get; set; }
-        private readonly UserServices _userServices;
-        private readonly ClientServices _clientsManager;
-        private PostServices PostsManager { get; }
-        private CommentServices CommentsManager { get; }
-        private ContactMessageServices ContactMessagesManager { get; }
-        private CityServices CitiesManager { get; }
-        private readonly ReportServices _reportServices;
+        private readonly PropertiesServices propertyManager;
+        private readonly ReservationServices reservationsManager;
+        private readonly ReviewServices reviewsManager;
+        private readonly UserServices userServices;
+        private readonly PostServices postsManager;
+        private readonly CommentServices commentsManager;
+        private readonly ContactMessageServices contactMessagesManager;
+        private readonly CityServices citiesManager;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         [Inject]
-        public HomeController(PropertiesServices propertyServices, UserServices userServices, ClientServices clientServices, RentalInfoServices rentalInfoServices, ReservationServices reservationServices, ReviewServices reviewServices, PostServices postsManager, CommentServices commentsManager, ContactMessageServices contactMessagesManager, CityServices citiesManager, ReportServices reportServices)
+        public HomeController(PropertiesServices propertyServices, 
+            UserServices userServices, 
+            ReservationServices reservationServices, 
+            ReviewServices reviewServices, 
+            PostServices postsManager, 
+            CommentServices commentsManager, 
+            ContactMessageServices contactMessagesManager, 
+            CityServices citiesManager)
         {
-            _propertyManager = propertyServices;
-            RentalsManager = rentalInfoServices;
-            ReservationsManager = reservationServices;
-            ReviewsManager = reviewServices;
-            PostsManager = postsManager;
-            CommentsManager = commentsManager;
-            ContactMessagesManager = contactMessagesManager;
-            CitiesManager = citiesManager;
-            _reportServices = reportServices;
-            _userServices = userServices;
-            _clientsManager = clientServices;
+            propertyManager = propertyServices;
+            reservationsManager = reservationServices;
+            reviewsManager = reviewServices;
+            this.postsManager = postsManager;
+            this.commentsManager = commentsManager;
+            this.contactMessagesManager = contactMessagesManager;
+            this.citiesManager = citiesManager;
+            this.userServices = userServices;
 
         }
 
@@ -55,14 +56,14 @@ namespace RealEstate.WebAppMVC.Controllers
         //GET: Properties
         public async Task<ActionResult> Index()
         {
-            ViewBag.SliderProperties = await _propertyManager.GetPropertiesForMainSlider(3);
+            ViewBag.SliderProperties = await propertyManager.GetPropertiesForMainSlider(3);
 
-            ViewBag.Cities = await CitiesManager.GetCitiesForDropDown(40);
-            ViewBag.PropertyTypes = await _propertyManager.GetPropertyTypes();
-            ViewBag.RelatedProperties = await _propertyManager.GetRelatedPropertiesBriefInfo();
-            ViewBag.HappyClient = await ReviewsManager.ListClientReviews();
+            ViewBag.Cities = await citiesManager.GetCitiesForDropDown(40);
+            ViewBag.PropertyTypes = await propertyManager.GetPropertyTypes();
+            ViewBag.RelatedProperties = await propertyManager.GetRelatedPropertiesBriefInfo();
+            ViewBag.HappyClient = await reviewsManager.ListClientReviews();
 
-            var propertiesAggregated = await _propertyManager.GetPropertiesForHomePage();
+            var propertiesAggregated = await propertyManager.GetPropertiesForHomePage();
 
             ViewBag.PropertiesAll = propertiesAggregated.PropertiesForSell;
             ViewBag.Houses = propertiesAggregated.HousesForSell;
@@ -75,46 +76,41 @@ namespace RealEstate.WebAppMVC.Controllers
             ViewBag.ApartmentsRented = propertiesAggregated.ApartmentsForRent;
 
             //Agents List
-            ViewBag.Agents = await _userServices.GetTopTwoAgents();
+            ViewBag.Agents = await userServices.GetTopTwoAgents();
             return View();
         }
 
         public async Task<ActionResult> About()
         {
-            ViewBag.HappyClient = await ReviewsManager.ListClientReviews();
-            ViewBag.TeamMembers = _userServices.GetTeamMembers();
+            ViewBag.HappyClient = await reviewsManager.ListClientReviews();
+            ViewBag.TeamMembers = userServices.GetTeamMembers();
 
             return View();
         }
 
-        //public ActionResult Activity()
-        //{
-        //    return View();
-        //}
-
         public async Task<ActionResult> Contact()
         {
-            ViewBag.Agents = await _userServices.GetTopTwoAgents();
-            ViewBag.PopularPosts = await PostsManager.ListMostPopular();
-            ViewBag.LatestComments = await CommentsManager.ListLatest();
+            ViewBag.Agents = await userServices.GetTopTwoAgents();
+            ViewBag.PopularPosts = await postsManager.ListMostPopular();
+            ViewBag.LatestComments = await commentsManager.ListLatest();
 
             return View();
         }
 
         public async Task<ActionResult> FAQ()
         {
-            ViewBag.PopularPosts = await PostsManager.ListMostPopular();
-            ViewBag.LatestComments = await CommentsManager.ListLatest();
+            ViewBag.PopularPosts = await postsManager.ListMostPopular();
+            ViewBag.LatestComments = await commentsManager.ListLatest();
 
             return View();
         }
 
         public async Task<ActionResult> Team()
         {
-            ViewBag.FeaturedAgents = await _userServices.GetTopTwoAgents();
-            ViewBag.Agents = await _userServices.GetAgents();
-            ViewBag.Maintenance = await _userServices.GetMaintenance();
-            ViewBag.Marketers = await _userServices.GetMarketers();
+            ViewBag.FeaturedAgents = await userServices.GetTopTwoAgents();
+            ViewBag.Agents = await userServices.GetAgents();
+            ViewBag.Maintenance = await userServices.GetMaintenance();
+            ViewBag.Marketers = await userServices.GetMarketers();
 
             return View();
         }
@@ -159,6 +155,7 @@ namespace RealEstate.WebAppMVC.Controllers
 
         #endregion
 
+
         [HttpPost]
         public async Task<ActionResult> SendMessage(ContactMessageViewModel model)
         {
@@ -173,7 +170,7 @@ namespace RealEstate.WebAppMVC.Controllers
 
             try
             {
-                await ContactMessagesManager.AddContactMessage(model);
+                await contactMessagesManager.AddContactMessage(model);
                 _logger.Log(LogLevel.Info, "Contact form saved succesfully !");
 
                 return Json("STATUS_OK");
@@ -187,13 +184,13 @@ namespace RealEstate.WebAppMVC.Controllers
 
         public ActionResult GetReservationsCount(int propertyId, DateTime from, DateTime to)
         {
-            return Json(ReservationsManager.GetReservationsCount(propertyId, from, to));
+            return Json(reservationsManager.GetReservationsCount(propertyId, from, to));
         }
 
 
         public ActionResult ListReviews(int propertyId)
         {
-            return View(ReviewsManager.ListPropertyReviews(propertyId));
+            return View(reviewsManager.ListPropertyReviews(propertyId));
         }
 
         public async Task<ActionResult> SendSms()
@@ -209,97 +206,5 @@ namespace RealEstate.WebAppMVC.Controllers
                 return Json(ex);
             }
         }
-
-
-        public async Task<ActionResult> TestEmailTemplate()
-        {
-            var templateModel = new ReportTemplateViewModel
-            {
-                AgentCreator = "Stef Stef",
-                CreatedOn = DateTime.Now,
-                ActionsConclusion = "Lorem ipsum dolor sit amet",
-                ChangeArguments = "Lorem ipsum dolor sit amet",
-                IsMarketingChangeIssued = true,
-                IsPriceChangeIssued = true,
-                LinkToProperty = "https://www.sproperties.net",
-                TotalViews = 123,
-                TotalCalls = 4,
-                TotalInspections = 2,
-                TotalOffers = 0,
-                CustomRecommendedActions = new List<string>() { "Рекоменд" },
-                Offers = new List<decimal>() { 123M },
-                PartnersSharedWith = new List<string>() { "Иван Иванов", "Петър петров" },
-                PromotionMediae = new List<PromotionMediaForEmail>()
-                {
-                    new PromotionMediaForEmail
-                    {
-                        Id = 1,
-                        IsChecked = true,
-                        MediaType = "Уеб платформи"
-                    },
-                    new PromotionMediaForEmail
-                    {
-                        Id = 2,
-                        IsChecked = false,
-                        MediaType = "Флаери"
-                    },
-                    new PromotionMediaForEmail
-                    {
-                        Id = 3,
-                        IsChecked = false,
-                        MediaType = "Билборд"
-                    },
-                    new PromotionMediaForEmail
-                    {
-                        Id = 4,
-                        IsChecked = true,
-                        MediaType = " Споделяне с контакти "
-                    },
-                    new PromotionMediaForEmail
-                    {
-                        Id = 5,
-                        IsChecked = true,
-                        MediaType = "Транспаранти"
-                    },
-                    new PromotionMediaForEmail
-                    {
-                        Id = 6,
-                        IsChecked = true,
-                        MediaType = " Емейл маркетинг "
-                    },
-                    new PromotionMediaForEmail
-                    {
-                        Id = 7,
-                        IsChecked = false,
-                        MediaType = " Социални мрежи "
-                    },
-                    new PromotionMediaForEmail
-                    {
-                        Id = 8,
-                        IsChecked = true,
-                        MediaType = "Споделяне с Брокери"
-                    }
-                },
-                WebPlatformViews = new List<WebPlatformViewEmailViewModel>
-                {
-                    new WebPlatformViewEmailViewModel
-                    {
-                        PlatformName = "olx.bg",
-                        Views = 122
-                    },
-                    new WebPlatformViewEmailViewModel
-                    {
-                        PlatformName = "bazar.bg",
-                        Views = 322
-                    }
-                },
-                CustomPromotionMediae = new List<string> { "One Media" }
-            };
-
-            templateModel = await _reportServices.CreateTemplateViewModelAsync(2);
-
-            return View(templateModel);
-        }
-
     }
 }
